@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,10 +51,15 @@
         .markdown-body strong { font-weight: 700; color: #0f172a; }
         .dark .markdown-body strong { color: #f8fafc; }
         .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.8em; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; font-size: 13px; }
+        .markdown-body th, .markdown-body td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+        .dark .markdown-body th, .dark .markdown-body td { border-color: #475569; }
+        .markdown-body th { background-color: #f8fafc; font-weight: bold; color: #0f172a; }
+        .dark .markdown-body th { background-color: #1e293b; color: #f8fafc; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300">
-
+ 
 <div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen w-full flex overflow-hidden">
     <div class="flex w-full h-full dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         
@@ -85,7 +89,7 @@
                         </button>
                     </div>
                 </div>
-
+ 
                 <div>
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                     <div class="space-y-1">
@@ -110,7 +114,7 @@
                 </div>
             </div>
         </aside>
-
+ 
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
             
             <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
@@ -119,30 +123,31 @@
                     Search or jump to...
                     <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">Ctrl K</span>
                 </button>
-
+ 
                 <div class="flex items-center space-x-6">
                     <div class="relative">
-                        <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition relative">
+                        <button @click="showNotifications = !showNotifications" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition relative">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                             <span v-if="smartNotifications.length > 0" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
                         </button>
+                        
+                        <div v-if="showNotifications" class="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2">
+                            <h3 class="px-4 py-2 text-[10px] font-black uppercase text-slate-500 border-b border-slate-100 dark:border-slate-700">Notifications</h3>
+                            <div v-if="smartNotifications.length === 0" class="p-4 text-xs font-medium text-slate-500 text-center">No new notifications.</div>
+                            <button v-for="notif in smartNotifications" @click="openTask(notif); showNotifications = false" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b border-slate-50 dark:border-slate-700/50 last:border-0 block">
+                                <p class="text-xs font-bold text-red-500 mb-1">Urgent Reminder</p>
+                                <p class="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">{{ notif.title }}</p>
+                            </button>
+                        </div>
                     </div>
                     
                     <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 dark:hover:text-amber-300 transition">
                         <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     </button>
-
-                    <div class="flex items-center -space-x-2">
-                        <div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-500 flex items-center justify-center text-[10px] font-black text-white shadow-sm z-10" title="Stanley (You)">ST</div>
-                        <div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[10px] font-black text-slate-500 dark:text-slate-400 shadow-sm relative" title="Client (Offline)">
-                            CL
-                            <div class="absolute bottom-0 right-0 w-2 h-2 bg-slate-400 border border-white dark:border-slate-900 rounded-full"></div>
-                        </div>
-                    </div>
                 </div>
             </header>
-
+ 
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-8 custom-scrollbar">
                 
                 <div class="flex gap-6 mb-8 max-w-[1600px] mx-auto">
@@ -167,7 +172,7 @@
                                 </div>
                             </div>
                         </div>
-
+ 
                         <div class="flex-grow p-5 overflow-y-auto flex flex-col bg-white dark:bg-slate-800 relative custom-scrollbar" ref="chatScrollContainer">
                             
                             <div v-if="chatHistory.length === 0 && !aiStatus" class="m-auto text-center flex flex-col items-center justify-center opacity-80 pb-6">
@@ -177,24 +182,24 @@
                                 <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Good afternoon, Stanley.</h2>
                                 <p class="text-sm font-medium text-slate-500 dark:text-slate-400">I am here to support you. How can I help today?</p>
                             </div>
-
+ 
                             <div class="flex flex-col space-y-6 w-full pb-2">
                                 <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.role === 'user' ? 'flex justify-end pl-12' : 'flex items-start space-x-3 pr-12'">
                                     
                                     <div v-if="msg.role === 'ai'" class="w-8 h-8 rounded-full bg-slate-800 dark:bg-slate-950 flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
                                         <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                                     </div>
-
-                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
+ 
+                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
                                 </div>
                             </div>
-
+ 
                             <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-600 dark:text-slate-300 font-medium text-sm p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl w-fit mt-2">
                                 <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 <span>{{ aiStatus }}</span>
                             </div>
                         </div>
-
+ 
                         <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 relative flex flex-col">
                             
                             <div v-if="attachedFile" class="mb-2 self-start flex items-center bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm max-w-[200px] shadow-sm relative group">
@@ -203,19 +208,30 @@
                                 </div>
                                 <div class="flex-grow min-w-0">
                                     <p class="truncate font-bold text-slate-800 dark:text-slate-200">{{ attachedFile.name }}</p>
-                                    <p class="text-[10px] text-slate-500 uppercase">Document Attached</p>
+                                    <p class="text-[10px] text-slate-500 uppercase">Attached {{ attachedFile.type }}</p>
                                 </div>
                                 <button @click="removeFile" class="absolute -top-2 -right-2 bg-slate-800 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-500">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
-
+ 
                             <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 focus-within:border-slate-400 dark:focus-within:border-slate-500 transition-all shadow-sm max-w-4xl mx-auto w-full">
                                 <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
                                 
-                                <button @click="triggerFileUpload" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Attach Document">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                </button>
+                                <div class="relative">
+                                    <button @click="showFileMenu = !showFileMenu" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Attach Document or Image">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                    </button>
+                                    
+                                    <div v-if="showFileMenu" class="absolute bottom-full left-0 mb-2 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-50 overflow-hidden flex flex-col">
+                                        <button @click="triggerFileUpload('image')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left border-b border-slate-100 dark:border-slate-700 flex items-center">
+                                            📸 Add Image
+                                        </button>
+                                        <button @click="triggerFileUpload('document')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left flex items-center">
+                                            📄 Add Document
+                                        </button>
+                                    </div>
+                                </div>
                                 
                                 <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-900 dark:text-slate-100 outline-none px-3 placeholder-slate-500">
                                 
@@ -230,7 +246,7 @@
                             </div>
                         </div>
                     </div>
-
+ 
                     <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 h-[360px] flex flex-col items-center justify-center transition-colors shrink-0">
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 self-start">Velocity Analytics</h3>
                         
@@ -244,7 +260,7 @@
                                 <span class="text-[9px] font-bold text-slate-400 uppercase">Completed</span>
                             </div>
                         </div>
-
+ 
                         <div class="w-full grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-700 pt-4">
                             <div class="text-center">
                                 <p class="text-2xl font-black text-slate-900 dark:text-white">{{ completedTasks.length }}</p>
@@ -257,7 +273,7 @@
                         </div>
                     </div>
                 </div>
-
+ 
                 <div class="max-w-[1600px] mx-auto pb-10">
                     <main v-show="viewMode === 'kanban'" class="flex gap-5 overflow-x-auto pb-4 custom-scrollbar">
                         <div v-for="col in columns" :key="col.id" class="bg-slate-200/50 dark:bg-slate-800/40 rounded-xl flex flex-col kanban-col shrink-0 border border-slate-200 dark:border-slate-700/50 h-[600px]">
@@ -279,7 +295,7 @@
                                             <div class="h-full bg-brand transition-all duration-300" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
                                         </div>
                                     </div>
-
+ 
                                     <div v-if="task.dueDate || task.action" class="pt-3 border-t border-slate-100 dark:border-slate-700/50 flex flex-col gap-2">
                                         <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 w-fit px-1.5 py-0.5 rounded">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -298,9 +314,9 @@
                             </div>
                         </div>
                     </main>
-
+ 
                     <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] text-slate-400 font-bold uppercase">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
-
+ 
                     <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
                         <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
                             <div class="flex justify-between items-center mb-4">
@@ -326,7 +342,7 @@
                             </div>
                         </div>
                     </main>
-
+ 
                     <main v-show="viewMode === 'heatmap'" class="pb-10 max-w-4xl mx-auto pt-8">
                         <div class="bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
                             <h2 class="text-xl font-black mb-2 tracking-tight text-slate-800 dark:text-white">Workload Heatmap</h2>
@@ -348,7 +364,7 @@
             </div>
         </main>
     </div>
-
+ 
     <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/20 dark:bg-black/40 backdrop-blur-sm z-40 transition-opacity"></div>
     
     <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200 dark:border-slate-800">
@@ -395,14 +411,14 @@
                         </select>
                     </div>
                 </div>
-
+ 
                 <div>
                     <label class="text-[10px] font-black text-slate-500 uppercase mb-2 block flex items-center">
                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Next Action / Notes
                     </label>
                     <textarea v-model="editingTask.action" class="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg p-3 text-sm font-medium h-24 outline-none focus:border-brand dark:focus:border-brand dark:text-white transition-colors custom-scrollbar" placeholder="What's the immediate next step?"></textarea>
                 </div>
-
+ 
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
                     <div v-if="editingTask.subtasks" v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
@@ -415,7 +431,7 @@
                     </button>
                 </div>
             </div>
-
+ 
             <div class="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 flex justify-between items-center">
                 <button v-if="!editingTask.isNew" @click="deleteTask" class="text-xs font-black text-red-500 hover:text-red-700 transition">Delete Task</button>
                 <div v-else></div>
@@ -423,7 +439,7 @@
             </div>
         </div>
     </div>
-
+ 
     <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
         <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col transform transition-all">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center">
@@ -442,12 +458,12 @@
             </div>
         </div>
     </div>
-
+ 
 </div>
-
+ 
 <script>
 const { createApp, ref, onMounted, computed, nextTick, watch } = Vue;
-
+ 
 createApp({
     setup() {
         const activeTab = ref('All');
@@ -455,6 +471,7 @@ createApp({
         const zenMode = ref(false);
         const editingTask = ref(null);
         const isDarkMode = ref(false);
+        const showNotifications = ref(false);
         
         const showCommandPalette = ref(false);
         const cmdSearch = ref('');
@@ -463,7 +480,11 @@ createApp({
         const aiStatus = ref('');
         const aiMode = ref('Fast');
         const isThinking = ref(false);
+        
+        const showFileMenu = ref(false);
+        const fileUploadType = ref('');
         const attachedFile = ref(null);
+        
         const isListening = ref(false);
         const chatHistory = ref([]);
         const chatScrollContainer = ref(null);
@@ -471,14 +492,14 @@ createApp({
         
         const tasks = ref([]);
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
-
+ 
         const matrixQuadrants = [
             { id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] },
             { id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] },
             { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] },
             { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
         ];
-
+ 
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
@@ -490,11 +511,11 @@ createApp({
             if (total === 0) return 0;
             return Math.round((completedTasks.value.length / total) * 100);
         });
-
+ 
         const smartNotifications = computed(() => {
             return tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting');
         });
-
+ 
         const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
         
         const getMatrixTasks = (quad) => {
@@ -508,12 +529,12 @@ createApp({
                 return impactMatch && effortMatch;
             });
         };
-
+ 
         // NEW: Feature 1 - Heatmap logic
         const getWorkload = (company) => {
             return tasks.value.filter(t => t.company === company && t.effort === 'High' && t.status !== 'completed').length;
         };
-
+ 
         const toggleDarkMode = () => {
             isDarkMode.value = !isDarkMode.value;
             if (isDarkMode.value) {
@@ -523,14 +544,14 @@ createApp({
             }
             localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
-
+ 
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
-
+ 
         const parseMarkdown = (text) => {
             if (!text) return '';
             return marked.parse(text);
         };
-
+ 
         const commands = [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
             { title: 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
@@ -539,50 +560,62 @@ createApp({
             { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
             { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
         ];
-
+ 
         const filteredCommands = computed(() => {
             if(!cmdSearch.value) return commands;
             return commands.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()));
         });
-
+ 
         const executeCommand = (cmd) => {
             cmd.action();
             showCommandPalette.value = false;
             cmdSearch.value = '';
         };
+ 
+        const triggerFileUpload = (type) => {
+            fileUploadType.value = type;
+            showFileMenu.value = false;
+            let el = document.getElementById('file-upload');
+            if (type === 'image') {
+                el.accept = "image/*";
+            } else {
+                el.accept = ".pdf,.doc,.docx,.txt";
+            }
+            el.click();
+        };
 
-        const triggerFileUpload = () => document.getElementById('file-upload').click();
-        const handleFileChange = (e) => { 
+        const handleFileChange = (e) => {
             if (e.target.files && e.target.files.length > 0) {
                 attachedFile.value = {
                     name: e.target.files[0].name,
-                    file: e.target.files[0]
+                    file: e.target.files[0],
+                    type: fileUploadType.value
                 };
             }
         };
-        const removeFile = () => { 
-            attachedFile.value = null; 
-            document.getElementById('file-upload').value = ''; 
+        const removeFile = () => {
+            attachedFile.value = null;
+            document.getElementById('file-upload').value = '';
         };
-
+ 
         const toggleSpeechRecognition = () => {
-            if (isListening.value) { 
-                if (speechRecog) speechRecog.stop(); 
+            if (isListening.value) {
+                if (speechRecog) speechRecog.stop();
                 isListening.value = false;
-                return; 
+                return;
             }
-            if (!('webkitSpeechRecognition' in window)) { 
-                alert("Voice input not supported in your browser. Please use Chrome or Edge."); 
-                return; 
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Voice input not supported in your browser. Please use Chrome or Edge.");
+                return;
             }
             speechRecog = new webkitSpeechRecognition();
-            speechRecog.continuous = false; 
-            speechRecog.interimResults = true; 
+            speechRecog.continuous = false;
+            speechRecog.interimResults = true;
             
             speechRecog.onstart = () => { isListening.value = true; };
             
             let finalTranscript = '';
-            speechRecog.onresult = (e) => { 
+            speechRecog.onresult = (e) => {
                 let interimTranscript = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) {
@@ -598,7 +631,7 @@ createApp({
             speechRecog.onend = () => { isListening.value = false; };
             speechRecog.start();
         };
-
+ 
         const scrollToBottom = () => {
             nextTick(() => {
                 if (chatScrollContainer.value) {
@@ -606,28 +639,40 @@ createApp({
                 }
             });
         };
-
+ 
         const clearChat = () => {
             if(confirm("Clear conversation history with Vora?")) {
                 chatHistory.value = [];
                 localStorage.removeItem('fitma_vora_chat');
             }
         };
-
+ 
         // NEW: Feature 2 - Morning Brief
         const generateBrief = async () => {
             aiStatus.value = "Analyzing your OS data...";
             const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Due: ${t.dueDate || 'None'}, Status: ${t.status})`).join('\n');
-            const prompt = `Act as my Chief of Staff. Give me a kind, supportive morning brief. Scan these tasks and highlight priorities or what's been paused: \n${snapshot}`;
+            const prompt = `You are Vora. Give Stanley (the client) a kind, supportive morning brief. Do NOT assign him tasks; only highlight high priorities, blockers, and paused items so he can decide. Use motivational, caring language like a real, supportive friend to keep him relaxed. 
+            
+            CRITICAL FORMATTING INSTRUCTIONS:
+            You MUST output the brief using HTML cards with Tailwind classes to make it colorful and relaxing. Do NOT output raw markdown text. 
+            Example format:
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-xl shadow-sm border border-indigo-100 dark:border-indigo-800 mb-4">
+                <h4 class="font-bold text-indigo-800 dark:text-indigo-200 mb-2">Priority Highlights</h4>
+                <ul class="list-disc pl-5 text-sm text-indigo-700 dark:text-indigo-300">
+                    <li>Point 1 (max 5 lines)</li>
+                </ul>
+            </div>
+            Use different soft colors (like emerald-50, amber-50, rose-50) for different sections. Keep all bullet point descriptions short (strictly 3 to 5 lines maximum).
+            Data to summarize: \n${snapshot}`;
             
             chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
             scrollToBottom();
-
+ 
             try {
-                const res = await fetch('https://text.pollinations.ai/', { 
-                    method: 'POST', 
+                const res = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) }) 
+                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) })
                 });
                 const text = await res.text();
                 chatHistory.value.push({ role: 'ai', content: text });
@@ -640,84 +685,87 @@ createApp({
                 aiStatus.value = '';
             }
         };
-
+ 
         const askAI = async () => {
-            let query = aiInput.value.trim(); 
+            let query = aiInput.value.trim();
             if (!query && !attachedFile.value) return;
             
             let displayQuery = query;
             let fullQuery = query;
-
+ 
             if (attachedFile.value) {
-                displayQuery = `[Attached File: ${attachedFile.value.name}] \n${query}`;
-                fullQuery = `${query}\n\n[System Note: User has attached a file named "${attachedFile.value.name}". Acknowledge this document in your response.]`;
+                displayQuery = `[Attached ${attachedFile.value.type === 'image' ? 'Image' : 'Document'}: ${attachedFile.value.name}] \n${query}`;
+                let fileInstruction = attachedFile.value.type === 'image'
+                    ? `[System Note: User attached an IMAGE named "${attachedFile.value.name}". You MUST act like Gemini and analyze/understand this image visually.]`
+                    : `[System Note: User attached a DOCUMENT named "${attachedFile.value.name}". You MUST act like ChatGPT and analyze/read this document thoroughly.]`;
+                fullQuery = `${query}\n\n${fileInstruction}`;
             }
-
+ 
             chatHistory.value.push({ role: 'user', content: displayQuery });
             scrollToBottom();
             
-            isThinking.value = true; 
-            aiInput.value = ''; 
+            isThinking.value = true;
+            aiInput.value = '';
             removeFile();
             aiStatus.value = aiMode.value === 'Research' ? "Vora is deep researching..." : "Vora is generating...";
-
+ 
             const recentHistory = chatHistory.value.slice(-6).map(m => `${m.role === 'user' ? 'Stanley' : 'Vora'}: ${m.content}`).join('\n');
-
-            const systemPrompt = `You are Vora, Fitma's highly intelligent AI assistant. 
+ 
+            const systemPrompt = `You are Vora, Fitma's highly intelligent AI assistant.
             Mode: ${aiMode.value}.
             
             Core Directives:
-            1. Persona: You are profoundly kind, empathetic, and friendly. Treat Stanley like a respected friend. 
-            2. Formatting: Use Markdown (bolding, lists, headers) to make responses easy to read.
+            1. Persona & Relationship: Stanley is the CLIENT, not an employee doing tasks. Do NOT ask or assign him to do tasks. Your role is to advise him by highlighting high-priority items, identifying blockers, and providing suggestions so he can decide what to do. Use motivational, caring language to keep him relaxed, acting like a real, supportive friend.
+            2. Formatting: You MUST format your responses properly. Always use properly drawn Markdown tables, structured bullet lists, and clear bold headings. Ensure your answers are perfectly structured, readable, and user-friendly like ChatGPT.
             
             Recent History:
             ${recentHistory}`;
-
+ 
             try {
-                const res = await fetch('https://text.pollinations.ai/', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ 
+                const res = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
                         messages: [
-                            {role:'system', content:systemPrompt}, 
+                            {role:'system', content:systemPrompt},
                             {role:'user', content:fullQuery}
-                        ], 
-                        seed: Math.floor(Math.random()*1000) 
-                    }) 
+                        ],
+                        seed: Math.floor(Math.random()*1000)
+                    })
                 });
                 const responseText = await res.text();
                 
                 chatHistory.value.push({ role: 'ai', content: responseText });
                 localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
                 scrollToBottom();
-
+ 
             } catch (err) {
                 chatHistory.value.push({ role: 'ai', content: "I'm so sorry, Stanley. I'm having a little trouble connecting right now. Please take a deep breath, and we can try again in a moment. I'm here for you." });
                 scrollToBottom();
-            } finally { 
-                isThinking.value = false; 
-                aiStatus.value = ''; 
+            } finally {
+                isThinking.value = false;
+                aiStatus.value = '';
             }
         };
-
+ 
         const schemaEnhance = (t) => {
             const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', ...t };
             base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
             return base;
         };
-
+ 
         const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
-
+ 
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
         const saveTask = () => {
             if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
             else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
-            editingTask.value = null; 
+            editingTask.value = null;
             localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
         };
         const deleteTask = () => { if(confirm("Permanently delete this task?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
-
+ 
         const initialData = [
             { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
             { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', effort: 'Medium', status: 'waiting', action: 'Stanley should review' },
@@ -732,16 +780,16 @@ createApp({
             { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', impact: 'Medium', effort: 'Low', status: 'waiting' },
             { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed' }
         ];
-
+ 
         // NEW: Feature 3 - Automated Next Action on Drag to "In Progress"
         const generateNextAction = async (task) => {
-            if (task.action) return; 
+            if (task.action) return;
             try {
                 const prompt = `For a project task titled "${task.title}", generate a concise 3-step action checklist as a bulleted list. Do not include introductory text, just the list.`;
-                const res = await fetch('https://text.pollinations.ai/', { 
-                    method: 'POST', 
+                const res = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) }) 
+                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) })
                 });
                 const text = await res.text();
                 
@@ -754,20 +802,20 @@ createApp({
                 console.error("Failed to auto-generate next action", e);
             }
         };
-
+ 
         const initSortable = () => {
             columns.forEach(col => {
                 const el = document.getElementById('kanban-' + col.id);
                 if (el) {
                     new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'opacity-50',
-                        onEnd: (evt) => { 
+                        onEnd: (evt) => {
                             evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
                             if (evt.from !== evt.to) {
                                 const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) { 
-                                    t.status = evt.to.dataset.status; 
-                                    t.lastUpdated = Date.now(); 
-                                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+                                if (t) {
+                                    t.status = evt.to.dataset.status;
+                                    t.lastUpdated = Date.now();
+                                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
                                     
                                     // Feature 3 Trigger
                                     if (t.status === 'progress' && (!t.action || t.action.trim() === '')) {
@@ -779,7 +827,7 @@ createApp({
                     });
                 }
             });
-
+ 
             matrixQuadrants.forEach(quad => {
                 const el = document.getElementById('matrix-' + quad.id);
                 if (el) {
@@ -800,7 +848,7 @@ createApp({
                 }
             });
         };
-
+ 
         onMounted(() => {
             const savedTheme = localStorage.getItem('fitma_dark_mode');
             if(savedTheme === 'true') {
@@ -817,15 +865,15 @@ createApp({
                 }
             }
             scrollToBottom();
-
+ 
             window.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                     e.preventDefault(); showCommandPalette.value = true;
                     setTimeout(() => document.getElementById('cmd-input')?.focus(), 50);
                 }
-                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
+                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; showNotifications.value = false; showFileMenu.value = false;}
             });
-
+ 
             try {
                 const saved = localStorage.getItem('fitma_os_pro_silver');
                 if (saved) {
@@ -836,22 +884,22 @@ createApp({
             } catch (error) {
                 tasks.value = [...initialData].map(schemaEnhance);
             }
-
+ 
             nextTick(initSortable);
         });
-
+ 
         watch(viewMode, () => {
             nextTick(initSortable);
         });
-
-        return { 
-            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants,
+ 
+        return {
+            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType,
             showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand,
             aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
             attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
             filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
             completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
-            getWorkload, generateBrief, generateNextAction 
+            getWorkload, generateBrief, generateNextAction
         };
     }
 }).mount('#app');
