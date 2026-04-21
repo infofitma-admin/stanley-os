@@ -7,8 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         [v-cloak] { display: none; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
@@ -16,7 +15,7 @@
         .board-header { background: #1e293b; color: white; padding: 12px 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .kanban-wrapper { display: flex; gap: 20px; padding: 24px 0; overflow-x: auto; align-items: flex-start; }
         .kanban-col { background: #e2e8f0; border-radius: 12px; min-width: 310px; width: 310px; display: flex; flex-direction: column; max-height: 85vh; border: 1px solid #cbd5e1; }
-        .kanban-header { padding: 16px; font-weight: 800; font-size: 13px; color: #475569; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; }
+        .kanban-header { padding: 16px; font-weight: 800; font-size: 13px; color: #475569; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; }
         .card-list { padding: 0 12px 12px 12px; flex-grow: 1; overflow-y: auto; min-height: 100px; }
         .task-card { background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #cbd5e1; cursor: pointer; }
         .tag { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
@@ -24,8 +23,6 @@
         .tag-high { background: #fef3c7; color: #b45309; }
         .tag-normal { background: #e0e7ff; color: #4338ca; }
         .tag-low { background: #f1f5f9; color: #475569; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -33,7 +30,7 @@
 <div id="app" v-cloak class="min-h-screen flex flex-col">
     <header class="board-header flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-black tracking-tight">Fitma <span class="font-light opacity-50">|</span> Stanley OS</h1>
+            <h1 class="text-xl font-black tracking-tight">Fitma | Stanley OS</h1>
             <div class="flex space-x-1 bg-slate-700/50 p-1 rounded-md">
                 <button v-for="tab in ['All', 'Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab" :class="activeTab === tab ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:text-white'" class="px-3 py-1 rounded text-xs font-bold transition-all">{{ tab }}</button>
             </div>
@@ -55,13 +52,13 @@
                         <span class="bg-slate-300 text-slate-700 px-2 py-0.5 rounded text-[10px] font-black">{{ getTaskCount(col.id) }}</span>
                     </div>
                     <div :id="col.id" class="card-list">
-                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" class="task-card hover:border-slate-400 transition-colors">
+                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" class="task-card hover:border-slate-400">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{{ task.company }}</span>
                                 <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                             </div>
                             <h4 class="text-sm font-bold text-slate-800 leading-snug mb-2">{{ task.title }}</h4>
-                            <div v-if="task.dueDate" class="text-[9px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 py-0.5 rounded border border-blue-100 mb-2">📅 {{ task.dueDate }}</div>
+                            <div v-if="task.dueDate" class="text-[9px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 py-0.5 rounded mb-2">📅 {{ task.dueDate }}</div>
                             <p v-if="task.action" class="text-[10px] text-slate-500 border-t pt-2 mt-1 font-medium italic">Next: {{ task.action }}</p>
                         </div>
                     </div>
@@ -92,8 +89,7 @@ createApp({
         const wipCount = computed(() => getTaskCount('progress'));
 
         onMounted(async () => {
-            // FORCING A MASTER RESET FOR GITHUB PAGES
-            const RESET_KEY = "STANLEY_OS_FINAL_v7_STRICT";
+            const SYNC_ID = "STANLEY_OS_FINAL_v8"; 
             
             const rawData = [
                 /* DYMEK */
@@ -101,15 +97,15 @@ createApp({
                 { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', status: 'waiting', action: 'Stanley review' },
                 { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', status: 'waiting', action: 'Need Revision' },
                 { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', status: 'progress' },
-                { id: 5, company: 'Dymek', title: 'Brochure: Western Digital Penang', priority: 'Low', status: 'waiting', action: 'Stanley review' },
+                { id: 5, company: 'Dymek', title: 'Brochure: N&K Western Digital', priority: 'Low', status: 'waiting', action: 'Stanley review' },
                 { id: 6, company: 'Dymek', title: 'Landing Page: OATi Contact Lens', priority: 'Low', status: 'brainstorm', action: 'Stanley write content' },
-                { id: 7, company: 'Dymek', title: 'Research CRM software (Odoo)', priority: 'Normal', status: 'waiting', action: 'Respond to Peter email' },
+                { id: 7, company: 'Dymek', title: 'Research CRM software (Odoo)', priority: 'Normal', status: 'waiting', action: 'Respond to Peter' },
                 { id: 8, company: 'Dymek', title: 'Fitma video topics list', priority: 'Normal', status: 'notstarted' },
                 { id: 9, company: 'Dymek', title: 'Sales tracker (Excel)', priority: 'Low', status: 'notstarted' },
                 { id: 10, company: 'Dymek', title: 'PowerPoint template', priority: 'Low', status: 'brainstorm' },
                 { id: 11, company: 'Dymek', title: 'GBP Accounts regions', priority: 'Normal', status: 'waiting' },
                 { id: 12, company: 'Dymek', title: 'Brochure: OATi AR/VR Glasses', priority: 'Low', status: 'waiting', action: 'Stanley review' },
-                { id: 13, company: 'Dymek', title: 'Setup tracking Malaysia tenders', priority: 'Normal', status: 'notstarted' },
+                { id: 13, company: 'Dymek', title: 'Tracking Malaysia tenders', priority: 'Normal', status: 'notstarted' },
                 { id: 14, company: 'Dymek', title: 'Landing Page: Lynxx?', priority: 'Low', status: 'brainstorm' },
                 { id: 15, company: 'Dymek', title: 'Landing Page: yieldWerx?', priority: 'Low', status: 'brainstorm' },
                 { id: 16, company: 'Dymek', title: 'Brochure: microPREP?', priority: 'Low', status: 'brainstorm' },
@@ -117,25 +113,25 @@ createApp({
                 { id: 18, company: 'Dymek', title: 'Host QuickPRO-Cube TM', priority: 'Low', status: 'notstarted' },
                 { id: 19, company: 'Dymek', title: 'Host n&k brochure', priority: 'Normal', status: 'notstarted' },
                 { id: 20, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', status: 'brainstorm' },
-                { id: 21, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', status: 'brainstorm' },
+                { id: 21, company: 'Dymek', title: 'Doublet cementing Schott', priority: 'Low', status: 'brainstorm' },
                 { id: 22, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', status: 'brainstorm' },
                 { id: 23, company: 'Dymek', title: 'Coordinate Sales team spreadsheet', priority: 'Low', status: 'brainstorm' },
 
                 /* GIGASCAN */
                 { id: 24, company: 'GigaScan', title: 'New Solutions (3 categories)', priority: 'Urgent', status: 'waiting', action: 'Team provide images' },
-                { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live', priority: 'Urgent', status: 'waiting', action: 'Schedule with Patrik' },
+                { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live', priority: 'Urgent', status: 'waiting', action: 'Schedule Patrik' },
                 { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', status: 'waiting', action: 'Stanley review' },
                 { id: 27, company: 'GigaScan', title: 'Company profile layout', priority: 'Normal', status: 'progress', action: 'Stanley send material' },
                 { id: 28, company: 'GigaScan', title: 'TrueProp Instagram image', priority: 'Normal', status: 'waiting' },
                 { id: 29, company: 'GigaScan', title: 'Video editor candidates', priority: 'Normal', status: 'progress' },
-                { id: 30, company: 'GigaScan', title: 'Add Axial flow pump page', priority: 'Normal', status: 'notstarted' },
+                { id: 30, company: 'GigaScan', title: 'Add Axial flow pump app', priority: 'Normal', status: 'notstarted' },
                 { id: 31, company: 'GigaScan', title: 'Review LinkedIn notes', priority: 'Low', status: 'waiting' },
                 { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', status: 'waiting' },
                 { id: 33, company: 'GigaScan', title: 'Fix dynamic padding issue', priority: 'Low', status: 'notstarted' },
 
                 /* LADING */
-                { id: 34, company: 'Lading Technology', title: 'Driver pay structure', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 35, company: 'Lading Technology', title: 'Maintenance/escrow info', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 37, company: 'Lading Technology', title: 'Mobile App statement', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 38, company: 'Lading Technology', title: 'Preferred lanes for drivers', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
@@ -144,13 +140,13 @@ createApp({
                 { id: 41, company: 'Lading Technology', title: 'Operating Companies edit', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
                 { id: 42, company: 'Lading Technology', title: 'DOT report speed highlight', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
                 { id: 43, company: 'Lading Technology', title: 'Reminders and DOT section', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 44, company: 'Lading Technology', title: 'Filter feature list', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 44, company: 'Lading Technology', title: 'Strategy: Filter feature list', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 45, company: 'Lading Technology', title: 'Quantum vs Core build', priority: 'Normal', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking', priority: 'Normal', status: 'progress' },
+                { id: 46, company: 'Lading Technology', title: 'Figma tracking design', priority: 'Normal', status: 'progress' },
                 { id: 47, company: 'Lading Technology', title: 'Hire LATAM Freelancer', priority: 'Normal', status: 'waiting' },
                 { id: 48, company: 'Lading Technology', title: 'Operating Co Doc for Brokers', priority: 'Normal', status: 'notstarted' },
-                { id: 49, company: 'Lading Technology', title: 'Test AI tutorial (Guidde)', priority: 'Normal', status: 'notstarted' },
-                { id: 50, company: 'Lading Technology', title: 'Strategy outside transport', priority: 'Normal', status: 'brainstorm' },
+                { id: 49, company: 'Lading Technology', title: 'Test AI (Guidde)', priority: 'Normal', status: 'notstarted' },
+                { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', status: 'brainstorm' },
                 { id: 51, company: 'Lading Technology', title: 'Replace anime images', priority: 'Normal', status: 'progress', dueDate: '2026-10-09' },
                 { id: 52, company: 'Lading Technology', title: 'Logistics operating co page', priority: 'Normal', status: 'notstarted' },
                 { id: 53, company: 'Lading Technology', title: 'Recruit YouTuber', priority: 'Normal', status: 'notstarted' },
@@ -158,7 +154,7 @@ createApp({
                 { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', status: 'waiting' },
                 { id: 56, company: 'Lading Technology', title: 'Credential Vault UI', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
                 { id: 57, company: 'Lading Technology', title: 'Video topics list', priority: 'Normal', status: 'notstarted' },
-                { id: 58, company: 'Lading Technology', title: 'Fix zoom padding', priority: 'Low', status: 'notstarted' },
+                { id: 58, company: 'Lading Technology', title: 'Fix zoom padding issue', priority: 'Low', status: 'notstarted' },
                 { id: 59, company: 'Lading Technology', title: 'Check all buttons and links', priority: 'Low', status: 'notstarted' },
                 { id: 60, company: 'Lading Technology', title: 'Googlesheet for editor', priority: 'Low', status: 'notstarted' },
                 { id: 61, company: 'Lading Technology', title: 'Coordinate with Kriti', priority: 'Low', status: 'notstarted' },
@@ -178,18 +174,18 @@ createApp({
                 { id: 73, company: 'GigaScan', title: 'Japanese translation', status: 'completed' },
                 { id: 74, company: 'Lading Technology', title: 'Figma login/signup', status: 'completed', dueDate: '2026-03-31' },
                 { id: 75, company: 'Lading Technology', title: 'Broker/Shipper sections', status: 'completed', dueDate: '2026-03-31' },
-                { id: 76, company: 'Lading Technology', title: 'Add anime images', status: 'completed', dueDate: '2026-01-31' },
+                { id: 76, company: 'Lading Technology', title: 'Add relevant anime images', status: 'completed', dueDate: '2026-01-31' },
                 { id: 77, company: 'Lading Technology', title: 'Modify screenshots (Kriti)', status: 'completed' },
                 { id: 78, company: 'Lading Technology', title: 'YouTube viral tracking', status: 'completed', dueDate: '2026-03-31' },
                 { id: 79, company: 'Lading Technology', title: 'Recruitment evaluation', status: 'completed', dueDate: '2026-03-31' },
-                { id: 80, company: 'Lading Technology', title: 'Mobile UX optimization', status: 'completed' },
-                { id: 81, company: 'Lading Technology', title: 'Contact calendar', status: 'completed' }
+                { id: 80, company: 'Lading Technology', title: 'Mobile landscape optimization', status: 'completed' },
+                { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
             ];
 
-            if (localStorage.getItem('fitma_sync_v7') !== RESET_KEY) {
-                tasks.value = rawData.map(t => ({ action:'', dueDate:'', ...t }));
+            if (localStorage.getItem('fitma_sync_v8') !== SYNC_ID) {
+                tasks.value = rawData.map(t => ({ action: t.action || '', dueDate: t.dueDate || '', ...t }));
                 localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                localStorage.setItem('fitma_sync_v7', RESET_KEY);
+                localStorage.setItem('fitma_sync_v8', SYNC_ID);
             } else {
                 tasks.value = JSON.parse(localStorage.getItem('fitma_os_pro_silver'));
             }
@@ -203,7 +199,10 @@ createApp({
                             evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
                             if (evt.from !== evt.to) {
                                 const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) { t.status = evt.to.id; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
+                                if (t) { 
+                                    t.status = evt.to.id; 
+                                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+                                }
                             }
                         }
                     });
