@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        [v-cloak] { display: none; }
         body { font-family: 'Inter', sans-serif; background: #e2e8f0; color: #0f172a; overflow-y: auto; overflow-x: hidden; }
         .max-dashboard-width { max-width: 1650px; margin: 0 auto; width: 100%; }
         .board-header { background: linear-gradient(to right, #94a3b8, #cbd5e1); border-bottom: 2px solid #475569; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
@@ -34,7 +35,6 @@
         .markdown-body ul { list-style: disc; margin-left: 20px; margin-bottom: 12px; }
         .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 8px; }
         .progress-fill { height: 100%; background: #10b981; transition: width 0.3s ease; }
-        [v-cloak] { display: none; }
     </style>
 </head>
 <body>
@@ -64,7 +64,7 @@
             <div class="bg-white rounded-xl p-4 shadow-sm flex-grow border border-slate-300">
                 <div class="flex justify-between items-center mb-1">
                     <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 8v4l3 3"/></svg>
+                        <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
                         <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Vora <span class="font-normal lowercase opacity-60">(grounded calm intelligence)</span></p>
                     </div>
                     <div class="flex space-x-2">
@@ -145,7 +145,7 @@
 </div>
 
 <script>
-const { createApp, ref, onMounted, computed } = Vue;
+const { createApp, ref, onMounted, computed, nextTick } = Vue;
 
 createApp({
     setup() {
@@ -182,25 +182,21 @@ createApp({
             
             const systemPrompt = `You are Vora, the grounded and calm AI intelligence for Fitma. 
             Mode: ${aiMode.value}.
-            Specialty: Respond with kindness, care, and soothing words. Be human-like, supportive, and direct.
-            If mode is Research, provide deeper structural analysis. If Fast, stay punchy but warm.
-            Always comfort Stanley like a close, intelligent friend.`;
+            Persona: Respond with profound kindness, care, and soothing words. Be human-like and empathetic.
+            Objective: Act as a wise executive companion. Use soft, encouraging language while remaining highly intelligent and direct.
+            If mode is Research, provide deeper structural analysis. If Fast, stay warm but quick.`;
 
             try {
                 const res = await fetch('https://text.pollinations.ai/', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ 
-                        messages: [
-                            {role:'system', content:systemPrompt}, 
-                            {role:'user', content:query}
-                        ],
-                        seed: Math.floor(Math.random() * 1000)
+                        messages: [{role:'system', content:systemPrompt}, {role:'user', content:query}] 
                     }) 
                 });
                 aiResponse.value = await res.text();
             } catch (err) {
-                aiResponse.value = "I'm so sorry, Stanley. I'm having a little trouble connecting right now. Please try again in a moment, I'm here for you.";
+                aiResponse.value = "I'm so sorry, Stanley. I'm having a little trouble connecting right now. Take a deep breath, and we can try again in a moment. I'm here.";
             } finally { isThinking.value = false; aiStatus.value = ''; aiInput.value = ''; }
         };
 
@@ -216,7 +212,7 @@ createApp({
         onMounted(() => {
             const saved = localStorage.getItem('fitma_os_pro_silver');
             tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [
-                /* Your original task data persists here */
+                /* DYMEK (23 Tasks) */
                 { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
                 { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
                 { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Dow feedback expected 4/22' },
@@ -240,6 +236,7 @@ createApp({
                 { id: 21, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Direct to webpage or landing page?' },
                 { id: 22, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Budget issues currently' },
                 { id: 23, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', impact: 'Low', status: 'brainstorm' },
+                /* GIGASCAN (10 Tasks) */
                 { id: 24, company: 'GigaScan', title: 'New Solutions page (3 categories)', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'GigaScan team provide images' },
                 { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live with Patrik', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley schedule meeting' },
                 { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
@@ -250,6 +247,7 @@ createApp({
                 { id: 31, company: 'GigaScan', title: 'Review LinkedIn mental notes', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Stanley obtain access' },
                 { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Need system images/videos' },
                 { id: 33, company: 'GigaScan', title: 'Fix zoom-in padding dynamic', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                /* LADING TECHNOLOGY (28 Tasks) */
                 { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
@@ -300,19 +298,21 @@ createApp({
                 { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
             ].map(schemaEnhance);
 
-            columns.forEach(col => {
-                const el = document.getElementById(col.id);
-                if (el) {
-                    new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'bg-slate-200',
-                        onEnd: (evt) => { 
-                            evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                            if (evt.from !== evt.to) {
-                                const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) { t.status = evt.to.id; t.lastUpdated = Date.now(); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
+            nextTick(() => {
+                columns.forEach(col => {
+                    const el = document.getElementById(col.id);
+                    if (el) {
+                        new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'bg-slate-200',
+                            onEnd: (evt) => { 
+                                evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+                                if (evt.from !== evt.to) {
+                                    const t = tasks.value.find(x => x.id == evt.item.dataset.id);
+                                    if (t) { t.status = evt.to.id; t.lastUpdated = Date.now(); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             });
         });
 
