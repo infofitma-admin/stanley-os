@@ -7,202 +7,284 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        [v-cloak] { display: none; }
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
-        .max-dashboard-width { max-width: 1600px; margin: 0 auto; width: 100%; }
-        .board-header { background: #1e293b; color: white; padding: 12px 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .kanban-wrapper { display: flex; gap: 20px; padding: 24px 0; overflow-x: auto; align-items: flex-start; }
-        .kanban-col { background: #e2e8f0; border-radius: 12px; min-width: 310px; width: 310px; display: flex; flex-direction: column; max-height: 85vh; border: 1px solid #cbd5e1; }
-        .kanban-header { padding: 16px; font-weight: 800; font-size: 13px; color: #475569; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; }
-        .card-list { padding: 0 12px 12px 12px; flex-grow: 1; overflow-y: auto; min-height: 100px; }
-        .task-card { background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #cbd5e1; cursor: pointer; }
-        .tag { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        body { font-family: 'Inter', sans-serif; background: #e2e8f0; color: #0f172a; overflow-y: auto; overflow-x: hidden; }
+        .max-dashboard-width { max-width: 1650px; margin: 0 auto; width: 100%; }
+        .board-header { background: linear-gradient(to right, #94a3b8, #cbd5e1); border-bottom: 2px solid #475569; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .kanban-wrapper { display: flex; align-items: flex-start; padding: 20px 0; overflow-x: auto; min-height: 600px; }
+        .kanban-col { background: #f8fafc; border-radius: 12px; min-width: 320px; max-width: 320px; height: 78vh; display: flex; flex-direction: column; margin-right: 18px; border: 2px solid #64748b; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+        .kanban-col.zen-expanded { min-width: 650px; max-width: 850px; margin: 0 auto; height: 82vh; }
+        .kanban-header { padding: 14px 16px 10px 16px; font-weight: 700; font-size: 15px; color: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #cbd5e1; }
+        .card-list { padding: 12px 10px; flex-grow: 1; overflow-y: auto; min-height: 50px; }
+        .task-card { background: #ffffff; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; border: 1.5px solid #cbd5e1; transition: all 0.2s ease; position: relative; overflow-wrap: break-word; word-break: break-word; }
+        .task-card:hover { border-color: #475569; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; border: 2px solid #cbd5e1; }
+        .tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px; }
         .tag-urgent { background: #fee2e2; color: #b91c1c; }
         .tag-high { background: #fef3c7; color: #b45309; }
         .tag-normal { background: #e0e7ff; color: #4338ca; }
         .tag-low { background: #f1f5f9; color: #475569; }
+        .ai-response-scroll { max-height: 380px; overflow-y: auto; padding-right: 10px; }
+        .markdown-body h3 { font-weight: 800; margin-top: 12px; margin-bottom: 6px; color: #0f172a; }
+        .markdown-body p { margin-bottom: 10px; color: #1e293b; }
+        .markdown-body ul { list-style: disc; margin-left: 20px; margin-bottom: 12px; }
+        .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { height: 100%; background: #10b981; transition: width 0.3s ease; }
     </style>
 </head>
 <body>
 
 <div id="app" v-cloak class="min-h-screen flex flex-col">
-    <header class="board-header flex justify-between items-center">
-        <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-black tracking-tight">Fitma | Stanley OS</h1>
-            <div class="flex space-x-1 bg-slate-700/50 p-1 rounded-md">
-                <button v-for="tab in ['All', 'Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab" :class="activeTab === tab ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:text-white'" class="px-3 py-1 rounded text-xs font-bold transition-all">{{ tab }}</button>
+    <header class="board-header px-6 py-3 flex justify-center shrink-0">
+        <div class="max-dashboard-width flex justify-between items-center w-full">
+            <div class="flex items-center space-x-6">
+                <h1 class="text-2xl font-black text-slate-900">Fitma <span class="font-normal opacity-40">|</span> Stanley OS</h1>
+                <nav class="flex space-x-1 bg-white/50 backdrop-blur-sm p-1 rounded-lg border border-white/60">
+                    <button v-for="tab in ['All', 'Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab" :class="activeTab === tab ? 'bg-white text-slate-900 shadow-md' : 'text-slate-700 hover:bg-white/50'" class="px-4 py-1.5 rounded text-sm font-bold transition-all">{{ tab }}</button>
+                </nav>
             </div>
-        </div>
-        <div class="flex items-center space-x-6">
-            <div class="text-right">
-                <span class="text-[10px] block opacity-60 font-bold uppercase">System Velocity</span>
-                <span class="font-black text-lg">{{ completedTasks.length }} <span class="text-xs opacity-50 font-normal">DONE</span> / {{ wipCount }} <span class="text-xs opacity-50 font-normal">WIP</span></span>
+            <div class="flex space-x-2">
+                <div class="bg-white/50 p-1 rounded-lg flex space-x-1 mr-4 border border-white/60">
+                    <button @click="viewMode = 'kanban'" :class="viewMode === 'kanban' ? 'bg-white shadow-sm' : ''" class="px-3 py-1 rounded text-xs font-bold text-slate-800">Kanban</button>
+                    <button @click="viewMode = 'timeline'" :class="viewMode === 'timeline' ? 'bg-white shadow-sm' : ''" class="px-3 py-1 rounded text-xs font-bold text-slate-800">Timeline</button>
+                    <button @click="viewMode = 'matrix'" :class="viewMode === 'matrix' ? 'bg-white shadow-sm' : ''" class="px-3 py-1 rounded text-xs font-bold text-slate-800">Impact Matrix</button>
+                </div>
+                <button @click="toggleZenMode" :class="zenMode ? 'bg-emerald-100 text-emerald-800 border-emerald-400' : 'bg-white/60 text-slate-800'" class="border text-xs font-bold px-3 py-2 rounded transition">{{ zenMode ? 'Exit Focus' : 'Zen Focus' }}</button>
             </div>
         </div>
     </header>
 
+    <div class="px-6 pt-6 flex justify-center">
+        <div class="max-dashboard-width flex gap-5 items-start w-full">
+            <div class="bg-white rounded-xl p-4 shadow-sm flex-grow border border-slate-300">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Live AI Counselor (Empathetic Assist)</p>
+                <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="How's your day going, Stanley? Tell me what's on your mind..." class="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-900 outline-none p-0">
+                <div v-if="aiStatus || aiResponse" class="mt-4 pt-4 border-t-2 border-slate-200 ai-response-scroll">
+                    <p v-if="aiStatus" class="text-xs text-slate-600 font-bold animate-pulse">{{ aiStatus }}</p>
+                    <div v-if="aiResponse" class="markdown-body text-sm text-slate-800 bg-slate-50 p-5 rounded-lg border border-slate-300" v-html="parsedAiResponse"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm w-80 border border-slate-300 shrink-0">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Velocity ({{ activeTab }})</h3>
+                <div class="flex justify-between">
+                    <div><p class="text-2xl font-black text-slate-900 leading-none">{{ completedTasks.length }}</p><p class="text-[10px] text-slate-500 font-bold mt-1 uppercase">Done</p></div>
+                    <div class="text-right"><p :class="wipCount > 4 ? 'text-red-600' : 'text-emerald-600'" class="text-2xl font-black leading-none">{{ wipCount }}</p><p class="text-[10px] text-slate-500 font-bold mt-1 uppercase">Wip</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="px-6 flex justify-center">
-        <div class="max-dashboard-width">
-            <main class="kanban-wrapper">
-                <div v-for="col in columns" :key="col.id" class="kanban-col">
+        <div class="max-dashboard-width w-full">
+            <main v-show="viewMode === 'kanban'" class="kanban-wrapper">
+                <div v-for="col in columns" :key="col.id" v-show="!zenMode || col.id === 'progress'" :class="{'zen-expanded': zenMode && col.id === 'progress'}" class="kanban-col">
                     <div class="kanban-header">
-                        <span>{{ col.title }}</span>
-                        <span class="bg-slate-300 text-slate-700 px-2 py-0.5 rounded text-[10px] font-black">{{ getTaskCount(col.id) }}</span>
+                        <h3 class="font-bold text-slate-800">{{ col.title }}</h3>
+                        <span class="bg-white border-2 border-slate-300 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-black">{{ getTaskCount(col.id) }}</span>
                     </div>
                     <div :id="col.id" class="card-list">
-                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" class="task-card hover:border-slate-400">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{{ task.company }}</span>
-                                <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
-                            </div>
-                            <h4 class="text-sm font-bold text-slate-800 leading-snug mb-2">{{ task.title }}</h4>
-                            <div v-if="task.dueDate" class="text-[9px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 py-0.5 rounded mb-2">📅 {{ task.dueDate }}</div>
-                            <p v-if="task.action" class="text-[10px] text-slate-500 border-t pt-2 mt-1 font-medium italic">Next: {{ task.action }}</p>
+                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card">
+                            <div class="flex justify-between items-start mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">{{ task.company }}</span><span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span></div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-3">{{ task.title }}</h4>
+                            <div v-if="task.subtasks.length > 0" class="mb-2"><div class="progress-bar"><div class="progress-fill" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div></div></div>
+                            <p v-if="task.action" class="text-[11px] text-slate-700 border-t pt-2 mt-2 font-medium italic">Next: {{ task.action }}</p>
                         </div>
                     </div>
+                    <div class="p-3"><button @click="addTask(col.id)" class="w-full py-2.5 border-2 border-dashed border-slate-400 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-200">+ Add Card</button></div>
                 </div>
             </main>
+
+            <main v-if="viewMode === 'timeline'" class="py-10"><div class="bg-white rounded-xl shadow-md border-2 border-slate-300 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-100 border-b-2 border-slate-300"><tr><th class="p-4 text-xs font-black uppercase">Due Date</th><th class="p-4 text-xs font-black uppercase">Task</th><th class="p-4 text-xs font-black uppercase">Priority</th></tr></thead><tbody class="divide-y-2 divide-slate-100"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 cursor-pointer transition"><td class="p-4 text-sm font-bold">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black">{{ t.title }}</div><div class="text-[10px] text-slate-400 font-bold uppercase">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
+
+            <main v-if="viewMode === 'matrix'" class="py-10 grid grid-cols-2 gap-6 h-[600px]">
+                <div v-for="z in [{n:'Quick Wins', i:'High', e:['Low','Medium'], c:'emerald'}, {n:'Major Projects', i:'High', e:['High'], c:'blue'}, {n:'Fill-Ins', i:['Low','Medium'], e:['Low','Medium'], c:'slate'}, {n:'Re-evaluate', i:['Low','Medium'], e:['High'], c:'amber'}]" :class="'bg-'+z.c+'-50 border-'+z.c+'-300'" class="rounded-xl p-6 border-2 flex flex-col shadow-sm">
+                    <h3 class="font-black text-xs uppercase tracking-widest mb-4" :class="'text-'+z.c+'-800'">{{ z.n }}</h3>
+                    <div class="space-y-3 overflow-y-auto flex-grow"><div v-for="t in matrixTasks(z.i, z.e)" @click="openTask(t)" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 cursor-pointer text-sm font-bold text-slate-800 hover:border-slate-500 transition">{{ t.title }}</div></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div v-if="editingTask" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col border-2 border-slate-300 max-h-[90vh] overflow-hidden">
+            <div class="p-8 space-y-6 overflow-y-auto">
+                <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Task Title</label><textarea v-model="editingTask.title" class="text-xl font-black text-slate-900 w-full border-b-2 border-slate-100 focus:border-slate-400 outline-none pb-2 bg-transparent resize-none" rows="2"></textarea></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase">Priority</label><select v-model="editingTask.priority" class="w-full border-2 border-slate-200 rounded p-2 text-sm font-bold"><option>Urgent</option><option>High</option><option>Normal</option><option>Low</option></select></div>
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase">Due Date</label><input type="text" v-model="editingTask.dueDate" class="w-full border-2 border-slate-200 rounded p-2 text-sm font-bold" placeholder="YYYY-MM-DD"></div>
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase">Impact</label><select v-model="editingTask.impact" class="w-full border-2 border-slate-200 rounded p-2 text-sm font-bold"><option>High</option><option>Medium</option><option>Low</option></select></div>
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase">Effort</label><select v-model="editingTask.effort" class="w-full border-2 border-slate-200 rounded p-2 text-sm font-bold"><option>High</option><option>Medium</option><option>Low</option></select></div>
+                </div>
+                <div><label class="text-[10px] font-black text-slate-400 uppercase">Next Action Details</label><textarea v-model="editingTask.action" class="w-full border-2 border-slate-200 rounded-lg p-3 text-sm font-medium h-20 outline-none focus:border-slate-400"></textarea></div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
+                    <div v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2"><input type="checkbox" v-model="s.done" class="w-4 h-4"><input v-model="s.text" class="flex-grow border-b border-slate-100 text-sm outline-none"><button @click="editingTask.subtasks.splice(idx,1)" class="text-red-400">&times;</button></div>
+                    <button @click="editingTask.subtasks.push({text:'', done:false})" class="mt-3 text-xs font-black text-slate-400 hover:text-slate-800">+ Add Action Step</button>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-6 border-t-2 border-slate-200 flex justify-between">
+                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-sm font-black text-red-600">Delete Record</button>
+                <div v-else></div>
+                <div class="flex space-x-3"><button @click="editingTask = null" class="bg-white border-2 border-slate-300 px-6 py-2 rounded-lg font-black text-sm">Cancel</button><button @click="saveTask" class="bg-slate-800 text-white px-8 py-2 rounded-lg font-black text-sm shadow-md">Save Changes</button></div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-const { createApp, ref, onMounted, computed, nextTick } = Vue;
+const { createApp, ref, onMounted, computed } = Vue;
 
 createApp({
     setup() {
         const activeTab = ref('All');
+        const viewMode = ref('kanban');
+        const zenMode = ref(false);
+        const editingTask = ref(null);
+        const aiInput = ref('');
+        const aiStatus = ref('');
+        const aiResponse = ref('');
+        const isThinking = ref(false);
         const tasks = ref([]);
-        const columns = [
-            {id:'brainstorm', title:'Brainstorming'}, 
-            {id:'notstarted', title:'Not Started'}, 
-            {id:'progress', title:'In Progress'}, 
-            {id:'waiting', title:'Pending Review'}, 
-            {id:'completed', title:'Completed'}
-        ];
+        
+        const parsedAiResponse = computed(() => aiResponse.value ? marked.parse(aiResponse.value) : '');
+        const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
+
+        const schemaEnhance = (t) => ({ effort:'Medium', impact:'Medium', lastUpdated:Date.now(), subtasks:[], priority:'Normal', action:'', dueDate:'', ...t });
 
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
         const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
         const wipCount = computed(() => getTaskCount('progress'));
+        const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
+        const matrixTasks = (i, e) => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && (Array.isArray(i) ? i.includes(t.impact) : t.impact === i) && (Array.isArray(e) ? e.includes(t.effort) : t.effort === e));
 
-        onMounted(async () => {
-            const SYNC_ID = "STANLEY_OS_FINAL_v8"; 
-            
-            const rawData = [
-                /* DYMEK */
-                { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', status: 'notstarted', action: 'Complete brand guideline first' },
-                { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', status: 'waiting', action: 'Stanley review' },
-                { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', status: 'waiting', action: 'Need Revision' },
-                { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', status: 'progress' },
-                { id: 5, company: 'Dymek', title: 'Brochure: N&K Western Digital', priority: 'Low', status: 'waiting', action: 'Stanley review' },
-                { id: 6, company: 'Dymek', title: 'Landing Page: OATi Contact Lens', priority: 'Low', status: 'brainstorm', action: 'Stanley write content' },
-                { id: 7, company: 'Dymek', title: 'Research CRM software (Odoo)', priority: 'Normal', status: 'waiting', action: 'Respond to Peter' },
-                { id: 8, company: 'Dymek', title: 'Fitma video topics list', priority: 'Normal', status: 'notstarted' },
-                { id: 9, company: 'Dymek', title: 'Sales tracker (Excel)', priority: 'Low', status: 'notstarted' },
-                { id: 10, company: 'Dymek', title: 'PowerPoint template', priority: 'Low', status: 'brainstorm' },
-                { id: 11, company: 'Dymek', title: 'GBP Accounts regions', priority: 'Normal', status: 'waiting' },
-                { id: 12, company: 'Dymek', title: 'Brochure: OATi AR/VR Glasses', priority: 'Low', status: 'waiting', action: 'Stanley review' },
-                { id: 13, company: 'Dymek', title: 'Tracking Malaysia tenders', priority: 'Normal', status: 'notstarted' },
-                { id: 14, company: 'Dymek', title: 'Landing Page: Lynxx?', priority: 'Low', status: 'brainstorm' },
-                { id: 15, company: 'Dymek', title: 'Landing Page: yieldWerx?', priority: 'Low', status: 'brainstorm' },
-                { id: 16, company: 'Dymek', title: 'Brochure: microPREP?', priority: 'Low', status: 'brainstorm' },
-                { id: 17, company: 'Dymek', title: 'Product sales research', priority: 'Low', status: 'brainstorm' },
-                { id: 18, company: 'Dymek', title: 'Host QuickPRO-Cube TM', priority: 'Low', status: 'notstarted' },
-                { id: 19, company: 'Dymek', title: 'Host n&k brochure', priority: 'Normal', status: 'notstarted' },
-                { id: 20, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', status: 'brainstorm' },
-                { id: 21, company: 'Dymek', title: 'Doublet cementing Schott', priority: 'Low', status: 'brainstorm' },
-                { id: 22, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', status: 'brainstorm' },
-                { id: 23, company: 'Dymek', title: 'Coordinate Sales team spreadsheet', priority: 'Low', status: 'brainstorm' },
+        const getCompletedSubtasks = (t) => t.subtasks.filter(s => s.done).length;
+        const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
 
-                /* GIGASCAN */
-                { id: 24, company: 'GigaScan', title: 'New Solutions (3 categories)', priority: 'Urgent', status: 'waiting', action: 'Team provide images' },
-                { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live', priority: 'Urgent', status: 'waiting', action: 'Schedule Patrik' },
-                { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', status: 'waiting', action: 'Stanley review' },
-                { id: 27, company: 'GigaScan', title: 'Company profile layout', priority: 'Normal', status: 'progress', action: 'Stanley send material' },
-                { id: 28, company: 'GigaScan', title: 'TrueProp Instagram image', priority: 'Normal', status: 'waiting' },
-                { id: 29, company: 'GigaScan', title: 'Video editor candidates', priority: 'Normal', status: 'progress' },
-                { id: 30, company: 'GigaScan', title: 'Add Axial flow pump app', priority: 'Normal', status: 'notstarted' },
-                { id: 31, company: 'GigaScan', title: 'Review LinkedIn notes', priority: 'Low', status: 'waiting' },
-                { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', status: 'waiting' },
-                { id: 33, company: 'GigaScan', title: 'Fix dynamic padding issue', priority: 'Low', status: 'notstarted' },
+        const askAI = async () => {
+            const query = aiInput.value.trim(); if (!query) return;
+            isThinking.value = true; aiStatus.value = "Consulting your task strategy...";
+            const systemPrompt = "You are ChatGPT, Stanley's empathetic executive task manager. Provide concise, incredibly empathetic, smart, and direct answers using Markdown. comfort him like a friend and advise him to focus on 1 task if overwhelmed.";
+            try {
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:systemPrompt}, {role:'user', content:query}] }) });
+                aiResponse.value = await res.text();
+            } finally { isThinking.value = false; aiStatus.value = ''; aiInput.value = ''; }
+        };
 
-                /* LADING */
-                { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 37, company: 'Lading Technology', title: 'Mobile App statement', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 38, company: 'Lading Technology', title: 'Preferred lanes for drivers', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 39, company: 'Lading Technology', title: 'Broker: Quick pricing', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 40, company: 'Lading Technology', title: 'Copy Edit: Damage Claims', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 41, company: 'Lading Technology', title: 'Operating Companies edit', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 42, company: 'Lading Technology', title: 'DOT report speed highlight', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 43, company: 'Lading Technology', title: 'Reminders and DOT section', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 44, company: 'Lading Technology', title: 'Strategy: Filter feature list', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 45, company: 'Lading Technology', title: 'Quantum vs Core build', priority: 'Normal', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 46, company: 'Lading Technology', title: 'Figma tracking design', priority: 'Normal', status: 'progress' },
-                { id: 47, company: 'Lading Technology', title: 'Hire LATAM Freelancer', priority: 'Normal', status: 'waiting' },
-                { id: 48, company: 'Lading Technology', title: 'Operating Co Doc for Brokers', priority: 'Normal', status: 'notstarted' },
-                { id: 49, company: 'Lading Technology', title: 'Test AI (Guidde)', priority: 'Normal', status: 'notstarted' },
-                { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', status: 'brainstorm' },
-                { id: 51, company: 'Lading Technology', title: 'Replace anime images', priority: 'Normal', status: 'progress', dueDate: '2026-10-09' },
-                { id: 52, company: 'Lading Technology', title: 'Logistics operating co page', priority: 'Normal', status: 'notstarted' },
-                { id: 53, company: 'Lading Technology', title: 'Recruit YouTuber', priority: 'Normal', status: 'notstarted' },
-                { id: 54, company: 'Lading Technology', title: 'Videos for onboarding', priority: 'Normal', status: 'notstarted' },
-                { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', status: 'waiting' },
-                { id: 56, company: 'Lading Technology', title: 'Credential Vault UI', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 57, company: 'Lading Technology', title: 'Video topics list', priority: 'Normal', status: 'notstarted' },
-                { id: 58, company: 'Lading Technology', title: 'Fix zoom padding issue', priority: 'Low', status: 'notstarted' },
-                { id: 59, company: 'Lading Technology', title: 'Check all buttons and links', priority: 'Low', status: 'notstarted' },
-                { id: 60, company: 'Lading Technology', title: 'Googlesheet for editor', priority: 'Low', status: 'notstarted' },
-                { id: 61, company: 'Lading Technology', title: 'Coordinate with Kriti', priority: 'Low', status: 'notstarted' },
+        const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
+        const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
+        const saveTask = () => {
+            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
+            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
+            editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+        };
+        const deleteTask = () => { if(confirm("Permanently delete this record?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
 
-                /* COMPLETED */
-                { id: 62, company: 'Lading Technology', title: 'Homepage Overhaul', status: 'completed' },
-                { id: 63, company: 'Lading Technology', title: 'SEO metadata', status: 'completed' },
-                { id: 64, company: 'GigaScan', title: 'SEO metadata', status: 'completed' },
-                { id: 65, company: 'Dymek', title: 'LinkedIn Setup', status: 'completed' },
+        onMounted(() => {
+            const saved = localStorage.getItem('fitma_os_pro_silver');
+            tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [
+                /* DYMEK (23 Tasks) */
+                { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
+                { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
+                { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Dow feedback expected 4/22' },
+                { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'Medium', status: 'progress' },
+                { id: 5, company: 'Dymek', title: 'Brochure: Western Digital Penang', priority: 'Low', impact: 'High', status: 'waiting', action: 'Stanley should review' },
+                { id: 6, company: 'Dymek', title: 'Landing Page: OATi QuickPRO Contact Lens', priority: 'Low', impact: 'High', status: 'brainstorm', action: 'Stanley to write content' },
+                { id: 7, company: 'Dymek', title: 'Research CRM software (Odoo)', priority: 'Normal', impact: 'Low', status: 'waiting', action: 'Stanley respond to Peter email' },
+                { id: 8, company: 'Dymek', title: 'List of social media video topics for freelancer', priority: 'Normal', impact: 'Low', status: 'notstarted' },
+                { id: 9, company: 'Dymek', title: 'Sales tracker spreadsheet 3D-Micromac (Excel)', priority: 'Low', impact: 'Medium', status: 'notstarted' },
+                { id: 10, company: 'Dymek', title: 'PowerPoint template', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Stanley to send PowerPoint' },
+                { id: 11, company: 'Dymek', title: 'GBP Accounts for all regions', priority: 'Normal', impact: 'Low', status: 'waiting' },
+                { id: 12, company: 'Dymek', title: 'Brochure: OATi QuickPRO AR/VR', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
+                { id: 13, company: 'Dymek', title: 'Setup system tracking Malaysia tenders', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
+                { id: 14, company: 'Dymek', title: 'Landing Page: Lynxx?', priority: 'Low', impact: 'Medium', status: 'brainstorm' },
+                { id: 15, company: 'Dymek', title: 'Landing Page: yieldWerx?', priority: 'Low', impact: 'Medium', status: 'brainstorm' },
+                { id: 16, company: 'Dymek', title: 'Brochure: 3D-Micromac microPREP?', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Stanley get approval' },
+                { id: 17, company: 'Dymek', title: 'Product based sales research', priority: 'Low', impact: 'Low', status: 'brainstorm' },
+                { id: 18, company: 'Dymek', title: 'Host QuickPRO-Cube TM', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                { id: 19, company: 'Dymek', title: 'Host n&k brochure', priority: 'Normal', impact: 'Low', status: 'notstarted' },
+                { id: 20, company: 'Dymek', title: 'Coordinate Sales team spreadsheet', priority: 'Low', impact: 'Low', status: 'brainstorm' },
+                { id: 21, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Direct to webpage or landing page?' },
+                { id: 22, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Budget issues currently' },
+                { id: 23, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', impact: 'Low', status: 'brainstorm' },
+                /* GIGASCAN (10 Tasks) */
+                { id: 24, company: 'GigaScan', title: 'New Solutions page (3 categories)', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'GigaScan team provide images' },
+                { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live with Patrik', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley schedule meeting' },
+                { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
+                { id: 27, company: 'GigaScan', title: 'Company profile - brand layout match', priority: 'Normal', impact: 'High', status: 'progress', action: 'Stanley send material' },
+                { id: 28, company: 'GigaScan', title: 'TrueProp Instagram image - ISO-484 report', priority: 'Normal', impact: 'Medium', status: 'waiting' },
+                { id: 29, company: 'GigaScan', title: 'Test video editor candidates', priority: 'Normal', impact: 'Medium', status: 'progress' },
+                { id: 30, company: 'GigaScan', title: 'Add Axial flow pump app page', priority: 'Normal', impact: 'Low', status: 'notstarted' },
+                { id: 31, company: 'GigaScan', title: 'Review LinkedIn mental notes', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Stanley obtain access' },
+                { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Need system images/videos' },
+                { id: 33, company: 'GigaScan', title: 'Fix zoom-in padding dynamic', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                /* LADING TECHNOLOGY (28 Tasks) */
+                { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 37, company: 'Lading Technology', title: 'Mobile App for carriers statement', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 38, company: 'Lading Technology', title: 'Preferred lanes for drivers info', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 39, company: 'Lading Technology', title: 'Broker Content: Quick pricing', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 40, company: 'Lading Technology', title: 'Copy Edit: Damage Claims wording', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 41, company: 'Lading Technology', title: 'System caters to Operating Companies', priority: 'Low', impact: 'High', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 42, company: 'Lading Technology', title: 'Highlight DOT report speed', priority: 'Low', impact: 'High', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 43, company: 'Lading Technology', title: 'Reminders and DOT reports section', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 44, company: 'Lading Technology', title: 'Competitive Strategy: Feature filter', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 45, company: 'Lading Technology', title: 'Pricing: Quantum vs Core build', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-01-10', action: 'Depends on positioning' },
+                { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking design', priority: 'Normal', impact: 'High', status: 'progress' },
+                { id: 47, company: 'Lading Technology', title: 'Hire LATAM Freelancer', priority: 'Normal', impact: 'High', status: 'waiting', action: 'Schedule recruitment' },
+                { id: 48, company: 'Lading Technology', title: 'Operating Co Doc for Brokers', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
+                { id: 49, company: 'Lading Technology', title: 'Test AI tutorial (Guidde)', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
+                { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', impact: 'Medium', status: 'brainstorm' },
+                { id: 51, company: 'Lading Technology', title: 'Visual Refresh: Pro alternatives', priority: 'Normal', impact: 'Medium', status: 'progress', dueDate: '2026-10-09' },
+                { id: 52, company: 'Lading Technology', title: 'Page for Logistics operating co', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
+                { id: 53, company: 'Lading Technology', title: 'Recruit VA YouTuber', priority: 'Normal', impact: 'Medium', status: 'notstarted', action: 'Register Casting Club' },
+                { id: 54, company: 'Lading Technology', title: 'Videos for support/onboarding', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
+                { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', impact: 'Medium', status: 'waiting' },
+                { id: 56, company: 'Lading Technology', title: 'Showcase Credential Vault UI', priority: 'Low', impact: 'Medium', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 57, company: 'Lading Technology', title: 'Social media video topics', priority: 'Normal', impact: 'Low', status: 'notstarted' },
+                { id: 58, company: 'Lading Technology', title: 'Fix zoom padding (dynamic)', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                { id: 59, company: 'Lading Technology', title: 'Check all buttons & links', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                { id: 60, company: 'Lading Technology', title: 'GoogleSheet for video editor', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                { id: 61, company: 'Lading Technology', title: 'Coordinate with Kriti - Freelancer', priority: 'Low', impact: 'Low', status: 'notstarted' },
+                /* COMPLETED (20 Tasks) */
+                { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed' },
+                { id: 63, company: 'Lading Technology', title: 'SEO metadata & alt text', status: 'completed' },
+                { id: 64, company: 'GigaScan', title: 'SEO metadata & alt text', status: 'completed' },
+                { id: 65, company: 'Dymek', title: 'LinkedIn Page Setup', status: 'completed' },
                 { id: 66, company: 'GigaScan', title: 'Mobile design revisit', status: 'completed' },
                 { id: 67, company: 'GigaScan', title: 'Update Vehicle Page', status: 'completed' },
-                { id: 68, company: 'GigaScan', title: 'Update font issues', status: 'completed' },
+                { id: 68, company: 'GigaScan', title: 'Update font issues website', status: 'completed' },
                 { id: 69, company: 'Lading Technology', title: 'Mascot Variation', status: 'completed' },
-                { id: 70, company: 'Lading Technology', title: 'Call Abdul', status: 'completed', dueDate: '2026-03-29' },
+                { id: 70, company: 'Lading Technology', title: 'Schedule call Abdul (friendly contacts)', status: 'completed', dueDate: '2026-03-29' },
                 { id: 71, company: 'Dymek', title: '4D Business Update', status: 'completed', dueDate: '2026-03-11' },
                 { id: 72, company: 'GigaScan', title: 'Patrik revisions check', status: 'completed' },
                 { id: 73, company: 'GigaScan', title: 'Japanese translation', status: 'completed' },
                 { id: 74, company: 'Lading Technology', title: 'Figma login/signup', status: 'completed', dueDate: '2026-03-31' },
-                { id: 75, company: 'Lading Technology', title: 'Broker/Shipper sections', status: 'completed', dueDate: '2026-03-31' },
+                { id: 75, company: 'Lading Technology', title: 'Broker/Shipper Squarespace', status: 'completed', dueDate: '2026-03-31' },
                 { id: 76, company: 'Lading Technology', title: 'Add relevant anime images', status: 'completed', dueDate: '2026-01-31' },
-                { id: 77, company: 'Lading Technology', title: 'Modify screenshots (Kriti)', status: 'completed' },
-                { id: 78, company: 'Lading Technology', title: 'YouTube viral tracking', status: 'completed', dueDate: '2026-03-31' },
-                { id: 79, company: 'Lading Technology', title: 'Recruitment evaluation', status: 'completed', dueDate: '2026-03-31' },
+                { id: 77, company: 'Lading Technology', title: 'Redesigned screenshots update', status: 'completed' },
+                { id: 78, company: 'Lading Technology', title: 'Watch YouTube viral tracking', status: 'completed', dueDate: '2026-03-31' },
+                { id: 79, company: 'Lading Technology', title: 'Recruitment portals evaluation', status: 'completed', dueDate: '2026-03-31' },
                 { id: 80, company: 'Lading Technology', title: 'Mobile landscape optimization', status: 'completed' },
                 { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
-            ];
+            ].map(schemaEnhance);
 
-            if (localStorage.getItem('fitma_sync_v8') !== SYNC_ID) {
-                tasks.value = rawData.map(t => ({ action: t.action || '', dueDate: t.dueDate || '', ...t }));
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                localStorage.setItem('fitma_sync_v8', SYNC_ID);
-            } else {
-                tasks.value = JSON.parse(localStorage.getItem('fitma_os_pro_silver'));
-            }
-
-            await nextTick();
             columns.forEach(col => {
                 const el = document.getElementById(col.id);
                 if (el) {
                     new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'bg-slate-200',
-                        onEnd: (evt) => {
+                        onEnd: (evt) => { 
+                            // DOM Revert fix: Stops Vue.js from throwing node errors when dragging
                             evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+                            
                             if (evt.from !== evt.to) {
                                 const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) { 
-                                    t.status = evt.to.id; 
-                                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-                                }
+                                if (t) { t.status = evt.to.id; t.lastUpdated = Date.now(); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
                             }
                         }
                     });
@@ -210,7 +292,7 @@ createApp({
             });
         });
 
-        return { activeTab, tasks, columns, filteredTasks, getTaskCount, completedTasks, wipCount };
+        return { activeTab, viewMode, zenMode, tasks, editingTask, columns, aiInput, aiStatus, aiResponse, parsedAiResponse, isThinking, filteredTasks, completedTasks, timelineTasks, matrixTasks, getTaskCount, wipCount, getCompletedSubtasks, toggleZenMode, askAI, addTask, openTask, saveTask, deleteTask };
     }
 }).mount('#app');
 </script>
