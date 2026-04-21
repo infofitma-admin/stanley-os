@@ -49,13 +49,18 @@
         .markdown-body { font-size: 14px; line-height: 1.6; color: inherit; }
         .markdown-body p { margin-bottom: 0.8em; }
         .markdown-body strong { font-weight: 700; color: #0f172a; }
-        .dark .markdown-body strong { color: #f8fafc; }
+        .dark .markdown-body strong { color: #f8fafc !important; }
         .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.8em; }
         .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; font-size: 13px; }
         .markdown-body th, .markdown-body td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
         .dark .markdown-body th, .dark .markdown-body td { border-color: #475569; }
         .markdown-body th { background-color: #f8fafc; font-weight: bold; color: #0f172a; }
         .dark .markdown-body th { background-color: #1e293b; color: #f8fafc; }
+        
+        /* Strict Dark Mode Text Enforcement for AI chat */
+        .dark .markdown-body { color: #f8fafc !important; }
+        .dark .markdown-body h1, .dark .markdown-body h2, .dark .markdown-body h3, .dark .markdown-body h4, .dark .markdown-body h5, .dark .markdown-body h6 { color: #ffffff !important; }
+        .dark .markdown-body p, .dark .markdown-body li, .dark .markdown-body span { color: #f1f5f9 !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300">
@@ -285,7 +290,7 @@
                             <div :id="'kanban-' + col.id" class="card-list-scroll space-y-3 custom-scrollbar" :data-status="col.id">
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
-                                        <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{{ task.company }}</span>
+                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
                                         <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                     </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
@@ -315,7 +320,7 @@
                         </div>
                     </main>
  
-                    <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] text-slate-400 font-bold uppercase">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
+                    <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
  
                     <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
                         <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
@@ -335,7 +340,7 @@
                                             <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
                                         </div>
                                     </div>
-                                    <div class="text-[9px] text-slate-400 uppercase mt-1">{{ t.company }}</div>
+                                    <div class="text-[9px] uppercase mt-1 font-bold" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div>
                                 </div>
                                 
                                 <div v-if="getMatrixTasks(quad).length === 0" class="h-20 flex items-center justify-center text-xs font-medium text-slate-400 italic opacity-50 pointer-events-none">Drag tasks here...</div>
@@ -351,10 +356,10 @@
                                 <div v-for="company in ['Dymek', 'GigaScan', 'Lading Technology']" :key="company">
                                     <div class="flex justify-between text-xs font-black uppercase mb-2">
                                         <span class="text-slate-700 dark:text-slate-300">{{company}}</span>
-                                        <span :class="getWorkload(company) > 3 ? 'text-red-500' : 'text-slate-400'">{{getWorkload(company)}} High-Effort Tasks</span>
+                                        <span :class="getWorkload(company).count > 3 ? 'text-red-500' : 'text-slate-400'">{{getWorkload(company).count}} High-Effort Tasks</span>
                                     </div>
                                     <div class="h-3 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
-                                        <div class="h-full transition-all duration-1000" :style="'width: ' + Math.min(getWorkload(company) * 20, 100) + '%'" :class="getWorkload(company) > 3 ? 'bg-red-500' : 'bg-brand'"></div>
+                                        <div class="h-full transition-all duration-1000" :style="'width: ' + getWorkload(company).percentage + '%'" :class="getWorkload(company).count > 3 ? 'bg-red-500' : 'bg-brand'"></div>
                                     </div>
                                 </div>
                             </div>
@@ -370,7 +375,7 @@
     <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200 dark:border-slate-800">
         <div v-if="editingTask" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{{ editingTask.company }}</span>
+                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded" :class="editingTask.company === 'Dymek' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30' : editingTask.company === 'GigaScan' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30' : 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30'">{{ editingTask.company }}</span>
                 <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -530,9 +535,12 @@ createApp({
             });
         };
  
-        // NEW: Feature 1 - Heatmap logic
+        // NEW: Feature 1 - Heatmap logic Fixed
         const getWorkload = (company) => {
-            return tasks.value.filter(t => t.company === company && t.effort === 'High' && t.status !== 'completed').length;
+            const companyTasks = tasks.value.filter(t => t.company === company && t.status !== 'completed');
+            const highEffortCount = companyTasks.filter(t => t.effort === 'High').length;
+            const percentage = companyTasks.length > 0 ? Math.round((highEffortCount / companyTasks.length) * 100) : 0;
+            return { count: highEffortCount, percentage: percentage };
         };
  
         const toggleDarkMode = () => {
@@ -646,23 +654,48 @@ createApp({
                 localStorage.removeItem('fitma_vora_chat');
             }
         };
+
+        const _parseAiResponse = async (res) => {
+            let text = await res.text();
+            try {
+                let parsed = JSON.parse(text);
+                if (parsed.error) throw new Error(parsed.error);
+                if (parsed.choices && parsed.choices[0].message) text = parsed.choices[0].message.content;
+                else if (parsed.content) text = parsed.content;
+                else if (parsed.response) text = parsed.response;
+                else if (parsed.message?.content) text = parsed.message.content;
+            } catch(e) {}
+            
+            // Clean up reasoning models block if leaked
+            text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+            // Clean up possible markdown code blocks for HTML
+            text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
+            
+            return text;
+        };
  
-        // NEW: Feature 2 - Morning Brief
+        // NEW: Feature 2 - Morning Brief Fixed
         const generateBrief = async () => {
             aiStatus.value = "Analyzing your OS data...";
             const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Due: ${t.dueDate || 'None'}, Status: ${t.status})`).join('\n');
             const prompt = `You are Vora. Give Stanley (the client) a kind, supportive morning brief. Do NOT assign him tasks; only highlight high priorities, blockers, and paused items so he can decide. Use motivational, caring language like a real, supportive friend to keep him relaxed. 
             
             CRITICAL FORMATTING INSTRUCTIONS:
-            You MUST output the brief using HTML cards with Tailwind classes to make it colorful and relaxing. Do NOT output raw markdown text. 
+            You MUST output the brief using ONLY HTML cards with Tailwind classes to make it colorful and relaxing. 
             Example format:
-            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-xl shadow-sm border border-indigo-100 dark:border-indigo-800 mb-4">
-                <h4 class="font-bold text-indigo-800 dark:text-indigo-200 mb-2">Priority Highlights</h4>
-                <ul class="list-disc pl-5 text-sm text-indigo-700 dark:text-indigo-300">
+            <div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-indigo-100 dark:border-slate-700 mb-4">
+                <h4 class="font-bold mb-2">Priority Highlights</h4>
+                <ul class="list-disc pl-5 text-sm">
                     <li>Point 1 (max 5 lines)</li>
                 </ul>
             </div>
-            Use different soft colors (like emerald-50, amber-50, rose-50) for different sections. Keep all bullet point descriptions short (strictly 3 to 5 lines maximum).
+            
+            IMPORTANT:
+            - Do NOT output raw markdown text or JSON strings.
+            - Provide short bullet points (strictly max 5 lines per point).
+            - End with a naturally empathetic, caring, and motivating closing sentence like a human friend (NO robotic headings).
+            
             Data to summarize: \n${snapshot}`;
             
             chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
@@ -672,10 +705,15 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) })
+                    body: JSON.stringify({ 
+                        messages:[{role:'user', content:prompt}], 
+                        seed: Math.floor(Math.random()*1000),
+                        jsonMode: false
+                    })
                 });
-                const text = await res.text();
-                chatHistory.value.push({ role: 'ai', content: text });
+                
+                const finalResponse = await _parseAiResponse(res);
+                chatHistory.value.push({ role: 'ai', content: finalResponse });
                 localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
                 scrollToBottom();
             } catch (e) {
@@ -715,8 +753,9 @@ createApp({
             Mode: ${aiMode.value}.
             
             Core Directives:
-            1. Persona & Relationship: Stanley is the CLIENT, not an employee doing tasks. Do NOT ask or assign him to do tasks. Your role is to advise him by highlighting high-priority items, identifying blockers, and providing suggestions so he can decide what to do. Use motivational, caring language to keep him relaxed, acting like a real, supportive friend.
-            2. Formatting: You MUST format your responses properly. Always use properly drawn Markdown tables, structured bullet lists, and clear bold headings. Ensure your answers are perfectly structured, readable, and user-friendly like ChatGPT.
+            1. Persona & Relationship: Stanley is the CLIENT, not an employee doing tasks. Do NOT ask or assign him to do tasks. Your role is to advise him by highlighting high-priority items, identifying blockers, and providing suggestions so he can decide what to do. 
+            2. Empathy: ALWAYS end your response with a natural, human-like, warm, and caring motivating sentence as a supportive friend. NEVER use robotic headings like 'Motivation:' or 'Conclusion:'. Do not act like a machine.
+            3. Formatting: You MUST format your responses properly. Always use properly drawn Markdown tables, structured bullet lists, and clear bold headings. Ensure your answers are perfectly structured, readable, and user-friendly like ChatGPT.
             
             Recent History:
             ${recentHistory}`;
@@ -730,12 +769,13 @@ createApp({
                             {role:'system', content:systemPrompt},
                             {role:'user', content:fullQuery}
                         ],
-                        seed: Math.floor(Math.random()*1000)
+                        seed: Math.floor(Math.random()*1000),
+                        jsonMode: false
                     })
                 });
-                const responseText = await res.text();
                 
-                chatHistory.value.push({ role: 'ai', content: responseText });
+                const finalResponse = await _parseAiResponse(res);
+                chatHistory.value.push({ role: 'ai', content: finalResponse });
                 localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
                 scrollToBottom();
  
@@ -791,7 +831,7 @@ createApp({
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) })
                 });
-                const text = await res.text();
+                const text = await _parseAiResponse(res);
                 
                 const idx = tasks.value.findIndex(t => t.id === task.id);
                 if (idx !== -1) {
