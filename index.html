@@ -17,16 +17,13 @@
     
     <style>
         [v-cloak] { display: none; }
-        /* Lock body to screen height */
         body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100vh; width: 100vw; }
         
-        /* Modern Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
-        /* Kanban Specifics - Trello Style */
         .kanban-col { min-width: 320px; max-width: 320px; transition: all 0.3s ease; display: flex; flex-direction: column; max-height: 100%; }
         .card-list-scroll { flex-grow: 1; overflow-y: auto; overflow-x: hidden; min-height: 150px; padding: 12px; }
         .task-card { cursor: grab; border: 1px solid transparent; transition: all 0.2s ease; overflow-wrap: break-word; word-break: break-word; }
@@ -34,7 +31,6 @@
         .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #94a3b8; }
         .dark .task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.4); border-color: #64748b; }
         
-        /* Tags */
         .tag { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .tag-urgent { background: #fee2e2; color: #b91c1c; }
         .tag-high { background: #fef3c7; color: #b45309; }
@@ -45,7 +41,6 @@
         .dark .tag-normal { background: #312e81; color: #a5b4fc; }
         .dark .tag-low { background: #334155; color: #cbd5e1; }
         
-        /* Markdown rendering */
         .markdown-body { font-size: 14px; line-height: 1.6; color: inherit; }
         .markdown-body p { margin-bottom: 0.8em; }
         .markdown-body strong { font-weight: 700; color: #0f172a; }
@@ -57,12 +52,10 @@
         .markdown-body th { background-color: #f8fafc; font-weight: bold; color: #0f172a; }
         .dark .markdown-body th { background-color: #1e293b; color: #f8fafc; }
         
-        /* Strict Dark Mode Text Enforcement for AI chat */
         .dark .markdown-body { color: #f8fafc !important; }
         .dark .markdown-body h1, .dark .markdown-body h2, .dark .markdown-body h3, .dark .markdown-body h4, .dark .markdown-body h5, .dark .markdown-body h6 { color: #ffffff !important; }
         .dark .markdown-body p, .dark .markdown-body li, .dark .markdown-body span { color: #f1f5f9 !important; }
 
-        /* Siri animation orb */
         .siri-orb { background: radial-gradient(circle at center, #3b82f6, #8b5cf6, #ec4899); background-size: 200% 200%; animation: orb-pulse 2s infinite ease-in-out; }
         @keyframes orb-pulse { 0% { background-position: 0% 50%; transform: scale(0.95); } 50% { background-position: 100% 50%; transform: scale(1.05); } 100% { background-position: 0% 50%; transform: scale(0.95); } }
     </style>
@@ -140,6 +133,16 @@
                 </button>
  
                 <div class="flex items-center space-x-6">
+
+                    <div class="flex items-center space-x-1 border-r border-slate-200 dark:border-slate-700 pr-5 mr-1">
+                        <button @click="undo" :disabled="!canUndo" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Undo (Ctrl+Z)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                        </button>
+                        <button @click="redo" :disabled="!canRedo" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Redo (Ctrl+Y)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"/></svg>
+                        </button>
+                    </div>
+
                     <div class="relative">
                         <button @click="showNotifications = !showNotifications" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition relative">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -431,6 +434,32 @@
         </main>
     </div>
 
+    <div v-if="pendingVoiceTask" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-700 p-6 transform transition-all scale-100">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center text-brand">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-slate-900 dark:text-white">Confirm Task Capture</h3>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Voice to Task</p>
+                </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 mb-6 border border-slate-100 dark:border-slate-700/50">
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">"{{ pendingVoiceTask.title }}"</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.company }}</span>
+                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ columns.find(c => c.id === pendingVoiceTask.status)?.title || 'Not Started' }}</span>
+                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.priority }} Priority</span>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button @click="pendingVoiceTask = null" class="flex-1 py-2.5 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">Cancel</button>
+                <button @click="confirmVoiceTask" class="flex-1 py-2.5 rounded-lg font-black text-sm text-white bg-brand shadow-md hover:bg-emerald-500 transition">Confirm Add</button>
+            </div>
+        </div>
+    </div>
+
     <div class="fixed bottom-8 right-8 z-50 flex items-end justify-end">
         <div v-if="siriListening || siriProcessing" class="absolute bottom-20 right-0 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl w-72 border border-slate-700 backdrop-blur-md bg-opacity-90 mb-2 origin-bottom-right transition-all">
             <div class="flex items-center space-x-3 mb-2">
@@ -518,9 +547,9 @@
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
                     <div v-if="editingTask.subtasks" v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
-                        <input type="checkbox" v-model="s.done" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
+                        <input type="checkbox" v-model="s.done" @change="commitState" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
                         <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none focus:border-brand">
-                        <button @click="editingTask.subtasks.splice(idx,1)" class="text-slate-300 hover:text-red-500 transition">&times;</button>
+                        <button @click="editingTask.subtasks.splice(idx,1); commitState()" class="text-slate-300 hover:text-red-500 transition">&times;</button>
                     </div>
                     <button @click="editingTask.subtasks.push({text:'', done:false})" class="mt-3 text-xs font-black text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition flex items-center">
                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add Step
@@ -590,9 +619,14 @@ createApp({
         const siriListening = ref(false);
         const siriProcessing = ref(false);
         const siriTranscript = ref('');
+        const pendingVoiceTask = ref(null);
         let siriRecog = null;
         
+        // Undo/Redo State
+        const history = ref([]);
+        const historyIndex = ref(-1);
         const tasks = ref([]);
+
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
  
         const matrixQuadrants = [
@@ -601,6 +635,37 @@ createApp({
             { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] },
             { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
         ];
+
+        // Undo/Redo Logic
+        const commitState = () => {
+            if (historyIndex.value < history.value.length - 1) {
+                history.value = history.value.slice(0, historyIndex.value + 1);
+            }
+            history.value.push(JSON.stringify(tasks.value));
+            if (history.value.length > 50) history.value.shift();
+            else historyIndex.value = history.value.length - 1;
+        };
+
+        const canUndo = computed(() => historyIndex.value > 0);
+        const canRedo = computed(() => historyIndex.value < history.value.length - 1);
+
+        const undo = () => {
+            if (canUndo.value) {
+                historyIndex.value--;
+                tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
+                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                nextTick(initSortable);
+            }
+        };
+
+        const redo = () => {
+            if (canRedo.value) {
+                historyIndex.value++;
+                tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
+                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                nextTick(initSortable);
+            }
+        };
  
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
@@ -614,20 +679,16 @@ createApp({
             return Math.round((completedTasks.value.length / total) * 100);
         });
 
-        // Computed Cycle Time (Historical Performance mockup that scales based on data)
         const avgCycleTime = computed(() => {
             const completed = completedTasks.value;
             if(completed.length === 0) return 0;
-            // Simplified realistic calculation simulation for demonstration
             return 3.4;
         });
 
-        // Blocker Predictor Logic
         const atRiskTasks = computed(() => {
             return tasks.value.filter(t => t.status === 'waiting' && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value));
         });
 
-        // Resource View Logic
         const assignees = computed(() => {
             const uniqueAssignees = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))];
             return uniqueAssignees.map(name => ({ id: name, title: name }));
@@ -724,11 +785,11 @@ createApp({
             document.getElementById('file-upload').value = '';
         };
 
-        // Siri Quick Capture Logic
+        // Modified: Siri Quick Capture Logic with Pop-Up Trigger
         const processSiriCommand = async (text) => {
              const prompt = `Extract task creation details from this voice command: "${text}". 
              Return ONLY valid JSON format with NO markdown formatting, NO markdown blocks, and NO additional text. 
-             Required keys: "title" (string), "company" (choose from: "Dymek", "GigaScan", "Lading Technology"), "priority" (choose from: "Urgent", "High", "Normal", "Low"), "assignee" (string name if mentioned, otherwise "Unassigned").`;
+             Required keys: "title" (string), "company" (choose from: "Dymek", "GigaScan", "Lading Technology"), "priority" (choose from: "Urgent", "High", "Normal", "Low"), "status" (choose from: "notstarted", "progress", "waiting", "brainstorm"), "assignee" (string name if mentioned, otherwise "Unassigned").`;
              
              try {
                 const res = await fetch('https://text.pollinations.ai/', {
@@ -739,18 +800,29 @@ createApp({
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
                 
-                tasks.value.push(schemaEnhance({
-                    id: Date.now(),
+                pendingVoiceTask.value = {
                     title: data.title || text,
                     company: data.company || 'Dymek',
                     priority: data.priority || 'Normal',
-                    status: 'notstarted',
+                    status: data.status || 'notstarted',
                     assignee: data.assignee || 'Unassigned'
-                }));
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                };
              } catch(e) {
                  console.error("Failed to parse Voice Command", e);
+                 // Fallback if parsing fails
+                 pendingVoiceTask.value = { title: text, company: 'Dymek', priority: 'Normal', status: 'notstarted', assignee: 'Unassigned' };
              }
+        };
+
+        const confirmVoiceTask = () => {
+            if (!pendingVoiceTask.value) return;
+            tasks.value.push(schemaEnhance({
+                id: Date.now(),
+                ...pendingVoiceTask.value
+            }));
+            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+            commitState(); // Save to Undo history
+            pendingVoiceTask.value = null;
         };
 
         const toggleSiriCapture = () => {
@@ -778,7 +850,12 @@ createApp({
                 }
                 siriTranscript.value = finalT || interimT;
             };
-            siriRecog.onerror = (e) => { console.error(e); siriListening.value = false; siriProcessing.value = false; };
+            siriRecog.onerror = (e) => { 
+                console.error(e); 
+                siriListening.value = false; 
+                siriProcessing.value = false; 
+                if(e.error === 'not-allowed') alert("Microphone access was denied. Please allow microphone access to use this feature.");
+            };
             siriRecog.onend = async () => { 
                 siriListening.value = false;
                 if(siriTranscript.value && siriTranscript.value !== 'I am listening...') {
@@ -984,13 +1061,23 @@ createApp({
  
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
+        
         const saveTask = () => {
             if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
             else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
             editingTask.value = null;
             localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+            commitState(); // Save to Undo history
         };
-        const deleteTask = () => { if(confirm("Permanently delete this task?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
+
+        const deleteTask = () => { 
+            if(confirm("Permanently delete this task?")) { 
+                tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); 
+                editingTask.value = null; 
+                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+                commitState(); // Save to Undo history
+            } 
+        };
  
         const initialData = [
             { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first', assignee: 'Kriti' },
@@ -1027,6 +1114,7 @@ createApp({
                 if (idx !== -1) {
                     tasks.value[idx].action = text;
                     localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                    commitState(); // Save to Undo history after AI adds an action
                 }
             } catch (e) {
                 console.error("Failed to auto-generate next action", e);
@@ -1034,7 +1122,6 @@ createApp({
         };
  
         const initSortable = () => {
-            // Main Kanban Initialization
             columns.forEach(col => {
                 const el = document.getElementById('kanban-' + col.id);
                 if (el) {
@@ -1047,6 +1134,7 @@ createApp({
                                     t.status = evt.to.dataset.status;
                                     t.lastUpdated = Date.now();
                                     localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                                    commitState(); // Save to Undo history
                                     
                                     if (t.status === 'progress' && (!t.action || t.action.trim() === '')) generateNextAction(t);
                                 }
@@ -1056,7 +1144,6 @@ createApp({
                 }
             });
 
-            // Resource Load Initialization
             document.querySelectorAll('.resource-list').forEach(el => {
                 new Sortable(el, { group: 'resource', animation: 150, ghostClass: 'opacity-50',
                     onEnd: (evt) => {
@@ -1067,13 +1154,13 @@ createApp({
                                 t.assignee = evt.to.dataset.assignee;
                                 t.lastUpdated = Date.now();
                                 localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                                commitState(); // Save to Undo history
                             }
                         }
                     }
                 });
             });
  
-            // Matrix Initialization
             matrixQuadrants.forEach(quad => {
                 const el = document.getElementById('matrix-' + quad.id);
                 if (el) {
@@ -1087,6 +1174,7 @@ createApp({
                                     t.effort = evt.to.dataset.effort;
                                     t.lastUpdated = Date.now();
                                     localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                                    commitState(); // Save to Undo history
                                 }
                             }
                         }
@@ -1113,11 +1201,21 @@ createApp({
             scrollToBottom();
  
             window.addEventListener('keydown', (e) => {
+                const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+                
+                // Command Palette Shortcut
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                     e.preventDefault(); showCommandPalette.value = true;
                     setTimeout(() => document.getElementById('cmd-input')?.focus(), 50);
                 }
-                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; showNotifications.value = false; showFileMenu.value = false;}
+                
+                // Undo / Redo Shortcuts (ignore if user is typing text)
+                if (!isTyping) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+                    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
+                }
+
+                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; showNotifications.value = false; showFileMenu.value = false; pendingVoiceTask.value = null;}
             });
  
             try {
@@ -1130,7 +1228,10 @@ createApp({
             } catch (error) {
                 tasks.value = [...initialData].map(schemaEnhance);
             }
- 
+            
+            // Initialize first state into history
+            commitState();
+
             nextTick(initSortable);
         });
  
@@ -1143,7 +1244,8 @@ createApp({
             showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand,
             aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
             attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
-            siriListening, siriProcessing, siriTranscript, toggleSiriCapture,
+            siriListening, siriProcessing, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture,
+            undo, redo, canUndo, canRedo, commitState,
             filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
             completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
             getWorkload, generateBrief, generateNextAction,
