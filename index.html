@@ -10,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        [v-cloak] { display: none; }
         body { font-family: 'Inter', sans-serif; background: #e2e8f0; color: #0f172a; overflow-y: auto; overflow-x: hidden; }
         .max-dashboard-width { max-width: 1650px; margin: 0 auto; width: 100%; }
         .board-header { background: linear-gradient(to right, #94a3b8, #cbd5e1); border-bottom: 2px solid #475569; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
@@ -29,12 +28,16 @@
         .tag-high { background: #fef3c7; color: #b45309; }
         .tag-normal { background: #e0e7ff; color: #4338ca; }
         .tag-low { background: #f1f5f9; color: #475569; }
-        .ai-response-scroll { max-height: 380px; overflow-y: auto; padding-right: 10px; }
+        
+        /* Modern AI Styles */
+        .ai-response-scroll { overflow-y: auto; scroll-behavior: smooth; }
         .markdown-body h3 { font-weight: 800; margin-top: 12px; margin-bottom: 6px; color: #0f172a; }
-        .markdown-body p { margin-bottom: 10px; color: #1e293b; }
+        .markdown-body p { margin-bottom: 10px; color: #1e293b; line-height: 1.6; }
         .markdown-body ul { list-style: disc; margin-left: 20px; margin-bottom: 12px; }
+        
         .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 8px; }
         .progress-fill { height: 100%; background: #10b981; transition: width 0.3s ease; }
+        [v-cloak] { display: none; }
     </style>
 </head>
 <body>
@@ -61,27 +64,88 @@
 
     <div class="px-6 pt-6 flex justify-center">
         <div class="max-dashboard-width flex gap-5 items-start w-full">
-            <div class="bg-white rounded-xl p-4 shadow-sm flex-grow border border-slate-300">
-                <div class="flex justify-between items-center mb-1">
+            
+            <div class="bg-white rounded-xl shadow-sm flex-grow border border-slate-300 flex flex-col relative overflow-hidden h-[300px]">
+                
+                <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
                     <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Vora <span class="font-normal lowercase opacity-60">(grounded calm intelligence)</span></p>
+                        <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center shadow-sm">
+                            <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        </div>
+                        <span class="font-black text-slate-800 tracking-tight">Vora</span>
                     </div>
-                    <div class="flex space-x-2">
-                        <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-slate-400 border-transparent'" class="text-[9px] font-bold px-2 py-0.5 border rounded-md transition-all">{{ mode }}</button>
+                    <div class="flex space-x-1 bg-slate-200/50 p-1 rounded-lg">
+                        <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
                     </div>
                 </div>
-                <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="How's your day going, Stanley? Tell me what's on your mind..." class="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-900 outline-none p-0">
-                <div v-if="aiStatus || aiResponse" class="mt-4 pt-4 border-t-2 border-slate-200 ai-response-scroll">
-                    <p v-if="aiStatus" class="text-xs text-slate-600 font-bold animate-pulse">{{ aiStatus }}</p>
-                    <div v-if="aiResponse" class="markdown-body text-sm text-slate-800 bg-slate-50 p-5 rounded-lg border border-slate-300" v-html="parsedAiResponse"></div>
+
+                <div class="flex-grow p-5 ai-response-scroll flex flex-col bg-white relative">
+                    <div v-if="!aiStatus && !aiResponse" class="m-auto text-center flex flex-col items-center justify-center opacity-80 pb-6">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800 mb-1">Good afternoon, Stanley.</h2>
+                        <p class="text-sm font-medium text-slate-500">I am here to support you. How can I help today?</p>
+                    </div>
+
+                    <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-600 font-medium text-sm p-4 bg-slate-50 rounded-xl w-fit mb-4">
+                        <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span>{{ aiStatus }}</span>
+                    </div>
+
+                    <div v-if="aiResponse" class="w-full pb-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 rounded-full bg-slate-800 flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
+                                 <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                            </div>
+                            <div class="markdown-body text-sm text-slate-800 flex-grow" v-html="parsedAiResponse"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white border-t border-slate-100 shrink-0 relative">
+                    
+                    <div v-if="attachedFile" class="absolute -top-10 left-6 bg-white border border-slate-300 text-slate-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-md z-10 animate-fade-in">
+                        <svg class="w-3 h-3 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                        <span class="truncate max-w-[150px] font-medium">{{ attachedFile }}</span>
+                        <button @click="removeFile" class="ml-2 text-slate-400 hover:text-red-500 transition-colors focus:outline-none">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="relative flex items-center bg-[#f4f4f5] rounded-full px-2 py-1.5 border border-slate-200 focus-within:border-slate-400 focus-within:ring-1 focus-within:ring-slate-400 transition-all shadow-sm max-w-4xl mx-auto">
+                        
+                        <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
+
+                        <button @click="triggerFileUpload" class="p-2 text-slate-500 hover:text-slate-800 transition rounded-full hover:bg-slate-200" title="Attach file">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        </button>
+                        
+                        <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-900 outline-none px-3 placeholder-slate-500">
+                        
+                        <button @click="toggleSpeechRecognition" :class="isListening ? 'text-red-500 animate-pulse bg-red-50' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-800'" class="p-2 transition rounded-full mr-1" title="Voice Input">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                        </button>
+                        
+                        <button @click="askAI" :disabled="isThinking || !aiInput.trim()" class="p-2 bg-slate-800 text-white hover:bg-slate-700 disabled:opacity-50 disabled:bg-slate-300 transition rounded-full flex items-center justify-center w-8 h-8">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-5 shadow-sm w-80 border border-slate-300 shrink-0">
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Velocity ({{ activeTab }})</h3>
-                <div class="flex justify-between">
-                    <div><p class="text-2xl font-black text-slate-900 leading-none">{{ completedTasks.length }}</p><p class="text-[10px] text-slate-500 font-bold mt-1 uppercase">Done</p></div>
-                    <div class="text-right"><p :class="wipCount > 4 ? 'text-red-600' : 'text-emerald-600'" class="text-2xl font-black leading-none">{{ wipCount }}</p><p class="text-[10px] text-slate-500 font-bold mt-1 uppercase">Wip</p></div>
+
+            <div class="bg-white rounded-xl p-5 shadow-sm w-80 border border-slate-300 shrink-0 h-[300px] flex flex-col justify-center">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">Velocity ({{ activeTab }})</h3>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-4xl font-black text-slate-900 leading-none">{{ completedTasks.length }}</p>
+                        <p class="text-[10px] text-slate-500 font-bold mt-2 uppercase">Tasks Done</p>
+                    </div>
+                    <div class="h-10 w-px bg-slate-200"></div>
+                    <div class="text-right">
+                        <p :class="wipCount > 4 ? 'text-red-600' : 'text-emerald-600'" class="text-4xl font-black leading-none">{{ wipCount }}</p>
+                        <p class="text-[10px] text-slate-500 font-bold mt-2 uppercase">WIP</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -153,11 +217,17 @@ createApp({
         const viewMode = ref('kanban');
         const zenMode = ref(false);
         const editingTask = ref(null);
+        
+        // Vora Variables
         const aiInput = ref('');
         const aiStatus = ref('');
         const aiResponse = ref('');
         const aiMode = ref('Fast');
         const isThinking = ref(false);
+        const attachedFile = ref(null);
+        const isListening = ref(false);
+        let speechRecog = null;
+        
         const tasks = ref([]);
         
         const parsedAiResponse = computed(() => aiResponse.value ? marked.parse(aiResponse.value) : '');
@@ -175,29 +245,81 @@ createApp({
         const getCompletedSubtasks = (t) => t.subtasks.filter(s => s.done).length;
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
 
+        // File Attachment Handlers
+        const triggerFileUpload = () => document.getElementById('file-upload').click();
+        const handleFileChange = (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                attachedFile.value = e.target.files[0].name;
+            }
+        };
+        const removeFile = () => {
+            attachedFile.value = null;
+            document.getElementById('file-upload').value = '';
+        };
+
+        // Voice Recognition Handlers
+        const toggleSpeechRecognition = () => {
+            if (isListening.value) {
+                if (speechRecog) speechRecog.stop();
+                return;
+            }
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Voice input is not supported in your browser. Please use Chrome or Edge.");
+                return;
+            }
+            speechRecog = new webkitSpeechRecognition();
+            speechRecog.continuous = false;
+            speechRecog.interimResults = false;
+            speechRecog.onstart = () => { isListening.value = true; };
+            speechRecog.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                aiInput.value += (aiInput.value ? ' ' : '') + transcript;
+            };
+            speechRecog.onerror = (e) => { console.error(e); isListening.value = false; };
+            speechRecog.onend = () => { isListening.value = false; };
+            speechRecog.start();
+        };
+
+        // Core Vora AI Logic
         const askAI = async () => {
-            const query = aiInput.value.trim(); if (!query) return;
-            isThinking.value = true; 
-            aiStatus.value = aiMode.value === 'Research' ? "Vora is performing deep research..." : "Vora is gathering thoughts...";
+            let query = aiInput.value.trim(); 
+            if (!query && !attachedFile.value) return;
             
-            const systemPrompt = `You are Vora, the grounded and calm AI intelligence for Fitma. 
-            Mode: ${aiMode.value}.
-            Persona: Respond with profound kindness, care, and soothing words. Be human-like and empathetic.
-            Objective: Act as a wise executive companion. Use soft, encouraging language while remaining highly intelligent and direct.
-            If mode is Research, provide deeper structural analysis. If Fast, stay warm but quick.`;
+            isThinking.value = true; 
+            aiResponse.value = "";
+            aiStatus.value = aiMode.value === 'Research' ? "Vora is deep researching..." : "Vora is gathering thoughts...";
+            
+            if (attachedFile.value) {
+                query += `\n[System Note: User has attached a file named "${attachedFile.value}". Acknowledge this if relevant.]`;
+            }
+
+            const systemPrompt = `You are Vora, Fitma's highly intelligent, premium AI assistant. 
+            Current Mode: ${aiMode.value}.
+            Core Directives:
+            1. You MUST be profoundly kind, caring, and friendly. Make Stanley feel like he is talking to a warm, deeply supportive human friend.
+            2. Be conversational but highly intelligent and capable. 
+            3. Keep responses fast and concise to ensure low latency, unless in Research mode.
+            4. If Stanley asks for help, provide sharp, excellent guidance wrapped in an encouraging, empathetic tone.`;
 
             try {
+                // Optimized API Call for speed
                 const res = await fetch('https://text.pollinations.ai/', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ 
-                        messages: [{role:'system', content:systemPrompt}, {role:'user', content:query}] 
+                        messages: [{role:'system', content:systemPrompt}, {role:'user', content:query}],
+                        seed: Math.floor(Math.random() * 1000)
                     }) 
                 });
                 aiResponse.value = await res.text();
             } catch (err) {
-                aiResponse.value = "I'm so sorry, Stanley. I'm having a little trouble connecting right now. Take a deep breath, and we can try again in a moment. I'm here.";
-            } finally { isThinking.value = false; aiStatus.value = ''; aiInput.value = ''; }
+                aiResponse.value = "I'm so sorry, Stanley. I'm having a little trouble connecting to the network right now. Please take a deep breath, and we can try again in a moment. I'm here for you.";
+            } finally { 
+                isThinking.value = false; 
+                aiStatus.value = ''; 
+                aiInput.value = ''; 
+                removeFile(); // Clear file after sending
+            }
         };
 
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
@@ -212,7 +334,6 @@ createApp({
         onMounted(() => {
             const saved = localStorage.getItem('fitma_os_pro_silver');
             tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [
-                /* DYMEK (23 Tasks) */
                 { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
                 { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
                 { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Dow feedback expected 4/22' },
@@ -236,7 +357,6 @@ createApp({
                 { id: 21, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Direct to webpage or landing page?' },
                 { id: 22, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Budget issues currently' },
                 { id: 23, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', impact: 'Low', status: 'brainstorm' },
-                /* GIGASCAN (10 Tasks) */
                 { id: 24, company: 'GigaScan', title: 'New Solutions page (3 categories)', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'GigaScan team provide images' },
                 { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live with Patrik', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley schedule meeting' },
                 { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
@@ -247,7 +367,6 @@ createApp({
                 { id: 31, company: 'GigaScan', title: 'Review LinkedIn mental notes', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Stanley obtain access' },
                 { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Need system images/videos' },
                 { id: 33, company: 'GigaScan', title: 'Fix zoom-in padding dynamic', priority: 'Low', impact: 'Low', status: 'notstarted' },
-                /* LADING TECHNOLOGY (28 Tasks) */
                 { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
@@ -316,7 +435,13 @@ createApp({
             });
         });
 
-        return { activeTab, viewMode, zenMode, tasks, editingTask, columns, aiInput, aiStatus, aiResponse, aiMode, parsedAiResponse, isThinking, filteredTasks, completedTasks, timelineTasks, matrixTasks, getTaskCount, wipCount, getCompletedSubtasks, toggleZenMode, askAI, addTask, openTask, saveTask, deleteTask };
+        return { 
+            activeTab, viewMode, zenMode, tasks, editingTask, columns, 
+            aiInput, aiStatus, aiResponse, aiMode, parsedAiResponse, isThinking, 
+            attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
+            filteredTasks, completedTasks, timelineTasks, matrixTasks, getTaskCount, wipCount, 
+            getCompletedSubtasks, toggleZenMode, askAI, addTask, openTask, saveTask, deleteTask 
+        };
     }
 }).mount('#app');
 </script>
