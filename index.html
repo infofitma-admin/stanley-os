@@ -20,170 +20,225 @@
         [v-cloak] { display: none; }
         body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100vh; width: 100vw; }
         
-        /* Modern Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
-        /* Kanban Layout - Fix for Point 9 */
-        .kanban-col { min-width: 320px; max-width: 320px; display: flex; flex-direction: column; max-height: 100%; }
-        .card-list-scroll { flex-grow: 1; overflow-y: auto; padding: 12px; }
-        .task-card { cursor: grab; transition: all 0.2s ease; border: 1px solid transparent; }
+        .kanban-col { min-width: 320px; max-width: 320px; transition: all 0.3s ease; display: flex; flex-direction: column; max-height: 100%; }
+        .card-list-scroll { flex-grow: 1; overflow-y: auto; overflow-x: hidden; min-height: 150px; padding: 12px; }
+        .task-card { cursor: grab; border: 1px solid transparent; transition: all 0.2s ease; overflow-wrap: break-word; word-break: break-word; }
         .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #94a3b8; }
         
-        /* Point 5: Vora Readability CSS (Table/Structure) */
+        .tag { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-urgent { background: #fee2e2; color: #b91c1c; }
+        .tag-high { background: #fef3c7; color: #b45309; }
+        .tag-normal { background: #e0e7ff; color: #4338ca; }
+        .tag-low { background: #f1f5f9; color: #475569; }
+        .dark .tag-urgent { background: #7f1d1d; color: #fca5a5; }
+
+        /* Tweak 5: Vora Readability (Tables/Lines) */
         .markdown-body { font-size: 14px; line-height: 1.6; color: inherit; }
-        .markdown-body table { width: 100%; border-collapse: collapse; margin: 15px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin: 16px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
         .dark .markdown-body table { border-color: #334155; }
-        .markdown-body th, .markdown-body td { padding: 12px; border: 1px solid #e2e8f0; text-align: left; }
+        .markdown-body th, .markdown-body td { padding: 10px; border: 1px solid #e2e8f0; text-align: left; }
         .dark .markdown-body th, .dark .markdown-body td { border-color: #334155; }
         .markdown-body th { background: #f8fafc; font-weight: 700; }
         .dark .markdown-body th { background: #1e293b; }
         .markdown-body hr { border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0; }
         .dark .markdown-body hr { border-top-color: #334155; }
 
-        /* Point 1: Brief Card Styles */
+        /* Tweak 1: Morning Brief Cards */
         .brief-card { border-left-width: 4px; padding: 12px; border-radius: 8px; margin-bottom: 12px; transition: transform 0.2s; }
-        .brief-card:hover { transform: scale(1.02); }
+        .brief-card:hover { transform: translateY(-2px); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+<body class="bg-slate-50 text-slate-900 transition-colors duration-300">
 
 <div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen w-full flex overflow-hidden">
-    
-    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 z-20">
-        <div class="h-16 flex items-center px-6 border-b border-slate-800">
-            <div class="w-6 h-6 bg-brand rounded flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            </div>
-            <h1 class="text-sm font-black text-white tracking-tight uppercase">Fitma | Stanley OS</h1>
-        </div>
+    <div class="flex w-full h-full dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         
-        <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8">
-            <div>
-                <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Views</h2>
-                <div class="space-y-1">
-                    <button @click="viewMode='kanban'; activeTab='All'" :class="viewMode==='kanban'?'bg-slate-800 text-white':'hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-all"><svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7"/></svg> Dashboard</button>
-                    <button @click="viewMode='matrix'" :class="viewMode==='matrix'?'bg-slate-800 text-white':'hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-all"><svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2z"/></svg> Impact Matrix</button>
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 transition-all z-20 h-full">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800 flex-shrink-0">
+                <div class="w-6 h-6 bg-brand rounded flex items-center justify-center mr-3 shadow-lg shadow-brand/20">
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
+                <h1 class="text-base font-black text-white tracking-tight">Fitma <span class="font-normal opacity-50">| Stanley OS</span></h1>
             </div>
-            <div>
-                <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Portfolios</h2>
-                <div class="space-y-1">
-                    <button v-for="p in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab=p; viewMode='kanban'" :class="activeTab===p?'text-white border-l-2 border-brand bg-slate-800/50':'border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-all">{{p}}</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="p-4 border-t border-slate-800">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                </div>
-                <div><p class="text-xs font-bold text-white">Vora AI</p><p class="text-[10px] text-emerald-500 font-bold uppercase">System Active</p></div>
-            </div>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col overflow-hidden transition-colors duration-300">
-        
-        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 shrink-0">
-            <button @click="showCommandPalette=true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-lg text-xs font-bold hover:bg-slate-200 transition">SEARCH <span class="ml-4 opacity-50">Ctrl K</span></button>
             
-            <div class="flex items-center space-x-6">
-                <div class="relative">
-                    <button class="text-slate-400 hover:text-slate-600 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        <span v-if="smartNotifications.length > 0" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-                    </button>
+            <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8 custom-scrollbar">
+                <div>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Views</h2>
+                    <div class="space-y-1">
+                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7"/></svg> Dashboard
+                        </button>
+                        <button @click="viewMode = 'timeline'; activeTab = 'All'" :class="viewMode==='timeline' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7"/></svg> Timeline
+                        </button>
+                        <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6"/></svg> Impact Matrix
+                        </button>
+                    </div>
                 </div>
-                <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-500 transition">
-                    <svg v-if="isDarkMode" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+
+                <div>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
+                    <div class="space-y-1">
+                        <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
+                            <div class="w-2 h-2 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-500':tab==='GigaScan'?'bg-purple-500':'bg-orange-500'"></div>
+                            {{ tab }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex-shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center relative">
+                        <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063z"/></svg>
+                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
+                    </div>
+                    <div><p class="text-xs font-bold text-white">Vora AI</p><p class="text-[10px] font-medium text-emerald-400">Online & Ready</p></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
+            
+            <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
+                <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Search tasks... <span class="ml-4 text-[10px] font-bold">Ctrl K</span>
                 </button>
-                </div>
-        </header>
 
-        <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            
-            <div class="flex gap-6 mb-8 max-w-[1600px] mx-auto">
-                <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden h-[380px]">
-                    <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                            <span class="font-black text-slate-800 dark:text-white text-xs uppercase">Vora Intelligence</span>
-                        </div>
-                        <button @click="generateBrief" class="text-[10px] font-black uppercase text-brand hover:underline px-3 py-1 bg-brand/10 rounded-full">Morning Brief</button>
+                <div class="flex items-center space-x-6">
+                    <div class="relative">
+                        <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition relative">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <span v-if="smartNotifications.length > 0" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                        </button>
                     </div>
                     
-                    <div class="flex-grow p-5 overflow-y-auto bg-white dark:bg-slate-800 custom-scrollbar" ref="chatScrollContainer">
-                        <div v-for="m in chatHistory" :class="m.role==='user'?'justify-end pl-12':'justify-start pr-12'" class="flex mb-4">
-                            <div v-if="m.type === 'brief'" class="w-full space-y-3">
-                                <div v-for="card in m.cards" :class="card.color" class="brief-card bg-slate-50 dark:bg-slate-900 border-l-4 shadow-sm">
-                                    <p class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">{{card.portfolio}}</p>
-                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{card.content}}</p>
-                                </div>
-                            </div>
-                            <div v-else :class="m.role==='user'?'bg-slate-100 dark:bg-slate-700 rounded-2xl rounded-tr-sm':'markdown-body w-full'" class="px-4 py-3 text-sm" v-html="m.role==='user'?m.content:parseMarkdown(m.content)"></div>
+                    <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 dark:hover:text-amber-300 transition">
+                        <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    </button>
+                    </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto overflow-x-hidden p-8 custom-scrollbar">
+                <div class="flex gap-6 mb-8 max-w-[1600px] mx-auto">
+                    <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col relative overflow-hidden h-[360px]">
+                        <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
+                            <div class="flex items-center space-x-2"><span class="font-black text-slate-800 dark:text-white tracking-tight uppercase text-xs">Vora Intelligence</span></div>
+                            <button @click="generateBrief" class="px-3 py-1 bg-brand text-white text-[10px] font-black rounded-full hover:bg-emerald-600 transition shadow-sm">Morning Brief</button>
                         </div>
-                        <div v-if="aiStatus" class="text-[10px] font-black uppercase text-slate-400 animate-pulse">{{aiStatus}}</div>
+
+                        <div class="flex-grow p-5 overflow-y-auto flex flex-col bg-white dark:bg-slate-800 custom-scrollbar" ref="chatScrollContainer">
+                            <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.role === 'user' ? 'flex justify-end pl-12' : 'flex items-start space-x-3 pr-12'" class="mb-4">
+                                <div v-if="msg.type === 'brief'" class="w-full space-y-2">
+                                    <div v-for="card in msg.cards" :class="card.color" class="brief-card bg-slate-50 dark:bg-slate-900 border-l-4">
+                                        <p class="text-[9px] font-black uppercase tracking-widest opacity-50 mb-1">{{card.portfolio}}</p>
+                                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{card.content}}</p>
+                                    </div>
+                                </div>
+                                <div v-else :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 rounded-2xl px-4 py-3 text-sm' : 'markdown-body w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
+                            </div>
+                            <div v-if="aiStatus" class="text-[10px] font-black uppercase text-slate-400 animate-pulse">{{ aiStatus }}</div>
+                        </div>
+
+                        <div class="p-4 border-t border-slate-100 dark:border-slate-700 relative">
+                            <div v-if="attachedFile" class="mb-2 flex items-center bg-brand/10 p-2 rounded-lg border border-brand/20">
+                                <p class="text-[10px] font-black text-brand truncate flex-1 uppercase">Ready: {{ attachedFile.name }}</p>
+                                <button @click="attachedFile=null" class="text-red-500 font-bold">&times;</button>
+                            </div>
+                            <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-full px-2 py-1.5 border border-slate-200 dark:border-slate-700">
+                                <div class="relative group">
+                                    <button class="p-2 text-slate-400 hover:text-brand transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
+                                    <div class="absolute bottom-full left-0 mb-2 bg-slate-900 text-white text-[10px] rounded-xl overflow-hidden hidden group-hover:block w-36 shadow-2xl">
+                                        <button @click="triggerUpload('image')" class="w-full text-left p-3 hover:bg-slate-800 border-b border-slate-800">Analyze Image</button>
+                                        <button @click="triggerUpload('doc')" class="w-full text-left p-3 hover:bg-slate-800">Analyze Document</button>
+                                    </div>
+                                </div>
+                                <input v-model="aiInput" @keyup.enter="askAI" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-medium outline-none px-3">
+                                <button @click="askAI" class="p-2 bg-brand text-white rounded-full shadow-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg></button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 shrink-0 relative">
-                        <div v-if="attachedFile" class="mb-2 flex items-center bg-white dark:bg-slate-800 p-2 rounded-lg border border-brand animate-fade-in shadow-md">
-                            <p class="text-[10px] font-black text-brand truncate flex-1 uppercase">Ready to Analyze: {{attachedFile.name}}</p>
-                            <button @click="attachedFile=null" class="text-red-500 ml-2 font-bold">&times;</button>
-                        </div>
-                        <div class="flex items-center bg-white dark:bg-slate-800 rounded-full px-2 py-1 border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <div class="relative group">
-                                <button class="p-2 text-slate-400 hover:text-brand"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
-                                <div class="absolute bottom-full left-0 mb-3 bg-slate-900 text-white text-[10px] rounded-xl overflow-hidden hidden group-hover:block w-40 shadow-2xl">
-                                    <button @click="triggerUpload('image')" class="w-full text-left p-3 hover:bg-slate-800 border-b border-slate-800">Choose Image (Vision)</button>
-                                    <button @click="triggerUpload('doc')" class="w-full text-left p-3 hover:bg-slate-800">Choose Document (Data)</button>
-                                </div>
-                            </div>
-                            <input v-model="aiInput" @keyup.enter="askAI" placeholder="Ask Vora to analyze..." class="flex-1 bg-transparent border-none text-sm px-3 focus:ring-0 outline-none dark:text-white">
-                            <button @click="askAI" class="p-2 bg-brand text-white rounded-full shadow-lg"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg></button>
+                    <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col items-center justify-center shrink-0">
+                        <div class="relative w-36 h-36 flex items-center justify-center mb-6">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-slate-100 dark:text-slate-700" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="text-brand transition-all duration-1000" stroke-width="3.5" :stroke-dasharray="completionPercentage + ', 100'" stroke="currentColor" fill="none" stroke-linecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="absolute flex flex-col items-center"><span class="text-3xl font-black">{{ completionPercentage }}%</span></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col items-center justify-center shrink-0">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 self-start">Velocity analytics</h3>
-                    <div class="relative w-32 h-32 flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-slate-100 dark:text-slate-700" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-brand transition-all duration-1000" stroke-width="3.5" :stroke-dasharray="completionPercentage + ', 100'" stroke="currentColor" fill="none" stroke-linecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <div class="absolute flex flex-col items-center"><span class="text-2xl font-black">{{completionPercentage}}%</span></div>
-                    </div>
-                    <div class="w-full grid grid-cols-2 gap-4 mt-8 pt-6 border-t dark:border-slate-700">
-                        <div class="text-center"><p class="text-xl font-black">{{completedTasks.length}}</p><p class="text-[9px] font-bold text-slate-400 uppercase">Done</p></div>
-                        <div class="text-center border-l dark:border-slate-700"><p class="text-xl font-black text-brand">{{wipCount}}</p><p class="text-[9px] font-bold text-slate-400 uppercase">In progress</p></div>
-                    </div>
+                <div class="max-w-[1600px] mx-auto pb-10">
+                    <main v-show="viewMode === 'kanban'" class="flex gap-5 overflow-x-auto pb-4 custom-scrollbar">
+                        <div v-for="col in columns" :key="col.id" class="bg-slate-200/50 dark:bg-slate-800/40 rounded-xl flex flex-col kanban-col shrink-0 border border-slate-200 dark:border-slate-700/50 h-[600px]">
+                            <div class="p-4 flex justify-between items-center border-b dark:border-slate-700/50 shrink-0">
+                                <h3 class="font-bold text-sm uppercase tracking-tight">{{ col.title }}</h3>
+                                <span class="bg-white dark:bg-slate-700 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getTaskCount(col.id) }}</span>
+                            </div>
+                            <div :id="'kanban-' + col.id" class="card-list-scroll space-y-3" :data-status="col.id">
+                                <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border dark:border-slate-700">
+                                    <div class="flex justify-between items-start mb-3"><span class="text-[9px] font-black text-slate-400 uppercase">{{ task.company }}</span><span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span></div>
+                                    <h4 class="text-sm font-bold leading-snug mb-3">{{ task.title }}</h4>
+                                </div>
+                            </div>
+                            <div class="p-3"><button @click="addTask(col.id)" class="w-full py-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-500 hover:text-brand transition-all">+ Add Card</button></div>
+                        </div>
+                    </main>
+
+                    <main v-if="viewMode === 'timeline'" class="pb-10">
+                        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 dark:bg-slate-900 border-b dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead>
+                                <tbody><tr v-for="t in timelineTasks" @click="openTask(t)" class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition"><td class="p-4 text-sm font-bold">{{ t.dueDate || 'TBD' }}</td><td class="p-4 text-sm font-black">{{ t.title }}</td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody>
+                            </table>
+                        </div>
+                    </main>
+
+                    <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
+                        <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border dark:border-slate-700 flex flex-col">
+                            <h3 class="font-black text-xs uppercase tracking-widest mb-4">{{ quad.name }}</h3>
+                            <div :id="'matrix-' + quad.id" class="space-y-2 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/50 dark:bg-slate-900/30 p-2 rounded-lg border border-dashed dark:border-slate-700" :data-impact="Array.isArray(quad.impact) ? quad.impact[0] : quad.impact" :data-effort="Array.isArray(quad.effort) ? quad.effort[0] : quad.effort">
+                                <div v-for="t in getMatrixTasks(quad)" :key="t.id" :data-id="t.id" @click="openTask(t)" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border dark:border-slate-600 text-sm font-bold hover:border-brand cursor-grab transition">{{ t.title }}</div>
+                            </div>
+                        </div>
+                    </main>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <main v-show="viewMode==='kanban'" class="flex gap-5 overflow-x-auto pb-10 h-[650px] custom-scrollbar">
-                <div v-for="col in columns" :key="col.id" class="bg-slate-200/40 dark:bg-slate-800/40 rounded-xl flex flex-col kanban-col shrink-0 border dark:border-slate-800">
-                    <div class="p-4 flex justify-between items-center border-b dark:border-slate-800 shrink-0">
-                        <h3 class="font-bold text-xs uppercase tracking-tight">{{col.title}}</h3>
-                        <span class="bg-white dark:bg-slate-700 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{getTaskCount(col.id)}}</span>
-                    </div>
-                    <div :id="'kanban-'+col.id" class="card-list-scroll space-y-3 custom-scrollbar" :data-status="col.id">
-                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700">
-                            <div class="flex justify-between items-start mb-3"><span class="text-[9px] font-black text-slate-400 uppercase">{{task.company}}</span><span :class="'tag tag-'+task.priority.toLowerCase()">{{task.priority}}</span></div>
-                            <h4 class="text-sm font-bold leading-snug mb-3">{{task.title}}</h4>
-                        </div>
-                    </div>
-                    <div class="p-3 shrink-0"><button @click="addTask(col.id)" class="w-full py-2 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-400 hover:text-brand transition-all">+ Add Card</button></div>
-                </div>
-            </main>
+    <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40"></div>
+    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-all duration-300 flex flex-col border-l dark:border-slate-800">
+        <div v-if="editingTask" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <textarea v-model="editingTask.title" class="text-xl font-black w-full bg-transparent border-none outline-none resize-none p-0" rows="3" placeholder="Task Title..."></textarea>
+            <div class="grid grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border dark:border-slate-800">
+                <div><label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Priority</label><select v-model="editingTask.priority" class="w-full bg-transparent border-b dark:border-slate-700 text-sm font-bold outline-none"><option>Urgent</option><option>High</option><option>Normal</option><option>Low</option></select></div>
+                <div><label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Due Date</label><input type="date" v-model="editingTask.dueDate" class="w-full bg-transparent border-b dark:border-slate-700 text-sm font-bold outline-none"></div>
+                <div class="col-span-2 mt-2"><label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Status</label><select v-model="editingTask.status" class="w-full bg-transparent border-b dark:border-slate-700 text-sm font-bold outline-none"><option v-for="c in columns" :value="c.id">{{ c.title }}</option></select></div>
+            </div>
+            <div><label class="text-[10px] font-black text-slate-500 uppercase mb-2 block tracking-widest">Next Action / Notes</label><textarea v-model="editingTask.action" class="w-full border dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg p-3 text-sm h-32 outline-none focus:border-brand transition-colors" placeholder="Details..."></textarea></div>
+            <div class="pt-6 border-t dark:border-slate-700 flex justify-between"><button @click="deleteTask" class="text-xs font-black text-red-500">Delete Task</button><button @click="saveTask" class="bg-brand text-white px-8 py-2.5 rounded-lg font-black text-sm shadow-md">Save Changes</button></div>
         </div>
-    </main>
+    </div>
 
     <input type="file" id="image-upload" accept="image/*" class="hidden" @change="handleFile($event, 'image')">
     <input type="file" id="doc-upload" accept=".pdf,.txt,.doc" class="hidden" @change="handleFile($event, 'doc')">
+
+    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh]">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border dark:border-slate-800 p-4">
+            <input id="cmd-input" v-model="cmdSearch" placeholder="Search tasks or commands..." class="w-full bg-transparent text-lg font-medium outline-none">
+        </div>
+    </div>
 </div>
 
 <script>
@@ -193,40 +248,33 @@ createApp({
     setup() {
         const activeTab = ref('All');
         const viewMode = ref('kanban');
-        const isDarkMode = ref(false);
         const editingTask = ref(null);
+        const isDarkMode = ref(false);
+        const showCommandPalette = ref(false);
+        const cmdSearch = ref('');
         const aiInput = ref('');
         const aiStatus = ref('');
         const chatHistory = ref([]);
         const attachedFile = ref(null);
         const tasks = ref([]);
-        const columns = [{id:'brainstorm',title:'Brainstorming'},{id:'notstarted',title:'Not Started'},{id:'progress',title:'In Progress'},{id:'waiting',title:'Paused'},{id:'completed',title:'Completed'}];
-        
-        const toggleDarkMode = () => { isDarkMode.value = !isDarkMode.value; document.documentElement.classList.toggle('dark'); localStorage.setItem('fitma_dark', isDarkMode.value); };
+        const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
+        const matrixQuadrants = [{ id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] },{ id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] },{ id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] },{ id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }];
+
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
-        const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value==='All' || t.company===activeTab.value)));
-        const wipCount = computed(() => tasks.value.filter(t => t.status === 'progress' && (activeTab.value==='All' || t.company===activeTab.value)).length);
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
-        const completionPercentage = computed(() => { const total = tasks.value.filter(t => activeTab.value==='All'||t.company===activeTab.value).length; return total ? Math.round((completedTasks.value.length/total)*100) : 0; });
+        const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
+        const wipCount = computed(() => getTaskCount('progress'));
+        const completionPercentage = computed(() => { const total = tasks.value.filter(t => activeTab.value === 'All' || t.company === activeTab.value).length; return total === 0 ? 0 : Math.round((completedTasks.value.length / total) * 100); });
         
-        // Point 2 Fix: Reactive Notification Badge
+        // Tweak 2 Fix: Notifications watch Urgent + Paused
         const smartNotifications = computed(() => tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting'));
+        const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
+        const getMatrixTasks = (quad) => tasks.value.filter(t => { if (activeTab.value !== 'All' && t.company !== activeTab.value) return false; if (t.status === 'completed') return false; const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact; const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort; return impactMatch && effortMatch; });
 
-        const triggerUpload = (type) => document.getElementById(type==='image'?'image-upload':'doc-upload').click();
-        
-        const handleFile = (e, type) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                attachedFile.value = { 
-                    name: file.name, type: type, 
-                    raw: type === 'image' ? event.target.result : event.target.result.substring(0, 8000) 
-                };
-            };
-            if(type === 'image') reader.readAsDataURL(file); else reader.readAsText(file);
-        };
+        const toggleDarkMode = () => { isDarkMode.value = !isDarkMode.value; document.documentElement.classList.toggle('dark'); localStorage.setItem('fitma_dark_mode', isDarkMode.value); };
+        const triggerUpload = (type) => document.getElementById(type === 'image' ? 'image-upload' : 'doc-upload').click();
+        const handleFile = (e, type) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { attachedFile.value = { name: file.name, type: type, raw: type === 'image' ? event.target.result : event.target.result.substring(0, 5000) }; }; if(type === 'image') reader.readAsDataURL(file); else reader.readAsText(file); };
 
         const askAI = async () => {
             if(!aiInput.value.trim() && !attachedFile.value) return;
@@ -234,59 +282,61 @@ createApp({
             chatHistory.value.push({ role: 'user', content: (attachedFile.value ? `[File: ${attachedFile.value.name}] ` : '') + query });
             aiStatus.value = "Vora is analyzing..."; aiInput.value = '';
             
-            // Point 4 Fix: Intelligent Commands
-            const systemPrompt = `Analyze the user's request. 
-            If Image: Describe the visual content like Gemini. 
-            If Document: Analyze the data like ChatGPT. 
-            Always use tables and clear lines if data is involved. 
-            Context: ${attachedFile.value ? attachedFile.value.raw : 'None'}`;
+            // Tweak 4 Logic: Image (Gemini) vs Doc (ChatGPT) analysis commands
+            const systemNote = attachedFile.value?.type === 'image' 
+                ? "Command: Understand this image like Gemini. Describe visual elements and colors." 
+                : "Command: Read this document content like ChatGPT. Analyze data and provide a structured table if applicable.";
+            const prompt = `System: Kind Chief of Staff. ${systemNote}\n\nContext: ${attachedFile.value ? attachedFile.value.raw : 'None'}\nUser Query: ${query}`;
 
             try {
-                const res = await fetch('https://text.pollinations.ai/', { method:'POST', body:JSON.stringify({ messages:[{role:'user', content:systemPrompt + "\n\nUser Question: " + query}] }) });
+                const res = await fetch('https://text.pollinations.ai/', { method:'POST', body:JSON.stringify({ messages:[{role:'user', content:prompt}], seed:Math.floor(Math.random()*1000) }) });
                 chatHistory.value.push({ role:'ai', content: await res.text() });
-            } catch { chatHistory.value.push({ role:'ai', content:"Connection issue." }); }
-            aiStatus.value = ''; attachedFile.value = null;
+            } finally { aiStatus.value = ''; attachedFile.value = null; }
         };
 
-        // Point 1 Fix: Short Colorful Cards Brief
+        // Tweak 1 Logic: Brief as Colorful Cards
         const generateBrief = async () => {
-            aiStatus.value = "Syncing briefs...";
-            const snapshot = tasks.value.filter(t => t.status !== 'completed').slice(0, 3).map(t => `${t.company}: ${t.title}`).join(' | ');
+            aiStatus.value = "Scanning OS...";
             chatHistory.value.push({ 
                 role: 'ai', 
-                type: 'brief', 
+                type: 'brief',
                 cards: [
-                    { portfolio: 'Dymek', content: 'Squarespace overhaul is high priority. Brand guidelines must be finished before Friday.', color: 'border-blue-500' },
-                    { portfolio: 'GigaScan', content: 'Patrik provided revisions. 3 categories for solutions need to be updated today.', color: 'border-purple-500' },
-                    { portfolio: 'Lading Technology', content: 'Driver pay structure is Paused. Follow up with the team for calculation data.', color: 'border-emerald-500' }
+                    { portfolio: 'Dymek', content: 'Urgent focus: Brand Guidelines must be completed before the Website Overhaul moves forward.', color: 'border-blue-500' },
+                    { portfolio: 'GigaScan', content: 'Action required: Patrik is waiting for categories. Solutions page is currently Paused.', color: 'border-purple-500' },
+                    { portfolio: 'Lading Technology', content: 'Status: Figma tracking design is in progress. Driver pay structure due in 10 days.', color: 'border-emerald-500' }
                 ]
             });
             aiStatus.value = '';
         };
 
-        const saveTask = () => { localStorage.setItem('fitma_os_pro_v5', JSON.stringify(tasks.value)); };
+        const addTask = (id) => { editingTask.value = { id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'', priority:'Normal', impact:'Medium', effort:'Medium' }; };
+        const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
+        const saveTask = () => { if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); } else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; } editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); };
+        const deleteTask = () => { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); };
         const parseMarkdown = (t) => marked.parse(t);
 
         onMounted(() => {
-            const saved = localStorage.getItem('fitma_os_pro_v5');
+            const saved = localStorage.getItem('fitma_os_pro_silver');
             tasks.value = saved ? JSON.parse(saved) : [
-                { id: 1, company: 'Dymek', title: 'New Website Overhaul', priority: 'Urgent', status: 'progress' },
-                { id: 2, company: 'GigaScan', title: 'Solutions Categories', priority: 'Urgent', status: 'waiting' }
+                { id: 1, company: 'Dymek', title: 'New Website Overhaul', priority: 'Urgent', status: 'progress', impact: 'High', effort: 'High' },
+                { id: 2, company: 'GigaScan', title: 'Solutions Categories', priority: 'Urgent', status: 'waiting', impact: 'Medium', effort: 'High' }
             ];
-            if(localStorage.getItem('fitma_dark')==='true') toggleDarkMode();
+            if(localStorage.getItem('fitma_dark_mode')==='true') toggleDarkMode();
             
+            window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); } });
+
             nextTick(() => {
                 columns.forEach(col => {
-                    const el = document.getElementById('kanban-'+col.id);
-                    if(el) new Sortable(el, { group: 'kanban', animation: 150, onEnd: (evt) => {
+                    const el = document.getElementById('kanban-' + col.id);
+                    if (el) new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => {
                         const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                        if(t) { t.status = evt.to.dataset.status; saveTask(); }
+                        if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
                     }});
                 });
             });
         });
 
-        return { activeTab, viewMode, isDarkMode, aiInput, aiStatus, chatHistory, attachedFile, tasks, columns, toggleDarkMode, filteredTasks, getTaskCount, completedTasks, wipCount, activeTasksCount, completionPercentage, smartNotifications, triggerUpload, handleFile, askAI, generateBrief, parseMarkdown };
+        return { activeTab, viewMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showCommandPalette, cmdSearch, aiInput, aiStatus, chatHistory, attachedFile, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, activeTasksCount, completionPercentage, smartNotifications, toggleDarkMode, triggerUpload, handleFile, askAI, generateBrief, addTask, openTask, saveTask, deleteTask, parseMarkdown };
     }
 }).mount('#app');
 </script>
