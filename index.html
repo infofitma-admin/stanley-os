@@ -10,9 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* v-cloak ensures the app stays hidden until Vue is fully loaded */
         [v-cloak] { display: none; }
-        
         body { font-family: 'Inter', sans-serif; background: #e2e8f0; color: #0f172a; overflow-y: auto; overflow-x: hidden; }
         .max-dashboard-width { max-width: 1650px; margin: 0 auto; width: 100%; }
         .board-header { background: linear-gradient(to right, #94a3b8, #cbd5e1); border-bottom: 2px solid #475569; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
@@ -188,8 +186,11 @@ createApp({
         const deleteTask = () => { if(confirm("Permanently delete this record?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
 
         onMounted(async () => {
+            const currentVersion = "v2_exact_sections"; // Change this if you ever overhaul the layout again
+            const lastVersion = localStorage.getItem('fitma_os_version');
             const saved = localStorage.getItem('fitma_os_pro_silver');
-            const defaultTasks = [
+            
+            const rawTasks = [
                 /* DYMEK (23 Tasks) */
                 { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
                 { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
@@ -277,14 +278,15 @@ createApp({
                 { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
             ];
 
-            // Safety Check: If localStorage is empty or broken, load the default system data
-            if (saved && JSON.parse(saved).length > 0) {
-                tasks.value = JSON.parse(saved).map(schemaEnhance);
+            // Logic: If code version changed OR storage is empty, force the defaults above.
+            if (currentVersion !== lastVersion || !saved) {
+                tasks.value = rawTasks.map(schemaEnhance);
+                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                localStorage.setItem('fitma_os_version', currentVersion);
             } else {
-                tasks.value = defaultTasks.map(schemaEnhance);
+                tasks.value = JSON.parse(saved).map(schemaEnhance);
             }
 
-            // Fix for Netlify: Wait for Vue to finish the DOM render before initializing Sortable
             await nextTick();
 
             columns.forEach(col => {
