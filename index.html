@@ -80,6 +80,9 @@
                         <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
                             <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> Impact Matrix
                         </button>
+                        <button @click="viewMode = 'heatmap'; activeTab = 'All'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Heatmap
+                        </button>
                     </div>
                 </div>
 
@@ -153,6 +156,9 @@
                                 <span class="font-black text-slate-800 dark:text-white tracking-tight">Vora</span>
                             </div>
                             <div class="flex items-center space-x-3">
+                                <button @click="generateBrief" class="px-2 py-1 bg-brand text-white text-[10px] font-bold rounded-md hover:bg-emerald-600 transition-colors shadow-sm flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Morning Brief
+                                </button>
                                 <button @click="clearChat" class="text-slate-400 hover:text-red-500 transition-colors" title="Clear Conversation">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
@@ -320,6 +326,24 @@
                             </div>
                         </div>
                     </main>
+
+                    <main v-show="viewMode === 'heatmap'" class="pb-10 max-w-4xl mx-auto pt-8">
+                        <div class="bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <h2 class="text-xl font-black mb-2 tracking-tight text-slate-800 dark:text-white">Workload Heatmap</h2>
+                            <p class="text-xs font-medium text-slate-500 mb-8 uppercase tracking-widest">Tracking High Effort Bottlenecks</p>
+                            <div class="space-y-8">
+                                <div v-for="company in ['Dymek', 'GigaScan', 'Lading Technology']" :key="company">
+                                    <div class="flex justify-between text-xs font-black uppercase mb-2">
+                                        <span class="text-slate-700 dark:text-slate-300">{{company}}</span>
+                                        <span :class="getWorkload(company) > 3 ? 'text-red-500' : 'text-slate-400'">{{getWorkload(company)}} High-Effort Tasks</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
+                                        <div class="h-full transition-all duration-1000" :style="'width: ' + Math.min(getWorkload(company) * 20, 100) + '%'" :class="getWorkload(company) > 3 ? 'bg-red-500' : 'bg-brand'"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
                 </div>
             </div>
         </main>
@@ -426,18 +450,15 @@ const { createApp, ref, onMounted, computed, nextTick, watch } = Vue;
 
 createApp({
     setup() {
-        // Core State
         const activeTab = ref('All');
         const viewMode = ref('kanban');
         const zenMode = ref(false);
         const editingTask = ref(null);
         const isDarkMode = ref(false);
         
-        // Command Palette
         const showCommandPalette = ref(false);
         const cmdSearch = ref('');
         
-        // Vora Variables
         const aiInput = ref('');
         const aiStatus = ref('');
         const aiMode = ref('Fast');
@@ -458,8 +479,6 @@ createApp({
             { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
         ];
 
-        // --- Computed Properties ---
-        
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
@@ -490,7 +509,10 @@ createApp({
             });
         };
 
-        // --- Methods ---
+        // NEW: Feature 1 - Heatmap logic
+        const getWorkload = (company) => {
+            return tasks.value.filter(t => t.company === company && t.effort === 'High' && t.status !== 'completed').length;
+        };
 
         const toggleDarkMode = () => {
             isDarkMode.value = !isDarkMode.value;
@@ -509,7 +531,6 @@ createApp({
             return marked.parse(text);
         };
 
-        // --- Commands ---
         const commands = [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
             { title: 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
@@ -530,7 +551,6 @@ createApp({
             cmdSearch.value = '';
         };
 
-        // --- File Attachment ---
         const triggerFileUpload = () => document.getElementById('file-upload').click();
         const handleFileChange = (e) => { 
             if (e.target.files && e.target.files.length > 0) {
@@ -545,7 +565,6 @@ createApp({
             document.getElementById('file-upload').value = ''; 
         };
 
-        // --- Voice Recog ---
         const toggleSpeechRecognition = () => {
             if (isListening.value) { 
                 if (speechRecog) speechRecog.stop(); 
@@ -588,11 +607,37 @@ createApp({
             });
         };
 
-        // --- Vora AI ---
         const clearChat = () => {
             if(confirm("Clear conversation history with Vora?")) {
                 chatHistory.value = [];
                 localStorage.removeItem('fitma_vora_chat');
+            }
+        };
+
+        // NEW: Feature 2 - Morning Brief
+        const generateBrief = async () => {
+            aiStatus.value = "Analyzing your OS data...";
+            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Due: ${t.dueDate || 'None'}, Status: ${t.status})`).join('\n');
+            const prompt = `Act as my Chief of Staff. Give me a kind, supportive morning brief. Scan these tasks and highlight priorities or what's been paused: \n${snapshot}`;
+            
+            chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
+            scrollToBottom();
+
+            try {
+                const res = await fetch('https://text.pollinations.ai/', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) }) 
+                });
+                const text = await res.text();
+                chatHistory.value.push({ role: 'ai', content: text });
+                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+                scrollToBottom();
+            } catch (e) {
+                chatHistory.value.push({ role: 'ai', content: "I couldn't fetch your brief right now. Let's try again shortly." });
+                scrollToBottom();
+            } finally {
+                aiStatus.value = '';
             }
         };
 
@@ -663,7 +708,6 @@ createApp({
 
         const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
 
-        // --- Tasks Logic ---
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
         const saveTask = () => {
@@ -689,7 +733,28 @@ createApp({
             { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed' }
         ];
 
-        // --- Drag and Drop ---
+        // NEW: Feature 3 - Automated Next Action on Drag to "In Progress"
+        const generateNextAction = async (task) => {
+            if (task.action) return; 
+            try {
+                const prompt = `For a project task titled "${task.title}", generate a concise 3-step action checklist as a bulleted list. Do not include introductory text, just the list.`;
+                const res = await fetch('https://text.pollinations.ai/', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000) }) 
+                });
+                const text = await res.text();
+                
+                const idx = tasks.value.findIndex(t => t.id === task.id);
+                if (idx !== -1) {
+                    tasks.value[idx].action = text;
+                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                }
+            } catch (e) {
+                console.error("Failed to auto-generate next action", e);
+            }
+        };
+
         const initSortable = () => {
             columns.forEach(col => {
                 const el = document.getElementById('kanban-' + col.id);
@@ -703,6 +768,11 @@ createApp({
                                     t.status = evt.to.dataset.status; 
                                     t.lastUpdated = Date.now(); 
                                     localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+                                    
+                                    // Feature 3 Trigger
+                                    if (t.status === 'progress' && (!t.action || t.action.trim() === '')) {
+                                        generateNextAction(t);
+                                    }
                                 }
                             }
                         }
@@ -732,14 +802,12 @@ createApp({
         };
 
         onMounted(() => {
-            // Check Theme
             const savedTheme = localStorage.getItem('fitma_dark_mode');
             if(savedTheme === 'true') {
                 isDarkMode.value = true;
                 document.documentElement.classList.add('dark');
             }
             
-            // Load Chat
             const savedChat = localStorage.getItem('fitma_vora_chat');
             if(savedChat) {
                 try {
@@ -750,7 +818,6 @@ createApp({
             }
             scrollToBottom();
 
-            // Cmd+K
             window.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                     e.preventDefault(); showCommandPalette.value = true;
@@ -759,7 +826,6 @@ createApp({
                 if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
             });
 
-            // LOAD DATA
             try {
                 const saved = localStorage.getItem('fitma_os_pro_silver');
                 if (saved) {
@@ -784,7 +850,8 @@ createApp({
             aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
             attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
             filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
-            completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown 
+            completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
+            getWorkload, generateBrief, generateNextAction 
         };
     }
 }).mount('#app');
