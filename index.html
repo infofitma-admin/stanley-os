@@ -10,6 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* v-cloak ensures the app stays hidden until Vue is fully loaded */
+        [v-cloak] { display: none; }
+        
         body { font-family: 'Inter', sans-serif; background: #e2e8f0; color: #0f172a; overflow-y: auto; overflow-x: hidden; }
         .max-dashboard-width { max-width: 1650px; margin: 0 auto; width: 100%; }
         .board-header { background: linear-gradient(to right, #94a3b8, #cbd5e1); border-bottom: 2px solid #475569; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
@@ -136,7 +139,7 @@
 </div>
 
 <script>
-const { createApp, ref, onMounted, computed } = Vue;
+const { createApp, ref, onMounted, computed, nextTick } = Vue;
 
 createApp({
     setup() {
@@ -184,9 +187,9 @@ createApp({
         };
         const deleteTask = () => { if(confirm("Permanently delete this record?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
 
-        onMounted(() => {
+        onMounted(async () => {
             const saved = localStorage.getItem('fitma_os_pro_silver');
-            tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [
+            const defaultTasks = [
                 /* DYMEK (23 Tasks) */
                 { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
                 { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
@@ -272,16 +275,24 @@ createApp({
                 { id: 79, company: 'Lading Technology', title: 'Recruitment portals evaluation', status: 'completed', dueDate: '2026-03-31' },
                 { id: 80, company: 'Lading Technology', title: 'Mobile landscape optimization', status: 'completed' },
                 { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
-            ].map(schemaEnhance);
+            ];
+
+            // Safety Check: If localStorage is empty or broken, load the default system data
+            if (saved && JSON.parse(saved).length > 0) {
+                tasks.value = JSON.parse(saved).map(schemaEnhance);
+            } else {
+                tasks.value = defaultTasks.map(schemaEnhance);
+            }
+
+            // Fix for Netlify: Wait for Vue to finish the DOM render before initializing Sortable
+            await nextTick();
 
             columns.forEach(col => {
                 const el = document.getElementById(col.id);
                 if (el) {
                     new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'bg-slate-200',
                         onEnd: (evt) => { 
-                            // DOM Revert fix: Stops Vue.js from throwing node errors when dragging
                             evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                            
                             if (evt.from !== evt.to) {
                                 const t = tasks.value.find(x => x.id == evt.item.dataset.id);
                                 if (t) { t.status = evt.to.id; t.lastUpdated = Date.now(); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
