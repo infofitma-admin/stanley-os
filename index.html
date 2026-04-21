@@ -18,24 +18,20 @@
     
     <style>
         [v-cloak] { display: none; }
-        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        /* Lock body to screen height to fix Point 9 */
+        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100vh; width: 100vw; }
         
-        /* Custom Scrollbars */
+        /* Modern Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
-        /* AI Markdown Styles */
-        .ai-response-scroll { overflow-y: auto; scroll-behavior: smooth; }
-        .markdown-body h3 { font-weight: 800; margin-top: 12px; margin-bottom: 6px; }
-        .markdown-body p { margin-bottom: 10px; line-height: 1.6; }
-        .markdown-body ul { list-style: disc; margin-left: 20px; margin-bottom: 12px; }
-
-        /* Kanban Specifics */
-        .kanban-col { min-width: 320px; max-width: 320px; transition: all 0.3s ease; }
-        .kanban-col.zen-expanded { min-width: 650px; max-width: 850px; margin: 0 auto; }
-        .task-card { cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease; overflow-wrap: break-word; word-break: break-word; }
+        /* Kanban Specifics - Trello Style */
+        .kanban-col { min-width: 320px; max-width: 320px; transition: all 0.3s ease; display: flex; flex-direction: column; max-height: 100%; }
+        .card-list-scroll { flex-grow: 1; overflow-y: auto; overflow-x: hidden; min-height: 150px; padding: 12px; }
+        .task-card { cursor: grab; border: 1px solid transparent; transition: all 0.2s ease; overflow-wrap: break-word; word-break: break-word; }
+        .task-card:active { cursor: grabbing; }
         .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #94a3b8; }
         .dark .task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.4); border-color: #64748b; }
         
@@ -49,22 +45,29 @@
         .dark .tag-high { background: #78350f; color: #fcd34d; }
         .dark .tag-normal { background: #312e81; color: #a5b4fc; }
         .dark .tag-low { background: #334155; color: #cbd5e1; }
+        
+        /* Markdown rendering */
+        .markdown-body { font-size: 14px; line-height: 1.6; color: inherit; }
+        .markdown-body p { margin-bottom: 0.8em; }
+        .markdown-body strong { font-weight: 700; color: #0f172a; }
+        .dark .markdown-body strong { color: #f8fafc; }
+        .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.8em; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300">
 
-<div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen flex w-full">
+<div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen w-full flex overflow-hidden">
     <div class="flex w-full h-full dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         
-        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 transition-all z-20">
-            <div class="h-16 flex items-center px-6 border-b border-slate-800">
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 transition-all z-20 h-full">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800 flex-shrink-0">
                 <div class="w-6 h-6 bg-brand rounded flex items-center justify-center mr-3 shadow-lg shadow-brand/20">
                     <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
-                <h1 class="text-lg font-black text-white tracking-tight">Fitma <span class="font-normal opacity-50">OS</span></h1>
+                <h1 class="text-base font-black text-white tracking-tight">Fitma <span class="font-normal opacity-50">| Stanley OS</span></h1>
             </div>
             
-            <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+            <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8 custom-scrollbar">
                 <div>
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Views</h2>
                     <div class="space-y-1">
@@ -83,7 +86,7 @@
                 <div>
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                     <div class="space-y-1">
-                        <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
+                        <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
                             <div class="w-2 h-2 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-500':tab==='GigaScan'?'bg-purple-500':'bg-orange-500'"></div>
                             {{ tab }}
                         </button>
@@ -91,21 +94,21 @@
                 </div>
             </div>
             
-            <div class="p-4 border-t border-slate-800 bg-slate-950/50">
+            <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex-shrink-0">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center relative">
-                        <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                        <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                         <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
                     </div>
                     <div>
                         <p class="text-xs font-bold text-white">Vora AI</p>
-                        <p class="text-[10px] font-medium text-emerald-400">Online & Listening</p>
+                        <p class="text-[10px] font-medium text-emerald-400">Online & Ready</p>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
             
             <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
                 <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">
@@ -122,8 +125,8 @@
                         </button>
                     </div>
                     
-                    <button @click="toggleDarkMode" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
-                        <svg v-if="isDarkMode" class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 dark:hover:text-amber-300 transition">
+                        <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     </button>
 
@@ -137,71 +140,92 @@
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto overflow-x-hidden p-8 custom-scrollbar">
                 
                 <div class="flex gap-6 mb-8 max-w-[1600px] mx-auto">
                     
-                    <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col relative overflow-hidden h-[340px] transition-colors">
+                    <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col relative overflow-hidden h-[360px] transition-colors">
                         <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
                             <div class="flex items-center space-x-2">
                                 <div class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-950 flex items-center justify-center shadow-sm">
-                                    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                                    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                                 </div>
                                 <span class="font-black text-slate-800 dark:text-white tracking-tight">Vora</span>
                             </div>
-                            <div class="flex space-x-1 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-lg">
-                                <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
+                            <div class="flex items-center space-x-3">
+                                <button @click="clearChat" class="text-slate-400 hover:text-red-500 transition-colors" title="Clear Conversation">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                                <div class="flex space-x-1 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-lg">
+                                    <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex-grow p-5 ai-response-scroll flex flex-col bg-white dark:bg-slate-800 relative">
-                            <div v-if="!aiStatus && !aiResponse" class="m-auto text-center flex flex-col items-center justify-center opacity-80 pb-6">
+                        <div class="flex-grow p-5 overflow-y-auto flex flex-col bg-white dark:bg-slate-800 relative custom-scrollbar" ref="chatScrollContainer">
+                            
+                            <div v-if="chatHistory.length === 0 && !aiStatus" class="m-auto text-center flex flex-col items-center justify-center opacity-80 pb-6">
                                 <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4">
-                                    <svg class="w-6 h-6 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                                    <svg class="w-6 h-6 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                                 </div>
                                 <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Good afternoon, Stanley.</h2>
                                 <p class="text-sm font-medium text-slate-500 dark:text-slate-400">I am here to support you. How can I help today?</p>
                             </div>
 
-                            <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-600 dark:text-slate-300 font-medium text-sm p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl w-fit mb-4">
+                            <div class="flex flex-col space-y-6 w-full pb-2">
+                                <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.role === 'user' ? 'flex justify-end pl-12' : 'flex items-start space-x-3 pr-12'">
+                                    
+                                    <div v-if="msg.role === 'ai'" class="w-8 h-8 rounded-full bg-slate-800 dark:bg-slate-950 flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
+                                        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                                    </div>
+
+                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
+                                </div>
+                            </div>
+
+                            <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-600 dark:text-slate-300 font-medium text-sm p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl w-fit mt-2">
                                 <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 <span>{{ aiStatus }}</span>
                             </div>
-
-                            <div v-if="aiResponse" class="w-full pb-4">
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-8 h-8 rounded-full bg-slate-800 dark:bg-slate-950 flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
-                                         <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                                    </div>
-                                    <div class="markdown-body text-sm text-slate-800 dark:text-slate-200 flex-grow" v-html="parsedAiResponse"></div>
-                                </div>
-                            </div>
                         </div>
 
-                        <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 relative">
-                            <div v-if="attachedFile" class="absolute -top-10 left-6 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs px-3 py-1.5 rounded-full flex items-center shadow-md z-10">
-                                <svg class="w-3 h-3 mr-2 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                <span class="truncate max-w-[150px] font-medium">{{ attachedFile }}</span>
-                                <button @click="removeFile" class="ml-2 text-slate-400 hover:text-red-500 focus:outline-none"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                        <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 relative flex flex-col">
+                            
+                            <div v-if="attachedFile" class="mb-2 self-start flex items-center bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm max-w-[200px] shadow-sm relative group">
+                                <div class="w-8 h-8 rounded bg-brand/20 flex items-center justify-center mr-3 text-brand">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <p class="truncate font-bold text-slate-800 dark:text-slate-200">{{ attachedFile.name }}</p>
+                                    <p class="text-[10px] text-slate-500 uppercase">Document Attached</p>
+                                </div>
+                                <button @click="removeFile" class="absolute -top-2 -right-2 bg-slate-800 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-500">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
                             </div>
 
-                            <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/50 rounded-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 focus-within:border-slate-400 dark:focus-within:border-slate-500 transition-all shadow-sm max-w-3xl mx-auto">
+                            <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 focus-within:border-slate-400 dark:focus-within:border-slate-500 transition-all shadow-sm max-w-4xl mx-auto w-full">
                                 <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
-                                <button @click="triggerFileUpload" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                                
+                                <button @click="triggerFileUpload" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Attach Document">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                 </button>
+                                
                                 <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-900 dark:text-slate-100 outline-none px-3 placeholder-slate-500">
-                                <button @click="toggleSpeechRecognition" :class="isListening ? 'text-red-500 bg-red-50 dark:bg-red-900/30' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'" class="p-2 transition rounded-full mr-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                                
+                                <button @click="toggleSpeechRecognition" class="p-2 transition rounded-full mr-1 relative group" title="Voice Input">
+                                    <div v-if="isListening" class="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
+                                    <svg :class="isListening ? 'text-red-500 scale-110' : 'text-slate-500 group-hover:text-slate-800 dark:group-hover:text-slate-200'" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
                                 </button>
-                                <button @click="askAI" :disabled="isThinking || !aiInput.trim()" class="p-2 bg-slate-800 dark:bg-brand text-white hover:bg-slate-700 dark:hover:bg-emerald-400 disabled:opacity-50 transition rounded-full w-8 h-8 flex items-center justify-center">
+                                
+                                <button @click="askAI" :disabled="isThinking || (!aiInput.trim() && !attachedFile)" class="p-2 bg-slate-900 dark:bg-brand text-white hover:bg-slate-700 dark:hover:bg-emerald-400 disabled:opacity-50 transition rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 h-[340px] flex flex-col items-center justify-center transition-colors">
+                    <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 h-[360px] flex flex-col items-center justify-center transition-colors shrink-0">
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 self-start">Velocity Analytics</h3>
                         
                         <div class="relative w-36 h-36 flex items-center justify-center mb-6">
@@ -228,25 +252,25 @@
                     </div>
                 </div>
 
-                <div class="max-w-[1600px] mx-auto">
-                    <main v-show="viewMode === 'kanban'" class="flex gap-5 overflow-x-auto pb-8 custom-scrollbar min-h-[500px]">
-                        <div v-for="col in columns" :key="col.id" class="bg-slate-200/50 dark:bg-slate-800/40 rounded-xl flex flex-col w-[320px] shrink-0 border border-slate-200 dark:border-slate-700/50">
-                            <div class="p-4 flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50">
+                <div class="max-w-[1600px] mx-auto pb-10">
+                    <main v-show="viewMode === 'kanban'" class="flex gap-5 overflow-x-auto pb-4 custom-scrollbar">
+                        <div v-for="col in columns" :key="col.id" class="bg-slate-200/50 dark:bg-slate-800/40 rounded-xl flex flex-col kanban-col shrink-0 border border-slate-200 dark:border-slate-700/50 h-[600px]">
+                            <div class="p-4 flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 shrink-0">
                                 <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm uppercase tracking-tight">{{ col.title }}</h3>
                                 <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getTaskCount(col.id) }}</span>
                             </div>
                             
-                            <div :id="col.id" class="p-3 flex-1 overflow-y-auto min-h-[150px] space-y-3 custom-scrollbar">
-                                <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-slate-400 dark:hover:border-slate-500 transition-all hover:shadow-md group">
+                            <div :id="'kanban-' + col.id" class="card-list-scroll space-y-3 custom-scrollbar" :data-status="col.id">
+                                <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                         <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{{ task.company }}</span>
                                         <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                     </div>
-                                    <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3 group-hover:text-brand transition-colors">{{ task.title }}</h4>
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
                                     
                                     <div v-if="task.subtasks && task.subtasks.length > 0" class="mb-2">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
+                                        <div class="h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-brand transition-all duration-300" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
                                         </div>
                                     </div>
 
@@ -263,7 +287,7 @@
                                 </div>
                             </div>
                             
-                            <div class="p-3">
+                            <div class="p-3 border-t border-slate-200 dark:border-slate-700/50 shrink-0">
                                 <button @click="addTask(col.id)" class="w-full py-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all">+ Add Card</button>
                             </div>
                         </div>
@@ -271,10 +295,29 @@
 
                     <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] text-slate-400 font-bold uppercase">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
 
-                    <main v-if="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[600px]">
-                        <div v-for="z in [{n:'Quick Wins', i:'High', e:['Low','Medium']}, {n:'Major Projects', i:'High', e:['High']}, {n:'Fill-Ins', i:['Low','Medium'], e:['Low','Medium']}, {n:'Re-evaluate', i:['Low','Medium'], e:['High']}]" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
-                            <h3 class="font-black text-xs uppercase tracking-widest mb-4 text-slate-800 dark:text-slate-200">{{ z.n }}</h3>
-                            <div class="space-y-3 overflow-y-auto flex-grow custom-scrollbar"><div v-for="t in matrixTasks(z.i, z.e)" @click="openTask(t)" class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 cursor-pointer text-sm font-bold text-slate-800 dark:text-slate-200 hover:border-brand transition">{{ t.title }}</div></div>
+                    <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
+                        <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-200">{{ quad.name }}</h3>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Impact: {{ Array.isArray(quad.impact) ? quad.impact.join('/') : quad.impact }} | Effort: {{ Array.isArray(quad.effort) ? quad.effort.join('/') : quad.effort }}</span>
+                            </div>
+                            
+                            <div :id="'matrix-' + quad.id" class="matrix-zone space-y-3 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/50 dark:bg-slate-900/30 p-2 rounded-lg border border-dashed border-slate-200 dark:border-slate-700" :data-impact="Array.isArray(quad.impact) ? quad.impact[0] : quad.impact" :data-effort="Array.isArray(quad.effort) ? quad.effort[0] : quad.effort">
+                                
+                                <div v-for="t in getMatrixTasks(quad)" :key="t.id" :data-id="t.id" @click="openTask(t)" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 cursor-grab active:cursor-grabbing text-sm font-bold text-slate-800 dark:text-slate-200 hover:border-brand transition group">
+                                    <div class="flex justify-between items-center">
+                                        <span class="truncate pr-2">{{ t.title }}</span>
+                                        <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                        </div>
+                                    </div>
+                                    <div class="text-[9px] text-slate-400 uppercase mt-1">{{ t.company }}</div>
+                                </div>
+                                
+                                <div v-if="getMatrixTasks(quad).length === 0" class="h-20 flex items-center justify-center text-xs font-medium text-slate-400 italic opacity-50 pointer-events-none">Drag tasks here...</div>
+                            </div>
                         </div>
                     </main>
                 </div>
@@ -295,7 +338,7 @@
             
             <div class="p-6 space-y-6 flex-1">
                 <div>
-                    <textarea v-model="editingTask.title" class="text-2xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0" rows="3" placeholder="Task Title..."></textarea>
+                    <textarea v-model="editingTask.title" class="text-xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-snug" rows="3" placeholder="Task Title..."></textarea>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-5 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
@@ -316,8 +359,14 @@
                         <input type="date" v-model="editingTask.dueDate" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Impact</label>
-                        <select v-model="editingTask.impact" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
+                        <label class="text-[9px] font-black text-brand uppercase mb-1 block">Impact (Matrix)</label>
+                        <select v-model="editingTask.impact" class="w-full bg-transparent border-b border-brand text-sm font-bold dark:text-white pb-1 outline-none">
+                            <option class="dark:bg-slate-800">High</option><option class="dark:bg-slate-800">Medium</option><option class="dark:bg-slate-800">Low</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[9px] font-black text-brand uppercase mb-1 block">Effort (Matrix)</label>
+                        <select v-model="editingTask.effort" class="w-full bg-transparent border-b border-brand text-sm font-bold dark:text-white pb-1 outline-none">
                             <option class="dark:bg-slate-800">High</option><option class="dark:bg-slate-800">Medium</option><option class="dark:bg-slate-800">Low</option>
                         </select>
                     </div>
@@ -327,39 +376,41 @@
                     <label class="text-[10px] font-black text-slate-500 uppercase mb-2 block flex items-center">
                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Next Action / Notes
                     </label>
-                    <textarea v-model="editingTask.action" class="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg p-3 text-sm font-medium h-24 outline-none focus:border-brand dark:focus:border-brand dark:text-white transition-colors" placeholder="What's the immediate next step?"></textarea>
+                    <textarea v-model="editingTask.action" class="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg p-3 text-sm font-medium h-24 outline-none focus:border-brand dark:focus:border-brand dark:text-white transition-colors custom-scrollbar" placeholder="What's the immediate next step?"></textarea>
                 </div>
 
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
                     <div v-if="editingTask.subtasks" v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
-                        <input type="checkbox" v-model="s.done" class="w-4 h-4">
-                        <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none">
-                        <button @click="editingTask.subtasks.splice(idx,1)" class="text-red-400 hover:text-red-600 transition">&times;</button>
+                        <input type="checkbox" v-model="s.done" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
+                        <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none focus:border-brand">
+                        <button @click="editingTask.subtasks.splice(idx,1)" class="text-slate-300 hover:text-red-500 transition">&times;</button>
                     </div>
-                    <button @click="editingTask.subtasks.push({text:'', done:false})" class="mt-3 text-xs font-black text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition">+ Add Action Step</button>
+                    <button @click="editingTask.subtasks.push({text:'', done:false})" class="mt-3 text-xs font-black text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add Step
+                    </button>
                 </div>
             </div>
 
             <div class="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 flex justify-between items-center">
-                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-xs font-black text-red-500 hover:text-red-700 transition">Delete</button>
+                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-xs font-black text-red-500 hover:text-red-700 transition">Delete Task</button>
                 <div v-else></div>
-                <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-8 py-2.5 rounded-lg font-black text-sm shadow-md hover:bg-slate-800 dark:hover:bg-emerald-400 transition-colors">Save Task</button>
+                <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-8 py-2.5 rounded-lg font-black text-sm shadow-md hover:bg-slate-800 dark:hover:bg-emerald-400 transition-colors">Save Changes</button>
             </div>
         </div>
     </div>
 
-    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
+    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col transform transition-all">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center">
                 <svg class="w-5 h-5 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="What do you need? (e.g. 'Dark mode', 'New Task')" class="w-full bg-transparent text-lg font-medium text-slate-900 dark:text-white outline-none placeholder-slate-400">
             </div>
             <div class="max-h-[400px] overflow-y-auto p-2 custom-scrollbar">
-                <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer flex items-center group transition">
-                    <div class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3 text-slate-500 group-hover:bg-brand group-hover:text-white transition" v-html="cmd.icon"></div>
+                <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg cursor-pointer flex items-center group transition">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-4 text-slate-500 group-hover:bg-brand group-hover:text-white transition shadow-sm" v-html="cmd.icon"></div>
                     <div>
-                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ cmd.title }}</p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand dark:group-hover:text-brand transition">{{ cmd.title }}</p>
                         <p class="text-[10px] font-medium text-slate-400">{{ cmd.desc }}</p>
                     </div>
                 </div>
@@ -371,7 +422,7 @@
 </div>
 
 <script>
-const { createApp, ref, onMounted, computed, nextTick } = Vue;
+const { createApp, ref, onMounted, computed, nextTick, watch } = Vue;
 
 createApp({
     setup() {
@@ -389,25 +440,32 @@ createApp({
         // Vora Variables
         const aiInput = ref('');
         const aiStatus = ref('');
-        const aiResponse = ref('');
         const aiMode = ref('Fast');
         const isThinking = ref(false);
         const attachedFile = ref(null);
         const isListening = ref(false);
+        const chatHistory = ref([]);
+        const chatScrollContainer = ref(null);
         let speechRecog = null;
         
         const tasks = ref([]);
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
 
-        // Computed
-        const parsedAiResponse = computed(() => aiResponse.value ? marked.parse(aiResponse.value) : '');
+        const matrixQuadrants = [
+            { id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] },
+            { id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] },
+            { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] },
+            { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
+        ];
+
+        // --- Computed Properties ---
+        
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
         const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
         const wipCount = computed(() => getTaskCount('progress'));
         
-        // Analytics
         const completionPercentage = computed(() => {
             const total = tasks.value.filter(t => activeTab.value === 'All' || t.company === activeTab.value).length;
             if (total === 0) return 0;
@@ -419,24 +477,46 @@ createApp({
         });
 
         const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
-        const matrixTasks = (i, e) => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && (Array.isArray(i) ? i.includes(t.impact) : t.impact === i) && (Array.isArray(e) ? e.includes(t.effort) : t.effort === e));
+        
+        const getMatrixTasks = (quad) => {
+            return tasks.value.filter(t => {
+                if (activeTab.value !== 'All' && t.company !== activeTab.value) return false;
+                if (t.status === 'completed') return false;
+                
+                const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact;
+                const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort;
+                
+                return impactMatch && effortMatch;
+            });
+        };
 
-        // Methods
+        // --- Methods ---
+
         const toggleDarkMode = () => {
             isDarkMode.value = !isDarkMode.value;
+            if (isDarkMode.value) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
             localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
 
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
 
-        // Commands
+        const parseMarkdown = (text) => {
+            if (!text) return '';
+            return marked.parse(text);
+        };
+
+        // --- Commands ---
         const commands = [
-            { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
-            { title: 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
-            { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
-            { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
-            { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
-            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
+            { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
+            { title: 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
+            { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
+            { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
+            { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
+            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
         ];
 
         const filteredCommands = computed(() => {
@@ -450,160 +530,227 @@ createApp({
             cmdSearch.value = '';
         };
 
-        // File Attachment
+        // --- File Attachment ---
         const triggerFileUpload = () => document.getElementById('file-upload').click();
-        const handleFileChange = (e) => { if (e.target.files && e.target.files.length > 0) attachedFile.value = e.target.files[0].name; };
-        const removeFile = () => { attachedFile.value = null; document.getElementById('file-upload').value = ''; };
+        const handleFileChange = (e) => { 
+            if (e.target.files && e.target.files.length > 0) {
+                attachedFile.value = {
+                    name: e.target.files[0].name,
+                    file: e.target.files[0]
+                };
+            }
+        };
+        const removeFile = () => { 
+            attachedFile.value = null; 
+            document.getElementById('file-upload').value = ''; 
+        };
 
-        // Voice Recog
+        // --- Voice Recog ---
         const toggleSpeechRecognition = () => {
-            if (isListening.value) { if (speechRecog) speechRecog.stop(); return; }
-            if (!('webkitSpeechRecognition' in window)) { alert("Voice input not supported in your browser."); return; }
+            if (isListening.value) { 
+                if (speechRecog) speechRecog.stop(); 
+                isListening.value = false;
+                return; 
+            }
+            if (!('webkitSpeechRecognition' in window)) { 
+                alert("Voice input not supported in your browser. Please use Chrome or Edge."); 
+                return; 
+            }
             speechRecog = new webkitSpeechRecognition();
-            speechRecog.continuous = false; speechRecog.onstart = () => { isListening.value = true; };
-            speechRecog.onresult = (e) => { aiInput.value += (aiInput.value ? ' ' : '') + e.results[0][0].transcript; };
+            speechRecog.continuous = false; 
+            speechRecog.interimResults = true; 
+            
+            speechRecog.onstart = () => { isListening.value = true; };
+            
+            let finalTranscript = '';
+            speechRecog.onresult = (e) => { 
+                let interimTranscript = '';
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    if (e.results[i].isFinal) {
+                        finalTranscript += e.results[i][0].transcript;
+                    } else {
+                        interimTranscript += e.results[i][0].transcript;
+                    }
+                }
+                const baseText = aiInput.value.replace(/ \.$/, '');
+                aiInput.value = baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
+            };
             speechRecog.onerror = (e) => { console.error(e); isListening.value = false; };
             speechRecog.onend = () => { isListening.value = false; };
             speechRecog.start();
         };
 
-        // Vora AI
+        const scrollToBottom = () => {
+            nextTick(() => {
+                if (chatScrollContainer.value) {
+                    chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight;
+                }
+            });
+        };
+
+        // --- Vora AI ---
+        const clearChat = () => {
+            if(confirm("Clear conversation history with Vora?")) {
+                chatHistory.value = [];
+                localStorage.removeItem('fitma_vora_chat');
+            }
+        };
+
         const askAI = async () => {
             let query = aiInput.value.trim(); 
             if (!query && !attachedFile.value) return;
             
-            isThinking.value = true; aiResponse.value = "";
-            aiStatus.value = aiMode.value === 'Research' ? "Vora is deep researching..." : "Vora is gathering thoughts...";
-            
-            if (attachedFile.value) query += `\n[System Note: User attached file "${attachedFile.value}".]`;
+            let displayQuery = query;
+            let fullQuery = query;
 
-            const systemPrompt = `You are Vora, Fitma's highly intelligent, premium AI assistant. 
+            if (attachedFile.value) {
+                displayQuery = `[Attached File: ${attachedFile.value.name}] \n${query}`;
+                fullQuery = `${query}\n\n[System Note: User has attached a file named "${attachedFile.value.name}". Acknowledge this document in your response.]`;
+            }
+
+            chatHistory.value.push({ role: 'user', content: displayQuery });
+            scrollToBottom();
+            
+            isThinking.value = true; 
+            aiInput.value = ''; 
+            removeFile();
+            aiStatus.value = aiMode.value === 'Research' ? "Vora is deep researching..." : "Vora is generating...";
+
+            const recentHistory = chatHistory.value.slice(-6).map(m => `${m.role === 'user' ? 'Stanley' : 'Vora'}: ${m.content}`).join('\n');
+
+            const systemPrompt = `You are Vora, Fitma's highly intelligent AI assistant. 
             Mode: ${aiMode.value}.
-            Directives:
-            1. Be profoundly kind, caring, and friendly. Make Stanley feel supported.
-            2. Be conversational but highly intelligent and capable. 
-            3. Keep responses concise unless in Research mode.`;
+            
+            Core Directives:
+            1. Persona: You are profoundly kind, empathetic, and friendly. Treat Stanley like a respected friend. 
+            2. Formatting: Use Markdown (bolding, lists, headers) to make responses easy to read.
+            
+            Recent History:
+            ${recentHistory}`;
 
             try {
                 const res = await fetch('https://text.pollinations.ai/', { 
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ messages: [{role:'system', content:systemPrompt}, {role:'user', content:query}], seed: Math.floor(Math.random()*1000) }) 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ 
+                        messages: [
+                            {role:'system', content:systemPrompt}, 
+                            {role:'user', content:fullQuery}
+                        ], 
+                        seed: Math.floor(Math.random()*1000) 
+                    }) 
                 });
-                aiResponse.value = await res.text();
+                const responseText = await res.text();
+                
+                chatHistory.value.push({ role: 'ai', content: responseText });
+                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+                scrollToBottom();
+
             } catch (err) {
-                aiResponse.value = "I'm so sorry, Stanley. I'm having a little trouble connecting right now. I'm here for you.";
-            } finally { isThinking.value = false; aiStatus.value = ''; aiInput.value = ''; removeFile(); }
+                chatHistory.value.push({ role: 'ai', content: "I'm so sorry, Stanley. I'm having a little trouble connecting right now. Please take a deep breath, and we can try again in a moment. I'm here for you." });
+                scrollToBottom();
+            } finally { 
+                isThinking.value = false; 
+                aiStatus.value = ''; 
+            }
         };
 
-        // SAFETY WRAPPER: Ensures data never crashes if missing properties
         const schemaEnhance = (t) => {
             const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', ...t };
-            // Guarantee subtasks is always an array to prevent crash
             base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
             return base;
         };
 
         const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
 
-        // Tasks Logic
+        // --- Tasks Logic ---
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
         const saveTask = () => {
             if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
             else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
-            editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+            editingTask.value = null; 
+            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
         };
-        const deleteTask = () => { if(confirm("Permanently delete this record?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
+        const deleteTask = () => { if(confirm("Permanently delete this task?")) { tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); } };
 
         const initialData = [
-            { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
-            { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
-            { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Dow feedback expected 4/22' },
-            { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'Medium', status: 'progress' },
-            { id: 5, company: 'Dymek', title: 'Brochure: Western Digital Penang', priority: 'Low', impact: 'High', status: 'waiting', action: 'Stanley should review' },
-            { id: 6, company: 'Dymek', title: 'Landing Page: OATi QuickPRO Contact Lens', priority: 'Low', impact: 'High', status: 'brainstorm', action: 'Stanley to write content' },
-            { id: 7, company: 'Dymek', title: 'Research CRM software (Odoo)', priority: 'Normal', impact: 'Low', status: 'waiting', action: 'Stanley respond to Peter email' },
-            { id: 8, company: 'Dymek', title: 'List of social media video topics for freelancer', priority: 'Normal', impact: 'Low', status: 'notstarted' },
-            { id: 9, company: 'Dymek', title: 'Sales tracker spreadsheet 3D-Micromac (Excel)', priority: 'Low', impact: 'Medium', status: 'notstarted' },
-            { id: 10, company: 'Dymek', title: 'PowerPoint template', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Stanley to send PowerPoint' },
-            { id: 11, company: 'Dymek', title: 'GBP Accounts for all regions', priority: 'Normal', impact: 'Low', status: 'waiting' },
-            { id: 12, company: 'Dymek', title: 'Brochure: OATi QuickPRO AR/VR', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
-            { id: 13, company: 'Dymek', title: 'Setup system tracking Malaysia tenders', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
-            { id: 14, company: 'Dymek', title: 'Landing Page: Lynxx?', priority: 'Low', impact: 'Medium', status: 'brainstorm' },
-            { id: 15, company: 'Dymek', title: 'Landing Page: yieldWerx?', priority: 'Low', impact: 'Medium', status: 'brainstorm' },
-            { id: 16, company: 'Dymek', title: 'Brochure: 3D-Micromac microPREP?', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Stanley get approval' },
-            { id: 17, company: 'Dymek', title: 'Product based sales research', priority: 'Low', impact: 'Low', status: 'brainstorm' },
-            { id: 18, company: 'Dymek', title: 'Host QuickPRO-Cube TM', priority: 'Low', impact: 'Low', status: 'notstarted' },
-            { id: 19, company: 'Dymek', title: 'Host n&k brochure', priority: 'Normal', impact: 'Low', status: 'notstarted' },
-            { id: 20, company: 'Dymek', title: 'Coordinate Sales team spreadsheet', priority: 'Low', impact: 'Low', status: 'brainstorm' },
-            { id: 21, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Direct to webpage or landing page?' },
-            { id: 22, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', impact: 'Low', status: 'brainstorm', action: 'Budget issues currently' },
-            { id: 23, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', impact: 'Low', status: 'brainstorm' },
-            { id: 24, company: 'GigaScan', title: 'New Solutions page (3 categories)', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'GigaScan team provide images' },
-            { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live with Patrik', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley schedule meeting' },
-            { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', impact: 'Medium', status: 'waiting', action: 'Stanley should review' },
-            { id: 27, company: 'GigaScan', title: 'Company profile - brand layout match', priority: 'Normal', impact: 'High', status: 'progress', action: 'Stanley send material' },
-            { id: 28, company: 'GigaScan', title: 'TrueProp Instagram image - ISO-484 report', priority: 'Normal', impact: 'Medium', status: 'waiting' },
-            { id: 29, company: 'GigaScan', title: 'Test video editor candidates', priority: 'Normal', impact: 'Medium', status: 'progress' },
-            { id: 30, company: 'GigaScan', title: 'Add Axial flow pump app page', priority: 'Normal', impact: 'Low', status: 'notstarted' },
-            { id: 31, company: 'GigaScan', title: 'Review LinkedIn mental notes', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Stanley obtain access' },
-            { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', impact: 'Medium', status: 'waiting', action: 'Need system images/videos' },
-            { id: 33, company: 'GigaScan', title: 'Fix zoom-in padding dynamic', priority: 'Low', impact: 'Low', status: 'notstarted' },
-            { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 37, company: 'Lading Technology', title: 'Mobile App for carriers statement', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 38, company: 'Lading Technology', title: 'Preferred lanes for drivers info', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 39, company: 'Lading Technology', title: 'Broker Content: Quick pricing', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 40, company: 'Lading Technology', title: 'Copy Edit: Damage Claims wording', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 41, company: 'Lading Technology', title: 'System caters to Operating Companies', priority: 'Low', impact: 'High', status: 'waiting', dueDate: '2026-01-10' },
-            { id: 42, company: 'Lading Technology', title: 'Highlight DOT report speed', priority: 'Low', impact: 'High', status: 'waiting', dueDate: '2026-01-10' },
-            { id: 43, company: 'Lading Technology', title: 'Reminders and DOT reports section', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 44, company: 'Lading Technology', title: 'Competitive Strategy: Feature filter', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-10-09' },
-            { id: 45, company: 'Lading Technology', title: 'Pricing: Quantum vs Core build', priority: 'Normal', impact: 'High', status: 'waiting', dueDate: '2026-01-10', action: 'Depends on positioning' },
-            { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking design', priority: 'Normal', impact: 'High', status: 'progress' },
-            { id: 47, company: 'Lading Technology', title: 'Hire LATAM Freelancer', priority: 'Normal', impact: 'High', status: 'waiting', action: 'Schedule recruitment' },
-            { id: 48, company: 'Lading Technology', title: 'Operating Co Doc for Brokers', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
-            { id: 49, company: 'Lading Technology', title: 'Test AI tutorial (Guidde)', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
-            { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', impact: 'Medium', status: 'brainstorm' },
-            { id: 51, company: 'Lading Technology', title: 'Visual Refresh: Pro alternatives', priority: 'Normal', impact: 'Medium', status: 'progress', dueDate: '2026-10-09' },
-            { id: 52, company: 'Lading Technology', title: 'Page for Logistics operating co', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
-            { id: 53, company: 'Lading Technology', title: 'Recruit VA YouTuber', priority: 'Normal', impact: 'Medium', status: 'notstarted', action: 'Register Casting Club' },
-            { id: 54, company: 'Lading Technology', title: 'Videos for support/onboarding', priority: 'Normal', impact: 'Medium', status: 'notstarted' },
-            { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', impact: 'Medium', status: 'waiting' },
-            { id: 56, company: 'Lading Technology', title: 'Showcase Credential Vault UI', priority: 'Low', impact: 'Medium', status: 'waiting', dueDate: '2026-01-10' },
-            { id: 57, company: 'Lading Technology', title: 'Social media video topics', priority: 'Normal', impact: 'Low', status: 'notstarted' },
-            { id: 58, company: 'Lading Technology', title: 'Fix zoom padding (dynamic)', priority: 'Low', impact: 'Low', status: 'notstarted' },
-            { id: 59, company: 'Lading Technology', title: 'Check all buttons & links', priority: 'Low', impact: 'Low', status: 'notstarted' },
-            { id: 60, company: 'Lading Technology', title: 'GoogleSheet for video editor', priority: 'Low', impact: 'Low', status: 'notstarted' },
-            { id: 61, company: 'Lading Technology', title: 'Coordinate with Kriti - Freelancer', priority: 'Low', impact: 'Low', status: 'notstarted' },
-            { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed' },
-            { id: 63, company: 'Lading Technology', title: 'SEO metadata & alt text', status: 'completed' },
-            { id: 64, company: 'GigaScan', title: 'SEO metadata & alt text', status: 'completed' },
-            { id: 65, company: 'Dymek', title: 'LinkedIn Page Setup', status: 'completed' },
-            { id: 66, company: 'GigaScan', title: 'Mobile design revisit', status: 'completed' },
-            { id: 67, company: 'GigaScan', title: 'Update Vehicle Page', status: 'completed' },
-            { id: 68, company: 'GigaScan', title: 'Update font issues website', status: 'completed' },
-            { id: 69, company: 'Lading Technology', title: 'Mascot Variation', status: 'completed' },
-            { id: 70, company: 'Lading Technology', title: 'Schedule call Abdul (friendly contacts)', status: 'completed', dueDate: '2026-03-29' },
-            { id: 71, company: 'Dymek', title: '4D Business Update', status: 'completed', dueDate: '2026-03-11' },
-            { id: 72, company: 'GigaScan', title: 'Patrik revisions check', status: 'completed' },
-            { id: 73, company: 'GigaScan', title: 'Japanese translation', status: 'completed' },
-            { id: 74, company: 'Lading Technology', title: 'Figma login/signup', status: 'completed', dueDate: '2026-03-31' },
-            { id: 75, company: 'Lading Technology', title: 'Broker/Shipper Squarespace', status: 'completed', dueDate: '2026-03-31' },
-            { id: 76, company: 'Lading Technology', title: 'Add relevant anime images', status: 'completed', dueDate: '2026-01-31' },
-            { id: 77, company: 'Lading Technology', title: 'Redesigned screenshots update', status: 'completed' },
-            { id: 78, company: 'Lading Technology', title: 'Watch YouTube viral tracking', status: 'completed', dueDate: '2026-03-31' },
-            { id: 79, company: 'Lading Technology', title: 'Recruitment portals evaluation', status: 'completed', dueDate: '2026-03-31' },
-            { id: 80, company: 'Lading Technology', title: 'Mobile landscape optimization', status: 'completed' },
-            { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
+            { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first' },
+            { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', effort: 'Medium', status: 'waiting', action: 'Stanley should review' },
+            { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', effort: 'Low', status: 'waiting', action: 'Dow feedback expected 4/22' },
+            { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'High', effort: 'High', status: 'progress' },
+            { id: 24, company: 'GigaScan', title: 'New Solutions page (3 categories)', priority: 'Urgent', impact: 'Medium', effort: 'High', status: 'waiting', action: 'GigaScan team provide images' },
+            { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live with Patrik', priority: 'Urgent', impact: 'High', effort: 'Medium', status: 'waiting', action: 'Stanley schedule meeting' },
+            { id: 27, company: 'GigaScan', title: 'Company profile - brand layout match', priority: 'Normal', impact: 'High', effort: 'High', status: 'progress', action: 'Stanley send material' },
+            { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', impact: 'High', effort: 'Low', status: 'waiting', dueDate: '2026-10-09' },
+            { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking design', priority: 'Normal', impact: 'High', effort: 'High', status: 'progress' },
+            { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', impact: 'Medium', effort: 'High', status: 'brainstorm' },
+            { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', impact: 'Medium', effort: 'Low', status: 'waiting' },
+            { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed' }
         ];
 
+        // --- Drag and Drop ---
+        const initSortable = () => {
+            columns.forEach(col => {
+                const el = document.getElementById('kanban-' + col.id);
+                if (el) {
+                    new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'opacity-50',
+                        onEnd: (evt) => { 
+                            evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+                            if (evt.from !== evt.to) {
+                                const t = tasks.value.find(x => x.id == evt.item.dataset.id);
+                                if (t) { 
+                                    t.status = evt.to.dataset.status; 
+                                    t.lastUpdated = Date.now(); 
+                                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            matrixQuadrants.forEach(quad => {
+                const el = document.getElementById('matrix-' + quad.id);
+                if (el) {
+                    new Sortable(el, { group: 'matrix', animation: 150, ghostClass: 'opacity-50',
+                        onEnd: (evt) => {
+                            evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+                            if (evt.from !== evt.to) {
+                                const t = tasks.value.find(x => x.id == evt.item.dataset.id);
+                                if (t) {
+                                    t.impact = evt.to.dataset.impact;
+                                    t.effort = evt.to.dataset.effort;
+                                    t.lastUpdated = Date.now();
+                                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        };
+
         onMounted(() => {
-            // Theme Sync
-            if(localStorage.getItem('fitma_dark_mode') === 'true') isDarkMode.value = true;
+            // Check Theme
+            const savedTheme = localStorage.getItem('fitma_dark_mode');
+            if(savedTheme === 'true') {
+                isDarkMode.value = true;
+                document.documentElement.classList.add('dark');
+            }
             
-            // Cmd+K Listener
+            // Load Chat
+            const savedChat = localStorage.getItem('fitma_vora_chat');
+            if(savedChat) {
+                try {
+                    chatHistory.value = JSON.parse(savedChat);
+                } catch(e) {
+                    console.error("Chat parsing failed");
+                }
+            }
+            scrollToBottom();
+
+            // Cmd+K
             window.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                     e.preventDefault(); showCommandPalette.value = true;
@@ -612,7 +759,7 @@ createApp({
                 if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
             });
 
-            // FAIL-PROOF DATA LOADING
+            // LOAD DATA
             try {
                 const saved = localStorage.getItem('fitma_os_pro_silver');
                 if (saved) {
@@ -621,35 +768,23 @@ createApp({
                     tasks.value = [...initialData].map(schemaEnhance);
                 }
             } catch (error) {
-                console.error("Data integrity failure. Auto-repairing to safe defaults.", error);
                 tasks.value = [...initialData].map(schemaEnhance);
             }
 
-            nextTick(() => {
-                columns.forEach(col => {
-                    const el = document.getElementById(col.id);
-                    if (el) {
-                        new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'opacity-50',
-                            onEnd: (evt) => { 
-                                evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                                if (evt.from !== evt.to) {
-                                    const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                    if (t) { t.status = evt.to.id; t.lastUpdated = Date.now(); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); }
-                                }
-                            }
-                        });
-                    }
-                });
-            });
+            nextTick(initSortable);
+        });
+
+        watch(viewMode, () => {
+            nextTick(initSortable);
         });
 
         return { 
-            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode,
+            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants,
             showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand,
-            aiInput, aiStatus, aiResponse, aiMode, parsedAiResponse, isThinking, 
+            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
             attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
-            filteredTasks, completedTasks, timelineTasks, matrixTasks, getTaskCount, wipCount, activeTasksCount,
-            completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask 
+            filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
+            completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown 
         };
     }
 }).mount('#app');
