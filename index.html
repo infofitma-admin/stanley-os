@@ -11,98 +11,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         [v-cloak] { display: none; }
-        body { font-family: 'Inter', sans-serif; background: #e2e8f0; color: #0f172a; overflow-y: auto; overflow-x: hidden; }
-        .max-dashboard-width { max-width: 1650px; margin: 0 auto; width: 100%; }
-        .board-header { background: linear-gradient(to right, #94a3b8, #cbd5e1); border-bottom: 2px solid #475569; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .kanban-wrapper { display: flex; align-items: flex-start; padding: 20px 0; overflow-x: auto; min-height: 600px; }
-        .kanban-col { background: #f8fafc; border-radius: 12px; min-width: 320px; max-width: 320px; height: 78vh; display: flex; flex-direction: column; margin-right: 18px; border: 2px solid #64748b; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease; }
-        .kanban-header { padding: 14px 16px 10px 16px; font-weight: 700; font-size: 15px; color: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #cbd5e1; }
-        .card-list { padding: 12px 10px; flex-grow: 1; overflow-y: auto; min-height: 50px; }
-        .task-card { background: #ffffff; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; border: 1.5px solid #cbd5e1; transition: all 0.2s ease; position: relative; overflow-wrap: break-word; word-break: break-word; }
-        .task-card:hover { border-color: #475569; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
+        .max-dashboard-width { max-width: 1600px; margin: 0 auto; width: 100%; }
+        .board-header { background: #1e293b; color: white; padding: 12px 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .kanban-wrapper { display: flex; gap: 20px; padding: 24px 0; overflow-x: auto; align-items: flex-start; }
+        .kanban-col { background: #e2e8f0; border-radius: 12px; min-width: 310px; width: 310px; display: flex; flex-direction: column; max-height: 85vh; border: 1px solid #cbd5e1; }
+        .kanban-header { padding: 16px; font-weight: 800; font-size: 13px; color: #475569; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-list { padding: 0 12px 12px 12px; flex-grow: 1; overflow-y: auto; min-height: 100px; }
+        .task-card { background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #cbd5e1; cursor: pointer; }
+        .tag { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
         .tag-urgent { background: #fee2e2; color: #b91c1c; }
         .tag-high { background: #fef3c7; color: #b45309; }
         .tag-normal { background: #e0e7ff; color: #4338ca; }
         .tag-low { background: #f1f5f9; color: #475569; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div id="app" v-cloak class="min-h-screen flex flex-col">
-    <header class="board-header px-6 py-3 flex justify-center shrink-0">
-        <div class="max-dashboard-width flex justify-between items-center w-full">
-            <div class="flex items-center space-x-6">
-                <h1 class="text-2xl font-black text-slate-900">Fitma <span class="font-normal opacity-40">|</span> Stanley OS</h1>
-                <nav class="flex space-x-1 bg-white/50 backdrop-blur-sm p-1 rounded-lg border border-white/60">
-                    <button v-for="tab in ['All', 'Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab" :class="activeTab === tab ? 'bg-white text-slate-900 shadow-md' : 'text-slate-700 hover:bg-white/50'" class="px-4 py-1.5 rounded text-sm font-bold transition-all">{{ tab }}</button>
-                </nav>
+    <header class="board-header flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-black tracking-tight">Fitma <span class="font-light opacity-50">|</span> Stanley OS</h1>
+            <div class="flex space-x-1 bg-slate-700/50 p-1 rounded-md">
+                <button v-for="tab in ['All', 'Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab" :class="activeTab === tab ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300 hover:text-white'" class="px-3 py-1 rounded text-xs font-bold transition-all">{{ tab }}</button>
             </div>
-            <div class="bg-white/50 p-1 rounded-lg flex space-x-1 border border-white/60">
-                <button @click="viewMode = 'kanban'" :class="viewMode === 'kanban' ? 'bg-white shadow-sm' : ''" class="px-3 py-1 rounded text-xs font-bold text-slate-800">Kanban</button>
-                <button @click="viewMode = 'timeline'" :class="viewMode === 'timeline' ? 'bg-white shadow-sm' : ''" class="px-3 py-1 rounded text-xs font-bold text-slate-800">Timeline</button>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="text-right">
+                <span class="text-[10px] block opacity-60 font-bold uppercase">System Velocity</span>
+                <span class="font-black text-lg">{{ completedTasks.length }} <span class="text-xs opacity-50 font-normal">DONE</span> / {{ wipCount }} <span class="text-xs opacity-50 font-normal">WIP</span></span>
             </div>
         </div>
     </header>
 
-    <div class="px-6 pt-6 flex justify-center">
-        <div class="max-dashboard-width flex gap-5 items-start w-full">
-            <div class="bg-white rounded-xl p-4 shadow-sm flex-grow border border-slate-300">
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Live AI Counselor (Empathetic Assist)</p>
-                <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="How's your day going, Stanley? Tell me what's on your mind..." class="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-900 outline-none p-0">
-                <div v-if="aiStatus || aiResponse" class="mt-4 pt-4 border-t-2 border-slate-200">
-                    <p v-if="aiStatus" class="text-xs text-slate-600 font-bold animate-pulse">{{ aiStatus }}</p>
-                    <div v-if="aiResponse" class="markdown-body text-sm text-slate-800 bg-slate-50 p-5 rounded-lg border border-slate-300" v-html="parsedAiResponse"></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl p-5 shadow-sm w-80 border border-slate-300 shrink-0">
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Velocity ({{ activeTab }})</h3>
-                <div class="flex justify-between">
-                    <div><p class="text-2xl font-black text-slate-900 leading-none">{{ completedTasks.length }}</p><p class="text-[10px] text-slate-500 font-bold mt-1 uppercase">Done</p></div>
-                    <div class="text-right"><p class="text-2xl font-black leading-none text-emerald-600">{{ wipCount }}</p><p class="text-[10px] text-slate-500 font-bold mt-1 uppercase">Wip</p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="px-6 flex justify-center">
-        <div class="max-dashboard-width w-full">
-            <main v-show="viewMode === 'kanban'" class="kanban-wrapper">
+        <div class="max-dashboard-width">
+            <main class="kanban-wrapper">
                 <div v-for="col in columns" :key="col.id" class="kanban-col">
                     <div class="kanban-header">
-                        <h3 class="font-bold text-slate-800">{{ col.title }}</h3>
-                        <span class="bg-white border-2 border-slate-300 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-black">{{ getTaskCount(col.id) }}</span>
+                        <span>{{ col.title }}</span>
+                        <span class="bg-slate-300 text-slate-700 px-2 py-0.5 rounded text-[10px] font-black">{{ getTaskCount(col.id) }}</span>
                     </div>
                     <div :id="col.id" class="card-list">
-                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card">
+                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" class="task-card hover:border-slate-400 transition-colors">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="text-[10px] font-black text-slate-400 uppercase">{{ task.company }}</span>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{{ task.company }}</span>
                                 <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                             </div>
-                            <h4 class="text-sm font-bold text-slate-900 mb-3">{{ task.title }}</h4>
-                            <div v-if="task.dueDate" class="text-[10px] font-bold text-emerald-600 mb-2">📅 {{ task.dueDate }}</div>
-                            <p v-if="task.action" class="text-[11px] text-slate-700 border-t pt-2 mt-2 font-medium italic">Next: {{ task.action }}</p>
+                            <h4 class="text-sm font-bold text-slate-800 leading-snug mb-2">{{ task.title }}</h4>
+                            <div v-if="task.dueDate" class="text-[9px] font-bold text-blue-600 bg-blue-50 inline-block px-1.5 py-0.5 rounded border border-blue-100 mb-2">📅 {{ task.dueDate }}</div>
+                            <p v-if="task.action" class="text-[10px] text-slate-500 border-t pt-2 mt-1 font-medium italic">Next: {{ task.action }}</p>
                         </div>
                     </div>
-                </div>
-            </main>
-
-            <main v-if="viewMode === 'timeline'" class="py-10">
-                <div class="bg-white rounded-xl shadow-md border-2 border-slate-300 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-100 border-b-2 border-slate-300">
-                            <tr><th class="p-4 text-xs font-black uppercase">Due Date</th><th class="p-4 text-xs font-black uppercase">Task</th><th class="p-4 text-xs font-black uppercase">Company</th></tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr v-for="t in timelineTasks" :key="t.id" class="hover:bg-slate-50 cursor-pointer">
-                                <td class="p-4 text-sm font-bold">{{ t.dueDate || 'TBD' }}</td>
-                                <td class="p-4 text-sm font-black">{{ t.title }}</td>
-                                <td class="p-4 text-xs font-bold text-slate-400">{{ t.company }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </main>
         </div>
@@ -115,133 +77,121 @@ const { createApp, ref, onMounted, computed, nextTick } = Vue;
 createApp({
     setup() {
         const activeTab = ref('All');
-        const viewMode = ref('kanban');
         const tasks = ref([]);
-        const aiInput = ref('');
-        const aiStatus = ref('');
-        const aiResponse = ref('');
-        const isThinking = ref(false);
-
         const columns = [
             {id:'brainstorm', title:'Brainstorming'}, 
             {id:'notstarted', title:'Not Started'}, 
             {id:'progress', title:'In Progress'}, 
-            {id:'waiting', title:'Pending/Paused'}, 
+            {id:'waiting', title:'Pending Review'}, 
             {id:'completed', title:'Completed'}
         ];
-
-        const schemaEnhance = (t) => ({ effort:'Medium', impact:'Medium', lastUpdated:Date.now(), subtasks:[], priority:'Normal', action:'', dueDate:'', ...t });
 
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
         const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
         const wipCount = computed(() => getTaskCount('progress'));
-        const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
-        const parsedAiResponse = computed(() => aiResponse.value ? marked.parse(aiResponse.value) : '');
 
         onMounted(async () => {
-            // COMMAND FOR NETLIFY: Version check to force a clean data refresh
-            const VERSION = "STANLEY_OS_FINAL_v4"; 
-            const savedVersion = localStorage.getItem('fitma_version');
+            // FORCING A MASTER RESET FOR GITHUB PAGES
+            const RESET_KEY = "STANLEY_OS_FINAL_v7_STRICT";
             
             const rawData = [
                 /* DYMEK */
                 { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', status: 'notstarted', action: 'Complete brand guideline first' },
-                { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', status: 'waiting', action: 'Stanley should review' },
+                { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', status: 'waiting', action: 'Stanley review' },
                 { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', status: 'waiting', action: 'Need Revision' },
                 { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', status: 'progress' },
-                { id: 5, company: 'Dymek', title: 'Brochure: Western Digital Penang', priority: 'Low', status: 'waiting', action: 'Stanley should review' },
-                { id: 6, company: 'Dymek', title: 'Landing Page: OATi Contact Lens', priority: 'Low', status: 'brainstorm', action: 'Stanley to write content' },
-                { id: 7, company: 'Dymek', title: 'Research CRM software', priority: 'Normal', status: 'waiting', action: 'Stanley respond to Peter email' },
-                { id: 8, company: 'Dymek', title: 'List of Fitma video topics', priority: 'Normal', status: 'notstarted' },
+                { id: 5, company: 'Dymek', title: 'Brochure: Western Digital Penang', priority: 'Low', status: 'waiting', action: 'Stanley review' },
+                { id: 6, company: 'Dymek', title: 'Landing Page: OATi Contact Lens', priority: 'Low', status: 'brainstorm', action: 'Stanley write content' },
+                { id: 7, company: 'Dymek', title: 'Research CRM software (Odoo)', priority: 'Normal', status: 'waiting', action: 'Respond to Peter email' },
+                { id: 8, company: 'Dymek', title: 'Fitma video topics list', priority: 'Normal', status: 'notstarted' },
                 { id: 9, company: 'Dymek', title: 'Sales tracker (Excel)', priority: 'Low', status: 'notstarted' },
-                { id: 10, company: 'Dymek', title: 'PowerPoint template', priority: 'Low', status: 'brainstorm', action: 'Stanley to send PowerPoint' },
-                { id: 11, company: 'Dymek', title: 'GBP Accounts for all regions', priority: 'Normal', status: 'waiting' },
-                { id: 12, company: 'Dymek', title: 'Brochure: OATi AR/VR Glasses', priority: 'Low', status: 'waiting', action: 'Stanley should review' },
+                { id: 10, company: 'Dymek', title: 'PowerPoint template', priority: 'Low', status: 'brainstorm' },
+                { id: 11, company: 'Dymek', title: 'GBP Accounts regions', priority: 'Normal', status: 'waiting' },
+                { id: 12, company: 'Dymek', title: 'Brochure: OATi AR/VR Glasses', priority: 'Low', status: 'waiting', action: 'Stanley review' },
                 { id: 13, company: 'Dymek', title: 'Setup tracking Malaysia tenders', priority: 'Normal', status: 'notstarted' },
                 { id: 14, company: 'Dymek', title: 'Landing Page: Lynxx?', priority: 'Low', status: 'brainstorm' },
                 { id: 15, company: 'Dymek', title: 'Landing Page: yieldWerx?', priority: 'Low', status: 'brainstorm' },
-                { id: 16, company: 'Dymek', title: 'Brochure: microPREP?', priority: 'Low', status: 'brainstorm', action: 'Get approval from 3D-Micromac' },
-                { id: 17, company: 'Dymek', title: 'Product based sales research', priority: 'Low', status: 'brainstorm' },
+                { id: 16, company: 'Dymek', title: 'Brochure: microPREP?', priority: 'Low', status: 'brainstorm' },
+                { id: 17, company: 'Dymek', title: 'Product sales research', priority: 'Low', status: 'brainstorm' },
                 { id: 18, company: 'Dymek', title: 'Host QuickPRO-Cube TM', priority: 'Low', status: 'notstarted' },
                 { id: 19, company: 'Dymek', title: 'Host n&k brochure', priority: 'Normal', status: 'notstarted' },
-                { id: 20, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', status: 'brainstorm', action: 'Scope required' },
-                { id: 21, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', status: 'brainstorm', action: 'Project budget issues' },
+                { id: 20, company: 'Dymek', title: 'Google AdWords OATi LAS', priority: 'Low', status: 'brainstorm' },
+                { id: 21, company: 'Dymek', title: 'OATi doublet cementing Schott', priority: 'Low', status: 'brainstorm' },
                 { id: 22, company: 'Dymek', title: 'OATi QuickPRO promotion', priority: 'Low', status: 'brainstorm' },
                 { id: 23, company: 'Dymek', title: 'Coordinate Sales team spreadsheet', priority: 'Low', status: 'brainstorm' },
 
                 /* GIGASCAN */
-                { id: 24, company: 'GigaScan', title: "New Solutions: Patrik's 3 categories", priority: 'Urgent', status: 'waiting', action: 'Team provide images' },
-                { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live', priority: 'Urgent', status: 'waiting', action: 'Stanley schedule meeting' },
-                { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', status: 'waiting', action: 'Stanley should review' },
+                { id: 24, company: 'GigaScan', title: 'New Solutions (3 categories)', priority: 'Urgent', status: 'waiting', action: 'Team provide images' },
+                { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live', priority: 'Urgent', status: 'waiting', action: 'Schedule with Patrik' },
+                { id: 26, company: 'GigaScan', title: 'Brochure: GigaScan Metrology', priority: 'Urgent', status: 'waiting', action: 'Stanley review' },
                 { id: 27, company: 'GigaScan', title: 'Company profile layout', priority: 'Normal', status: 'progress', action: 'Stanley send material' },
                 { id: 28, company: 'GigaScan', title: 'TrueProp Instagram image', priority: 'Normal', status: 'waiting' },
-                { id: 29, company: 'GigaScan', title: 'Test video editor candidates', priority: 'Normal', status: 'progress' },
-                { id: 30, company: 'GigaScan', title: 'Add Axial flow pump app page', priority: 'Normal', status: 'notstarted' },
-                { id: 31, company: 'GigaScan', title: 'Review LinkedIn notes', priority: 'Low', status: 'waiting', action: 'Stanley obtain access' },
+                { id: 29, company: 'GigaScan', title: 'Video editor candidates', priority: 'Normal', status: 'progress' },
+                { id: 30, company: 'GigaScan', title: 'Add Axial flow pump page', priority: 'Normal', status: 'notstarted' },
+                { id: 31, company: 'GigaScan', title: 'Review LinkedIn notes', priority: 'Low', status: 'waiting' },
                 { id: 32, company: 'GigaScan', title: 'Delegate to Video Editor', priority: 'Low', status: 'waiting' },
                 { id: 33, company: 'GigaScan', title: 'Fix dynamic padding issue', priority: 'Low', status: 'notstarted' },
 
-                /* LADING TECHNOLOGY */
-                { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 35, company: 'Lading Technology', title: 'Add maintenance/escrow info', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                /* LADING */
+                { id: 34, company: 'Lading Technology', title: 'Driver pay structure', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 35, company: 'Lading Technology', title: 'Maintenance/escrow info', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 36, company: 'Lading Technology', title: 'Clarify asset management', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 37, company: 'Lading Technology', title: 'Carrier Mobile App statement', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 37, company: 'Lading Technology', title: 'Mobile App statement', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 38, company: 'Lading Technology', title: 'Preferred lanes for drivers', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 39, company: 'Lading Technology', title: 'Broker Content: Quick pricing', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 39, company: 'Lading Technology', title: 'Broker: Quick pricing', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
                 { id: 40, company: 'Lading Technology', title: 'Copy Edit: Damage Claims', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 41, company: 'Lading Technology', title: 'Caters to Operating Companies', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 42, company: 'Lading Technology', title: 'Highlight DOT report speed', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 41, company: 'Lading Technology', title: 'Operating Companies edit', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 42, company: 'Lading Technology', title: 'DOT report speed highlight', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
                 { id: 43, company: 'Lading Technology', title: 'Reminders and DOT section', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 44, company: 'Lading Technology', title: 'Strategy: Filter feature list', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
-                { id: 45, company: 'Lading Technology', title: 'Quantum vs Core versions', priority: 'Normal', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 46, company: 'Lading Technology', title: 'Figma tracking design', priority: 'Normal', status: 'progress' },
+                { id: 44, company: 'Lading Technology', title: 'Filter feature list', priority: 'Normal', status: 'waiting', dueDate: '2026-10-09' },
+                { id: 45, company: 'Lading Technology', title: 'Quantum vs Core build', priority: 'Normal', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking', priority: 'Normal', status: 'progress' },
                 { id: 47, company: 'Lading Technology', title: 'Hire LATAM Freelancer', priority: 'Normal', status: 'waiting' },
                 { id: 48, company: 'Lading Technology', title: 'Operating Co Doc for Brokers', priority: 'Normal', status: 'notstarted' },
                 { id: 49, company: 'Lading Technology', title: 'Test AI tutorial (Guidde)', priority: 'Normal', status: 'notstarted' },
-                { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', status: 'brainstorm' },
+                { id: 50, company: 'Lading Technology', title: 'Strategy outside transport', priority: 'Normal', status: 'brainstorm' },
                 { id: 51, company: 'Lading Technology', title: 'Replace anime images', priority: 'Normal', status: 'progress', dueDate: '2026-10-09' },
-                { id: 52, company: 'Lading Technology', title: 'Page for Logistics operating co', priority: 'Normal', status: 'notstarted' },
-                { id: 53, company: 'Lading Technology', title: 'Recruit VA YouTuber', priority: 'Normal', status: 'notstarted' },
+                { id: 52, company: 'Lading Technology', title: 'Logistics operating co page', priority: 'Normal', status: 'notstarted' },
+                { id: 53, company: 'Lading Technology', title: 'Recruit YouTuber', priority: 'Normal', status: 'notstarted' },
                 { id: 54, company: 'Lading Technology', title: 'Videos for onboarding', priority: 'Normal', status: 'notstarted' },
                 { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', status: 'waiting' },
-                { id: 56, company: 'Lading Technology', title: 'Credential Vault & Automation UI', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
-                { id: 57, company: 'Lading Technology', title: 'Social media video topics', priority: 'Normal', status: 'notstarted' },
+                { id: 56, company: 'Lading Technology', title: 'Credential Vault UI', priority: 'Low', status: 'waiting', dueDate: '2026-01-10' },
+                { id: 57, company: 'Lading Technology', title: 'Video topics list', priority: 'Normal', status: 'notstarted' },
                 { id: 58, company: 'Lading Technology', title: 'Fix zoom padding', priority: 'Low', status: 'notstarted' },
-                { id: 59, company: 'Lading Technology', title: 'Check all links and CTA', priority: 'Low', status: 'notstarted' },
-                { id: 60, company: 'Lading Technology', title: 'Googlesheet for video editor', priority: 'Low', status: 'notstarted' },
+                { id: 59, company: 'Lading Technology', title: 'Check all buttons and links', priority: 'Low', status: 'notstarted' },
+                { id: 60, company: 'Lading Technology', title: 'Googlesheet for editor', priority: 'Low', status: 'notstarted' },
                 { id: 61, company: 'Lading Technology', title: 'Coordinate with Kriti', priority: 'Low', status: 'notstarted' },
 
                 /* COMPLETED */
-                { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed' },
-                { id: 63, company: 'Lading Technology', title: 'SEO metadata & alt text', status: 'completed' },
-                { id: 64, company: 'GigaScan', title: 'SEO metadata & alt text', status: 'completed' },
-                { id: 65, company: 'Dymek', title: 'LinkedIn Page Setup', status: 'completed' },
+                { id: 62, company: 'Lading Technology', title: 'Homepage Overhaul', status: 'completed' },
+                { id: 63, company: 'Lading Technology', title: 'SEO metadata', status: 'completed' },
+                { id: 64, company: 'GigaScan', title: 'SEO metadata', status: 'completed' },
+                { id: 65, company: 'Dymek', title: 'LinkedIn Setup', status: 'completed' },
                 { id: 66, company: 'GigaScan', title: 'Mobile design revisit', status: 'completed' },
                 { id: 67, company: 'GigaScan', title: 'Update Vehicle Page', status: 'completed' },
                 { id: 68, company: 'GigaScan', title: 'Update font issues', status: 'completed' },
                 { id: 69, company: 'Lading Technology', title: 'Mascot Variation', status: 'completed' },
-                { id: 70, company: 'Lading Technology', title: 'Schedule call Abdul', status: 'completed' },
-                { id: 71, company: 'Dymek', title: '4D Business Update', status: 'completed' },
+                { id: 70, company: 'Lading Technology', title: 'Call Abdul', status: 'completed', dueDate: '2026-03-29' },
+                { id: 71, company: 'Dymek', title: '4D Business Update', status: 'completed', dueDate: '2026-03-11' },
                 { id: 72, company: 'GigaScan', title: 'Patrik revisions check', status: 'completed' },
                 { id: 73, company: 'GigaScan', title: 'Japanese translation', status: 'completed' },
-                { id: 74, company: 'Lading Technology', title: 'Figma login/signup', status: 'completed' },
-                { id: 75, company: 'Lading Technology', title: 'Squarespace Broker/Shipper sections', status: 'completed' },
-                { id: 76, company: 'Lading Technology', title: 'Add relevant anime images', status: 'completed' },
+                { id: 74, company: 'Lading Technology', title: 'Figma login/signup', status: 'completed', dueDate: '2026-03-31' },
+                { id: 75, company: 'Lading Technology', title: 'Broker/Shipper sections', status: 'completed', dueDate: '2026-03-31' },
+                { id: 76, company: 'Lading Technology', title: 'Add anime images', status: 'completed', dueDate: '2026-01-31' },
                 { id: 77, company: 'Lading Technology', title: 'Modify screenshots (Kriti)', status: 'completed' },
-                { id: 78, company: 'Lading Technology', title: 'Watch viral tracking video', status: 'completed' },
-                { id: 79, company: 'Lading Technology', title: 'Evaluation recruitment portals', status: 'completed' },
-                { id: 80, company: 'Lading Technology', title: 'Mobile landscape optimization', status: 'completed' },
-                { id: 81, company: 'Lading Technology', title: 'Website contact calendar', status: 'completed' }
+                { id: 78, company: 'Lading Technology', title: 'YouTube viral tracking', status: 'completed', dueDate: '2026-03-31' },
+                { id: 79, company: 'Lading Technology', title: 'Recruitment evaluation', status: 'completed', dueDate: '2026-03-31' },
+                { id: 80, company: 'Lading Technology', title: 'Mobile UX optimization', status: 'completed' },
+                { id: 81, company: 'Lading Technology', title: 'Contact calendar', status: 'completed' }
             ];
 
-            // Master Reset Logic: If version mismatch, force fresh data
-            if (savedVersion !== VERSION) {
-                tasks.value = rawData.map(schemaEnhance);
+            if (localStorage.getItem('fitma_sync_v7') !== RESET_KEY) {
+                tasks.value = rawData.map(t => ({ action:'', dueDate:'', ...t }));
                 localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                localStorage.setItem('fitma_version', VERSION);
+                localStorage.setItem('fitma_sync_v7', RESET_KEY);
             } else {
-                tasks.value = JSON.parse(localStorage.getItem('fitma_os_pro_silver')).map(schemaEnhance);
+                tasks.value = JSON.parse(localStorage.getItem('fitma_os_pro_silver'));
             }
 
             await nextTick();
@@ -261,17 +211,7 @@ createApp({
             });
         });
 
-        const askAI = async () => {
-            const query = aiInput.value.trim(); if (!query) return;
-            isThinking.value = true; aiStatus.value = "Consulting your task strategy...";
-            const systemPrompt = "You are ChatGPT, Stanley's empathetic executive manager. Provide concise, incredibly empathetic, smart, and direct answers using Markdown. Comfort him like a friend and advise him to focus on 1 task if overwhelmed.";
-            try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:systemPrompt}, {role:'user', content:query}] }) });
-                aiResponse.value = await res.text();
-            } finally { isThinking.value = false; aiStatus.value = ''; aiInput.value = ''; }
-        };
-
-        return { activeTab, viewMode, tasks, columns, aiInput, aiStatus, aiResponse, parsedAiResponse, isThinking, filteredTasks, completedTasks, timelineTasks, getTaskCount, wipCount, askAI };
+        return { activeTab, tasks, columns, filteredTasks, getTaskCount, completedTasks, wipCount };
     }
 }).mount('#app');
 </script>
