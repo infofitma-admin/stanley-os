@@ -61,10 +61,10 @@
         @keyframes orb-pulse { 0% { background-position: 0% 50%; transform: scale(0.95); } 50% { background-position: 100% 50%; transform: scale(1.05); } 100% { background-position: 0% 50%; transform: scale(0.95); } }
     </style>
 </head>
-<body :class="{'dark': isDarkMode}" class="bg-slate-50 text-slate-900 transition-colors duration-300">
+<body class="bg-slate-50 text-slate-900 transition-colors duration-300">
 
 <div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen w-full flex overflow-hidden">
-    <div class="flex w-full h-full bg-slate-50 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
+    <div class="flex w-full h-full dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         
         <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 transition-all z-20 h-full">
             <div class="h-16 flex items-center px-6 border-b border-slate-800 flex-shrink-0">
@@ -333,7 +333,7 @@
                                           <svg class="w-3 h-3 mr-1 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                             {{ task.action }}
                                        </p>
-                                   </div>
+                                    </div>
                                 </div>
                           </div>
                           
@@ -515,7 +515,7 @@
             <div v-if="siriListening && !isVoraSpeaking" class="absolute inset-0 rounded-full siri-orb opacity-50 blur-md"></div>
             <div v-if="isVoraSpeaking" class="absolute inset-0 rounded-full speaking-orb opacity-60 blur-md"></div>
             <div :class="isVoraSpeaking ? 'speaking-orb' : (siriListening ? 'siri-orb animate-none' : 'bg-gradient-to-tr from-slate-700 to-slate-900')" class="w-12 h-12 rounded-full flex items-center justify-center transition-all z-10">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
           </div>
        </button>
     </div>
@@ -650,6 +650,7 @@ createApp({
         const chatScrollContainer = ref(null);
         let speechRecog = null;
 
+        // Siri Quick Capture state
         const siriListening = ref(false);
         const siriProcessing = ref(false);
         const isVoraSpeaking = ref(false);
@@ -657,6 +658,7 @@ createApp({
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
         
+        // Undo/Redo State
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
@@ -670,11 +672,18 @@ createApp({
             { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
         ];
 
+        // 4. Greeting detects device time accordingly
         const timeGreeting = computed(() => {
             const hr = new Date().getHours();
             if (hr < 12) return 'Good morning';
             if (hr < 17) return 'Good afternoon';
             return 'Good evening';
+        });
+
+        // 1. Dark mode logic fixes
+        watch(isDarkMode, (newVal) => {
+            document.documentElement.classList.toggle('dark', newVal);
+            localStorage.setItem('fitma_dark_mode', newVal);
         });
 
         const commitState = () => {
@@ -762,8 +771,6 @@ createApp({
 
         const toggleDarkMode = () => {
           isDarkMode.value = !isDarkMode.value;
-          document.documentElement.classList.toggle('dark', isDarkMode.value);
-          localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
 
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
@@ -774,16 +781,17 @@ createApp({
             return marked.parse(text);
         };
 
+        // 2. Commands/Jump options restored
         const commands = computed(() => [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
             { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
-            { title: 'Switch to Timeline', desc: 'View tasks chronologically', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>', action: () => { viewMode.value = 'timeline' } },
-            { title: 'Open Morning Brief', desc: 'Vora will prepare your update', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', action: generateBrief }
+            { title: 'Dashboard View', desc: 'Switch to Kanban', icon: '📊', action: () => { viewMode.value = 'kanban' } },
+            { title: 'Risk Predictor', desc: 'Check blockers', icon: '⚠️', action: () => { viewMode.value = 'risk' } }
         ]);
 
         const filteredCommands = computed(() => {
           if(!cmdSearch.value) return commands.value;
-            return commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()) || c.desc.toLowerCase().includes(cmdSearch.value.toLowerCase()));
+            return commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()));
         });
 
         const executeCommand = (cmd) => { cmd.action(); showCommandPalette.value = false; cmdSearch.value = ''; };
@@ -817,7 +825,7 @@ createApp({
 
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
-             const prompt = `Voice Command: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"} OR {"intent": "task", "title": "...", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "...", "status": "notstarted", "assignee": "..."}`;
+             const prompt = `You are Vora. Voice Command: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"} OR {"intent": "task", "title": "...", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "...", "status": "notstarted", "assignee": "..."}`;
              try {
                 const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
                 const responseText = await _parseAiResponse(res);
@@ -844,7 +852,7 @@ createApp({
         const generateBrief = async () => {
           aiStatus.value = "Scanning tasks...";
           const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-          const prompt = `You are Vora, Stanley's kind and caring AI partner. Create a Morning Brief. Show exactly 3 colorful HTML cards (Rose for Critical, Sky for Flow, Amber for Blockers). Each card 3-5 lines. End with 4 lines of warm, human motivation. Data: \n${snapshot}`;
+          const prompt = `You are Vora, Stanley's kind AI assistant. Create a Morning Brief. Show exactly 3 colorful HTML cards (Rose for Critical, Sky for Flow, Amber for Blockers). Each card 3-5 lines. End with 4 lines of warm motivation. Data: \n${snapshot}`;
           chatHistory.value.push({ role: 'user', content: "Morning Brief." }); scrollToBottom();
           try {
               const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
@@ -852,21 +860,22 @@ createApp({
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-          } catch (e) { chatHistory.value.push({ role: 'ai', content: "I'm so sorry, I had trouble gathering your brief. Let's try again in a moment." }); }
+          } catch (e) { chatHistory.value.push({ role: 'ai', content: "I'm so sorry, I had trouble preparing your brief." }); }
           finally { aiStatus.value = ''; }
         };
 
+        // 3. Updated AI personality prompt
         const askAI = async () => {
             let query = aiInput.value.trim(); if (!query && !attachedFile.value) return;
             chatHistory.value.push({ role: 'user', content: query }); scrollToBottom();
             isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Thinking...";
             try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, a kind, caring, and human-like AI companion. You understand Stanley's goals and offer support. Use tables/markdown for structure. Always end with 4 lines of motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, Stanley's kind, caring, and highly capable human-like assistant. Always be understanding and supportive. Use tables/markdown for structure. End with 4 lines of sincere motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-            } catch (err) { chatHistory.value.push({ role: 'ai', content: "I'm having a little trouble connecting, but I'm still here for you." }); }
+            } catch (err) { chatHistory.value.push({ role: 'ai', content: "I'm sorry Stanley, I encountered an error. How can I try again for you?" }); }
             finally { isThinking.value = false; aiStatus.value = ''; }
         };
 
@@ -896,8 +905,9 @@ createApp({
           commitState();
           nextTick(initSortable);
 
+          // Listen for Ctrl+K
           window.addEventListener('keydown', (e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+              if (e.ctrlKey && e.key === 'k') {
                   e.preventDefault();
                   showCommandPalette.value = true;
                   nextTick(() => document.getElementById('cmd-input')?.focus());
