@@ -78,15 +78,14 @@
                 <div>
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Views</h2>
                     <div class="space-y-1">
-                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Dashboard</button>
-                        <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Resource Load</button>
-                        <button @click="viewMode = 'risk'; activeTab = 'All'" :class="viewMode==='risk' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-rose-300 hover:text-rose-200"> Risk Predictor</button>
-                        <button @click="viewMode = 'timeline'; activeTab = 'All'" :class="viewMode==='timeline' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Timeline</button>
-                        <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Impact Matrix</button>
-                        <button @click="viewMode = 'heatmap'; activeTab = 'All'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Heatmap</button>
+                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Dashboard </button>
+                        <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Resource Load </button>
+                        <button @click="viewMode = 'risk'; activeTab = 'All'" :class="viewMode==='risk' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-rose-300 hover:text-rose-200"> Risk Predictor </button>
+                        <button @click="viewMode = 'timeline'; activeTab = 'All'" :class="viewMode==='timeline' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Timeline </button>
+                        <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Impact Matrix </button>
+                        <button @click="viewMode = 'heatmap'; activeTab = 'All'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Heatmap </button>
                     </div>
                 </div>
- 
                 <div>
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                     <div class="space-y-1">
@@ -97,7 +96,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex-shrink-0">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center relative">
@@ -113,131 +111,43 @@
         </aside>
  
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
-            
             <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
-                <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                    Search or jump to...
-                    <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">Ctrl K</span>
-                </button>
- 
+                <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition"> Search or jump to... <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">Ctrl K</span></button>
                 <div class="flex items-center space-x-6">
                     <div class="flex items-center space-x-1 border-r border-slate-200 dark:border-slate-700 pr-5 mr-1">
-                        <button @click="undo" :disabled="!canUndo" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Undo (Ctrl+Z)">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
-                        </button>
-                        <button @click="redo" :disabled="!canRedo" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Redo (Ctrl+Y)">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"/></svg>
-                        </button>
+                        <button @click="undo" :disabled="!canUndo" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"> Undo </button>
+                        <button @click="redo" :disabled="!canRedo" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"> Redo </button>
                     </div>
-
-                    <div class="relative">
-                        <button @click="showNotifications = !showNotifications" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition relative">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                            <span v-if="smartNotifications.length > 0" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-                        </button>
-                        
-                        <div v-if="showNotifications" class="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2">
-                            <h3 class="px-4 py-2 text-[10px] font-black uppercase text-slate-500 border-b border-slate-100 dark:border-slate-700">Notifications</h3>
-                            <div v-if="smartNotifications.length === 0" class="p-4 text-xs font-medium text-slate-500 text-center">No new notifications.</div>
-                            <button v-for="notif in smartNotifications" @click="openTask(notif); showNotifications = false" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b border-slate-50 dark:border-slate-700/50 last:border-0 block">
-                                <p class="text-xs font-bold text-red-500 mb-1">Urgent Reminder</p>
-                                <p class="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">{{ notif.title }}</p>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 dark:hover:text-amber-300 transition">
-                        <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                    </button>
+                    <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 dark:hover:text-amber-300 transition"> Mode </button>
                 </div>
             </header>
  
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-8 custom-scrollbar relative">
-                
                 <div class="flex gap-6 mb-8 max-w-[1600px] mx-auto">
-                    
                     <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col relative overflow-hidden h-[360px] transition-colors">
                         <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
                             <div class="flex items-center space-x-2">
-                                <div class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-950 flex items-center justify-center shadow-sm">
-                                    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                                </div>
                                 <span class="font-black text-slate-800 dark:text-white tracking-tight">Vora</span>
                             </div>
                             <div class="flex items-center space-x-3">
-                                <button @click="generateBrief" class="px-2 py-1 bg-brand text-white text-[10px] font-bold rounded-md hover:bg-emerald-600 transition-colors shadow-sm flex items-center">
-                                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Morning Brief
-                                </button>
-                                <button @click="clearChat" class="text-slate-400 hover:text-red-500 transition-colors" title="Clear Conversation">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                </button>
-                                <div class="flex space-x-1 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-lg">
-                                    <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
-                                </div>
+                                <button @click="generateBrief" class="px-2 py-1 bg-brand text-white text-[10px] font-bold rounded-md hover:bg-emerald-600 transition-colors shadow-sm flex items-center"> Morning Brief </button>
+                                <button @click="clearChat" class="text-slate-400 hover:text-red-500 transition-colors"> Clear </button>
                             </div>
                         </div>
  
                         <div class="flex-grow p-5 overflow-y-auto flex flex-col bg-white dark:bg-slate-800 relative custom-scrollbar" ref="chatScrollContainer">
-                            
-                            <div v-if="chatHistory.length === 0 && !aiStatus" class="m-auto text-center flex flex-col items-center justify-center opacity-80 pb-6">
-                                <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4">
-                                    <svg class="w-6 h-6 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                                </div>
-                                <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Good afternoon, Stanley.</h2>
-                                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">I am here to support you. How can I help today?</p>
-                            </div>
- 
                             <div class="flex flex-col space-y-6 w-full pb-2">
                                 <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.role === 'user' ? 'flex justify-end pl-12' : 'flex items-start space-x-3 pr-12'">
-                                    
-                                    <div v-if="msg.role === 'ai'" class="w-8 h-8 rounded-full bg-slate-800 dark:bg-slate-950 flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
-                                        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                                    </div>
- 
                                     <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
                                 </div>
-                            </div>
- 
-                            <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-600 dark:text-slate-300 font-medium text-sm p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl w-fit mt-2">
-                                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <span>{{ aiStatus }}</span>
                             </div>
                         </div>
  
                         <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 relative flex flex-col">
-                            <div v-if="attachedFile" class="mb-2 self-start flex items-center bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm max-w-[200px] shadow-sm relative group">
-                                <div class="w-8 h-8 rounded bg-brand/20 flex items-center justify-center mr-3 text-brand">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                </div>
-                                <div class="flex-grow min-w-0">
-                                    <p class="truncate font-bold text-slate-800 dark:text-slate-200">{{ attachedFile.name }}</p>
-                                    <p class="text-[10px] text-slate-500 uppercase">Attached {{ attachedFile.type }}</p>
-                                </div>
-                                <button @click="removeFile" class="absolute -top-2 -right-2 bg-slate-800 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-500">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
- 
                             <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 focus-within:border-slate-400 dark:focus-within:border-slate-500 transition-all shadow-sm max-w-4xl mx-auto w-full">
-                                <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
-                                <div class="relative">
-                                    <button @click="showFileMenu = !showFileMenu" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Attach Document or Image">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                    </button>
-                                    <div v-if="showFileMenu" class="absolute bottom-full left-0 mb-2 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-50 overflow-hidden flex flex-col">
-                                        <button @click="triggerFileUpload('image')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left border-b border-slate-100 dark:border-slate-700 flex items-center">📸 Add Image</button>
-                                        <button @click="triggerFileUpload('document')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left flex items-center">📄 Add Document</button>
-                                    </div>
-                                </div>
                                 <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-900 dark:text-slate-100 outline-none px-3 placeholder-slate-500">
-                                <button @click="toggleSpeechRecognition" class="p-2 transition rounded-full mr-1 relative group" title="Voice Input">
-                                    <div v-if="isListening" class="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
-                                    <svg :class="isListening ? 'text-red-500 scale-110' : 'text-slate-500 group-hover:text-slate-800 dark:group-hover:text-slate-200'" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-                                </button>
-                                <button @click="askAI" :disabled="isThinking || (!aiInput.trim() && !attachedFile)" class="p-2 bg-slate-900 dark:bg-brand text-white hover:bg-slate-700 dark:hover:bg-emerald-400 disabled:opacity-50 transition rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                                </button>
+                                <button @click="toggleSpeechRecognition" class="p-2 transition rounded-full mr-1 relative group"> Voice </button>
+                                <button @click="askAI" :disabled="isThinking || !aiInput.trim()" class="p-2 bg-slate-900 dark:bg-brand text-white hover:bg-slate-700 dark:hover:bg-emerald-400 disabled:opacity-50 transition rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"> Send </button>
                             </div>
                         </div>
                     </div>
@@ -251,21 +161,6 @@
                             </svg>
                             <div class="absolute flex flex-col items-center">
                                 <span class="text-3xl font-black text-slate-900 dark:text-white">{{ completionPercentage }}%</span>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Completed</span>
-                            </div>
-                        </div>
-                        <div class="w-full grid grid-cols-3 gap-2 border-t border-slate-100 dark:border-slate-700 pt-4">
-                            <div class="text-center">
-                                <p class="text-xl font-black text-slate-900 dark:text-white">{{ completedTasks.length }}</p>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase">Done</p>
-                            </div>
-                            <div class="text-center border-l border-slate-100 dark:border-slate-700">
-                                <p class="text-xl font-black text-brand">{{ wipCount }}</p>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase">In Progress</p>
-                            </div>
-                            <div class="text-center border-l border-slate-100 dark:border-slate-700">
-                                <p class="text-xl font-black text-amber-500">{{ avgCycleTime }}d</p>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase">Avg Cycle</p>
                             </div>
                         </div>
                     </div>
@@ -278,51 +173,33 @@
                                 <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm uppercase tracking-tight">{{ col.title }}</h3>
                                 <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getTaskCount(col.id) }}</span>
                             </div>
+                            
                             <div :id="'kanban-' + col.id" class="card-list-scroll space-y-3 custom-scrollbar" :data-status="col.id">
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                         <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                        <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
-                                    </div>
-                                    <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
-                                    <div v-if="task.subtasks && task.subtasks.length > 0" class="mb-2">
-                                        <div class="h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                            <div class="h-full bg-brand transition-all duration-300" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
+                                        <div class="flex space-x-1">
+                                            <span v-if="task.blockedBy" class="text-[8px] font-black bg-rose-500 text-white px-1.5 py-0.5 rounded uppercase tracking-tighter">Blocked</span>
+                                            <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                         </div>
                                     </div>
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
+                                    
+                                    <div v-if="task.blockedBy" class="mb-2 flex items-center text-[9px] font-bold text-rose-500">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        Blocked by: {{ getTaskTitle(task.blockedBy) }}
+                                    </div>
+
                                     <div class="pt-3 border-t border-slate-100 dark:border-slate-700/50 flex flex-col gap-2">
                                         <div class="flex justify-between items-center">
                                             <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 w-fit px-1.5 py-0.5 rounded">{{ task.dueDate }}</div>
                                             <span v-if="task.assignee" class="text-[9px] font-black uppercase tracking-widest text-slate-400">{{ task.assignee }}</span>
                                         </div>
-                                        <p v-if="task.action" class="text-[10px] text-slate-600 dark:text-slate-400 font-medium italic flex items-start">{{ task.action }}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-3 border-t border-slate-200 dark:border-slate-700/50 shrink-0">
                                 <button @click="addTask(col.id)" class="w-full py-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all">+ Add Card</button>
-                            </div>
-                        </div>
-                    </main>
-
-                    <main v-show="viewMode === 'resources'" class="flex gap-5 overflow-x-auto pb-4 custom-scrollbar">
-                        <div v-for="assignee in assignees" :key="assignee.id" class="bg-slate-200/50 dark:bg-slate-800/40 rounded-xl flex flex-col kanban-col shrink-0 border border-slate-200 dark:border-slate-700/50 h-[600px]">
-                            <div class="p-4 flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 shrink-0">
-                                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm tracking-tight flex items-center">
-                                    <span class="w-6 h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-black mr-2">{{ assignee.id.charAt(0) }}</span>
-                                    {{ assignee.title }}
-                                </h3>
-                                <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getResourceTasks(assignee.id).length }}</span>
-                            </div>
-                            <div :id="'resource-' + assignee.id.replace(/\s+/g, '')" class="card-list-scroll space-y-3 custom-scrollbar resource-list" :data-assignee="assignee.id">
-                                <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                        <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
-                                    </div>
-                                    <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
-                                    <span class="text-[10px] font-black bg-slate-100 dark:bg-slate-900 text-slate-500 px-2 py-1 rounded">{{ columns.find(c => c.id === task.status)?.title || task.status }}</span>
-                                </div>
                             </div>
                         </div>
                     </main>
@@ -334,150 +211,83 @@
                                 <svg class="w-6 h-6 mr-2 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                 AI Blocker Predictor
                             </h2>
-                            <p class="text-xs font-medium text-slate-500 mb-8 uppercase tracking-widest">Tasks likely to delay dependencies</p>
-                            <div class="space-y-4">
+                            <div class="space-y-4 mt-6">
                                 <div v-for="task in atRiskTasks" :key="task.id" class="p-4 border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10 rounded-lg flex items-start justify-between cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors" @click="openTask(task)">
                                     <div>
                                         <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{task.title}}</h4>
                                         <p class="text-xs text-slate-600 dark:text-slate-400">
-                                            Status: <span class="font-bold text-rose-500 uppercase">{{task.status}}</span> | Effort: <span class="font-bold">High</span>
+                                            <span v-if="task.blockedBy" class="font-bold text-rose-500">EXPLICITLY BLOCKED</span> 
+                                            <span v-else>POTENTIAL DELAY</span> — Status: {{task.status}}
                                         </p>
-                                        <p class="text-[10px] text-rose-600 font-black uppercase mt-1">⚠️ BLOCKING: Delaying {{ task.company }} Project Milestones</p>
                                     </div>
-                                    <span class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{task.company}}</span>
+                                    <span class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">{{task.company}}</span>
                                 </div>
-                                <div v-if="atRiskTasks.length === 0" class="text-sm text-slate-500 text-center py-8">No immediate blockers detected. You are all clear!</div>
+                                <div v-if="atRiskTasks.length === 0" class="text-sm text-slate-500 text-center py-8">No immediate blockers detected.</div>
                             </div>
                         </div>
                     </main>
- 
-                    <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
- 
-                    <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
-                        <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-200">{{ quad.name }}</h3>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Impact: {{ Array.isArray(quad.impact) ? quad.impact.join('/') : quad.impact }} | Effort: {{ Array.isArray(quad.effort) ? quad.effort.join('/') : quad.effort }}</span>
-                            </div>
-                            <div :id="'matrix-' + quad.id" class="matrix-zone space-y-3 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/50 dark:bg-slate-900/30 p-2 rounded-lg border border-dashed border-slate-200 dark:border-slate-700" :data-impact="Array.isArray(quad.impact) ? quad.impact[0] : quad.impact" :data-effort="Array.isArray(quad.effort) ? quad.effort[0] : quad.effort">
-                                <div v-for="t in getMatrixTasks(quad)" :key="t.id" :data-id="t.id" @click="openTask(t)" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 cursor-grab active:cursor-grabbing text-sm font-bold text-slate-800 dark:text-slate-200 hover:border-brand transition group">
-                                    <div class="flex justify-between items-center"><span class="truncate pr-2">{{ t.title }}</span></div>
-                                    <div class="text-[9px] uppercase mt-1 font-bold" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
- 
-                    <main v-show="viewMode === 'heatmap'" class="pb-10 max-w-4xl mx-auto pt-8">
-                        <div class="bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
-                            <h2 class="text-xl font-black mb-2 tracking-tight text-slate-800 dark:text-white">Workload Heatmap</h2>
-                            <p class="text-xs font-medium text-slate-500 mb-8 uppercase tracking-widest">Tracking High Effort Bottlenecks</p>
-                            <div class="space-y-8">
-                                <div v-for="company in ['Dymek', 'GigaScan', 'Lading Technology']" :key="company">
-                                    <div class="flex justify-between text-xs font-black uppercase mb-2">
-                                        <span class="text-slate-700 dark:text-slate-300">{{company}}</span>
-                                        <span :class="getWorkload(company).count > 3 ? 'text-red-500' : 'text-slate-400'">{{getWorkload(company).count}} High-Effort Tasks</span>
-                                    </div>
-                                    <div class="h-3 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
-                                        <div class="h-full transition-all duration-1000" :style="'width: ' + getWorkload(company).percentage + '%'" :class="getWorkload(company).count > 3 ? 'bg-red-500' : 'bg-brand'"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
-                </div>
+
+                    </div>
             </div>
         </main>
     </div>
 
     <div v-if="pendingVoiceTask" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-700 p-6 transform transition-all scale-100">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center text-brand">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-                </div>
-                <div>
-                    <h3 class="text-sm font-black text-slate-900 dark:text-white">Confirm Task Capture</h3>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase">Voice to Task</p>
-                </div>
-            </div>
-            <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 mb-6 border border-slate-100 dark:border-slate-700/50">
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">"{{ pendingVoiceTask.title }}"</p>
-                <div class="flex flex-wrap gap-2">
-                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.company }}</span>
-                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ columns.find(c => c.id === pendingVoiceTask.status)?.title || 'Not Started' }}</span>
-                </div>
+            <h3 class="text-sm font-black text-slate-900 dark:text-white">Confirm Task Capture</h3>
+            <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 my-4">
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-200">"{{ pendingVoiceTask.title }}"</p>
             </div>
             <div class="flex space-x-3">
-                <button @click="pendingVoiceTask = null" class="flex-1 py-2.5 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 transition">Cancel</button>
-                <button @click="confirmVoiceTask" class="flex-1 py-2.5 rounded-lg font-black text-sm text-white bg-brand shadow-md hover:bg-emerald-500 transition">Confirm Add</button>
+                <button @click="pendingVoiceTask = null" class="flex-1 py-2.5 rounded-lg font-bold text-sm bg-slate-100 dark:bg-slate-800">Cancel</button>
+                <button @click="confirmVoiceTask" class="flex-1 py-2.5 rounded-lg font-black text-sm text-white bg-brand shadow-md">Confirm</button>
             </div>
         </div>
     </div>
 
     <div class="fixed bottom-8 right-8 z-50 flex items-end justify-end">
         <div v-if="siriListening || siriProcessing || isVoraSpeaking" class="absolute bottom-20 right-0 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl w-72 border border-slate-700 backdrop-blur-md bg-opacity-90 mb-2 origin-bottom-right transition-all">
-            <div class="flex items-center space-x-3 mb-2">
-                <div class="flex space-x-1" v-if="siriProcessing || isVoraSpeaking">
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse bg-brand"></span>
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse bg-brand" style="animation-delay: 0.1s"></span>
-                </div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-300">{{ isVoraSpeaking ? 'Vora is speaking...' : (siriProcessing ? 'Thinking...' : 'Listening...') }}</span>
-            </div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-300">{{ isVoraSpeaking ? 'Speaking...' : (siriProcessing ? 'Thinking...' : 'Listening...') }}</p>
             <p class="text-sm font-medium italic opacity-90">{{ siriTranscript }}</p>
         </div>
-        <button @click="toggleSiriCapture" class="w-16 h-16 rounded-full bg-slate-900 dark:bg-slate-800 text-white shadow-2xl flex items-center justify-center hover:scale-105 transition-transform border border-slate-700 group relative">
-            <div v-if="siriListening && !isVoraSpeaking" class="absolute inset-0 rounded-full siri-orb opacity-50 blur-md"></div>
-            <div v-if="isVoraSpeaking" class="absolute inset-0 rounded-full speaking-orb opacity-60 blur-md"></div>
-            <div :class="isVoraSpeaking ? 'speaking-orb' : (siriListening ? 'siri-orb animate-none' : 'bg-gradient-to-tr from-slate-700 to-slate-900')" class="w-12 h-12 rounded-full flex items-center justify-center transition-all z-10">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-            </div>
+        <button @click="toggleSiriCapture" class="w-16 h-16 rounded-full bg-slate-900 dark:bg-slate-800 text-white shadow-2xl flex items-center justify-center border border-slate-700 relative">
+            <div v-if="siriListening || isVoraSpeaking" class="absolute inset-0 rounded-full siri-orb opacity-50 blur-md"></div>
+            <div :class="isVoraSpeaking ? 'speaking-orb' : (siriListening ? 'siri-orb' : 'bg-slate-700')" class="w-12 h-12 rounded-full flex items-center justify-center transition-all z-10"> Voice </div>
         </button>
     </div>
  
     <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/20 dark:bg-black/40 backdrop-blur-sm z-40 transition-opacity"></div>
-    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 flex flex-col border-l border-slate-200 dark:border-slate-800">
+    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200 dark:border-slate-800">
         <div v-if="editingTask" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
-                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded" :class="editingTask.company === 'Dymek' ? 'text-blue-600 bg-blue-100' : 'text-purple-600 bg-purple-100'">{{ editingTask.company }}</span>
-                <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition">X</button>
-            </div>
             <div class="p-6 space-y-6 flex-1">
-                <textarea v-model="editingTask.title" class="text-xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-snug" rows="3" placeholder="Task Title..."></textarea>
-                <div class="grid grid-cols-2 gap-5 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100">
+                <textarea v-model="editingTask.title" class="text-xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0" rows="3" placeholder="Task Title..."></textarea>
+                
+                <div class="grid grid-cols-2 gap-5 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Status</label>
-                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 text-sm font-bold dark:text-white pb-1 outline-none">
+                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
                             <option v-for="c in columns" :value="c.id">{{ c.title }}</option>
                         </select>
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Priority</label>
-                        <select v-model="editingTask.priority" class="w-full bg-transparent border-b border-slate-200 text-sm font-bold dark:text-white pb-1 outline-none">
-                            <option>Urgent</option><option>High</option><option>Normal</option><option>Low</option>
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Assignee</label>
+                        <input type="text" v-model="editingTask.assignee" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[9px] font-black text-rose-500 uppercase mb-1 block">Blocked By (Task Dependency)</label>
+                        <select v-model="editingTask.blockedBy" class="w-full bg-transparent border-b border-rose-300 dark:border-rose-700 text-sm font-bold dark:text-white pb-1 outline-none">
+                            <option :value="null">No Blocker</option>
+                            <option v-for="t in tasks" :key="t.id" :value="t.id" v-show="t.id !== editingTask.id">{{ t.title }}</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="p-6 border-t border-slate-100 shrink-0 flex justify-between items-center">
+            <div class="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 flex justify-between items-center">
+                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-xs font-black text-red-500">Delete</button>
                 <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-8 py-2.5 rounded-lg font-black text-sm shadow-md">Save Changes</button>
             </div>
         </div>
     </div>
- 
-    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
-            <div class="p-4 border-b border-slate-100 flex items-center">
-                <input id="cmd-input" v-model="cmdSearch" placeholder="Search or Jump..." class="w-full bg-transparent text-lg font-medium outline-none">
-            </div>
-            <div class="max-h-[400px] overflow-y-auto p-2">
-                <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-                    <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ cmd.title }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
- 
 </div>
  
 <script>
@@ -487,103 +297,68 @@ createApp({
     setup() {
         const activeTab = ref('All');
         const viewMode = ref('kanban');
-        const zenMode = ref(false);
         const editingTask = ref(null);
         const isDarkMode = ref(false);
-        const showNotifications = ref(false);
-        const showCommandPalette = ref(false);
-        const cmdSearch = ref('');
-        const aiInput = ref('');
-        const aiStatus = ref('');
-        const aiMode = ref('Fast');
-        const isThinking = ref(false);
-        const showFileMenu = ref(false);
-        const fileUploadType = ref('');
-        const attachedFile = ref(null);
-        const isListening = ref(false);
         const chatHistory = ref([]);
         const chatScrollContainer = ref(null);
+        const aiInput = ref('');
+        const tasks = ref([]);
+        const isThinking = ref(false);
         const siriListening = ref(false);
         const siriProcessing = ref(false);
         const isVoraSpeaking = ref(false);
         const siriTranscript = ref('');
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
-        const history = ref([]);
-        const historyIndex = ref(-1);
-        const tasks = ref([]);
+
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
-        const matrixQuadrants = [{ id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] }, { id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] }, { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] }, { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }];
-
-        const commitState = () => {
-            if (historyIndex.value < history.value.length - 1) history.value = history.value.slice(0, historyIndex.value + 1);
-            history.value.push(JSON.stringify(tasks.value));
-            if (history.value.length > 50) history.value.shift();
-            else historyIndex.value = history.value.length - 1;
-        };
-
-        const canUndo = computed(() => historyIndex.value > 0);
-        const canRedo = computed(() => historyIndex.value < history.value.length - 1);
-        const undo = () => { if (canUndo.value) { historyIndex.value--; tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance); } };
-        const redo = () => { if (canRedo.value) { historyIndex.value++; tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance); } };
  
-        const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
-        const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed'));
-        const wipCount = computed(() => tasks.value.filter(t => t.status === 'progress').length);
-        const completionPercentage = computed(() => tasks.value.length ? Math.round((completedTasks.value.length / tasks.value.length) * 100) : 0);
-        const avgCycleTime = ref(3.4);
+        const completionPercentage = computed(() => {
+            const total = tasks.value.length;
+            if (total === 0) return 0;
+            return Math.round((tasks.value.filter(t => t.status === 'completed').length / total) * 100);
+        });
 
-        // RE-INTEGRATED INTELLIGENCE: Identifying what is blocking what
+        // Blocker Logic: Find tasks that are blocked by another task
         const atRiskTasks = computed(() => {
-            return tasks.value.filter(t => (t.status === 'waiting' || t.status === 'brainstorm') && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value));
+            return tasks.value.filter(t => {
+                const isMatchingTab = activeTab.value === 'All' || t.company === activeTab.value;
+                const isExplicitlyBlocked = t.blockedBy !== null && t.status !== 'completed';
+                const isHighEffortWaiting = t.status === 'waiting' && t.effort === 'High';
+                return isMatchingTab && (isExplicitlyBlocked || isHighEffortWaiting);
+            });
         });
 
-        const assignees = computed(() => {
-            const unique = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))];
-            return unique.map(name => ({ id: name, title: name }));
-        });
-        const getResourceTasks = (id) => tasks.value.filter(t => (t.assignee === id || (!t.assignee && id === 'Unassigned')) && t.status !== 'completed');
-        const smartNotifications = computed(() => tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting'));
-        const timelineTasks = computed(() => tasks.value.filter(t => t.dueDate && t.status !== 'completed').sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
-        const getMatrixTasks = (quad) => tasks.value.filter(t => {
-            if (t.status === 'completed') return false;
-            const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact;
-            const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort;
-            return impactMatch && effortMatch;
-        });
-
-        const toggleDarkMode = () => { isDarkMode.value = !isDarkMode.value; document.documentElement.classList.toggle('dark'); };
-        const parseMarkdown = (text) => text ? marked.parse(text) : '';
-        const commands = [{ title: 'New Task', action: () => addTask('notstarted') }, { title: 'Dark Mode', action: toggleDarkMode }];
-        const filteredCommands = computed(() => cmdSearch.value ? commands.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase())) : commands);
-        const executeCommand = (c) => { c.action(); showCommandPalette.value = false; };
+        const getTaskTitle = (id) => tasks.value.find(t => t.id === id)?.title || 'Unknown Task';
  
-        const speakText = (text, callback) => {
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.onend = () => { isVoraSpeaking.value = false; if(callback) callback(); };
-            isVoraSpeaking.value = true;
-            window.speechSynthesis.speak(u);
+        const toggleDarkMode = () => {
+            isDarkMode.value = !isDarkMode.value;
+            document.documentElement.classList.toggle('dark', isDarkMode.value);
+            localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
+ 
+        const parseMarkdown = (text) => text ? marked.parse(text) : '';
 
+        // SIRI CONTINUOUS LISTENING
         const startSiriListening = () => {
+            if (!('webkitSpeechRecognition' in window)) return;
             siriRecog = new webkitSpeechRecognition();
-            siriRecog.continuous = true;
+            siriRecog.continuous = true; 
             siriRecog.interimResults = true;
             let finalT = '';
             siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening...'; };
             siriRecog.onresult = (e) => {
-                let interim = '';
+                let interimT = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) finalT += e.results[i][0].transcript + ' ';
-                    else interim += e.results[i][0].transcript;
+                    else interimT += e.results[i][0].transcript;
                 }
-                siriTranscript.value = finalT + interim;
+                siriTranscript.value = finalT + interimT;
             };
-            siriRecog.onend = async () => {
+            siriRecog.onend = async () => { 
                 siriListening.value = false;
-                if(siriTranscript.value.trim().length > 0) {
+                if(siriTranscript.value.trim().length > 5) {
                     siriProcessing.value = true;
                     await processSiriCommand(siriTranscript.value);
                     siriProcessing.value = false;
@@ -594,79 +369,53 @@ createApp({
 
         const processSiriCommand = async (text) => {
              let cleanText = text.replace(/\b(bora|laura|flora)\b/gi, 'Vora');
-             const prompt = `Analyze: "${cleanText}". If task, extract: {"intent": "task", "title": "Concise summary", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"Normal", "status": "notstarted"}. Else: {"intent": "chat", "response": "text"}`;
+             const prompt = `Analze this voice command from Stanley: "${cleanText}". Return JSON only. If task, extract meaning: {"intent": "task", "title": "concise professional title", "company": "Dymek", "priority": "Normal", "status": "notstarted"}. Else if chat: {"intent": "chat", "response": "conversational reply"}`;
              try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:prompt}], model: 'openai', jsonMode: true }) });
-                const data = JSON.parse(await _parseAiResponse(res));
-                if (data.intent === 'chat') {
-                    speakText(data.response, () => startSiriListening());
-                } else {
-                    pendingVoiceTask.value = { title: data.title, company: data.company || 'Dymek', status: 'notstarted', priority: 'Normal' };
-                    speakText("I've prepared that task, Stanley. Please confirm to add it.");
-                }
-             } catch(e) { speakText("Sorry Stanley, didn't catch that.", () => startSiriListening()); }
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: 1, jsonMode: true }) });
+                const data = JSON.parse(await res.text());
+                siriTranscript.value = '';
+                if (data.intent === 'chat') { speakText(data.response, () => startSiriListening()); } 
+                else { pendingVoiceTask.value = { title: data.title, company: data.company, status: 'notstarted', priority: 'Normal', blockedBy: null }; speakText("Prepared that task for you."); }
+             } catch(e) { speakText("Sorry, I didn't catch that."); }
         };
 
-        const toggleSiriCapture = () => { if (siriListening.value || isVoraSpeaking.value) { if(siriRecog) siriRecog.stop(); window.speechSynthesis.cancel(); return; } startSiriListening(); };
+        const toggleSiriCapture = () => {
+            if (siriListening.value || isVoraSpeaking.value) { siriRecog?.stop(); window.speechSynthesis.cancel(); isVoraSpeaking.value = false; return; }
+            startSiriListening();
+        };
 
-        const _parseAiResponse = async (res) => {
-            let t = await res.text();
-            try {
-                let p = JSON.parse(t);
-                if (Array.isArray(p)) t = p[0].content || p[0].message?.content || p[0].reasoning_content;
-                else if (p.choices) t = p.choices[0].message.content || p.choices[0].message.reasoning_content;
-            } catch(e) {}
-            return t.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-        };
- 
-        const generateBrief = async () => {
-            aiStatus.value = "Predicting blockers...";
-            const snap = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.status}, Effort: ${t.effort})`).join('\n');
-            const prompt = `You are Vora. Create a Morning Brief for Stanley. 
-            RULES: 
-            1. Use RAW HTML cards only. 3 to 5 lines of description per card. No bullets.
-            2. CRITICAL: You MUST include a specific card identifying "WHAT IS BLOCKING WHAT". Look for High Effort tasks in Waiting/Brainstorm and explain how they are holding up project milestones.
-            3. End with a 4-line supportive paragraph.`;
-            
-            chatHistory.value.push({ role: 'user', content: "Morning Brief with Blocker Prediction" });
-            try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:prompt}], model: 'openai' }) });
-                chatHistory.value.push({ role: 'ai', content: await _parseAiResponse(res) });
-            } finally { aiStatus.value = ''; scrollToBottom(); }
-        };
- 
-        const askAI = async () => {
-            const query = aiInput.value; chatHistory.value.push({ role: 'user', content: query });
-            isThinking.value = true; aiInput.value = '';
-            try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:query}], model: 'openai' }) });
-                chatHistory.value.push({ role: 'ai', content: await _parseAiResponse(res) });
-            } finally { isThinking.value = false; scrollToBottom(); }
-        };
- 
-        const schemaEnhance = (t) => ({ effort: 'Medium', impact: 'Medium', priority: 'Normal', action: '', assignee: 'Unassigned', subtasks: [], ...t });
-        const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:'Dymek', status:id, isNew:true, title:'' }); };
+        const schemaEnhance = (t) => ({ effort: 'Medium', impact: 'Medium', priority: 'Normal', blockedBy: null, status: 'notstarted', assignee: 'Unassigned', ...t });
+        const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        const saveTask = () => { if (editingTask.value.isNew) tasks.value.push(editingTask.value); else tasks.value[tasks.value.findIndex(t => t.id === editingTask.value.id)] = editingTask.value; editingTask.value = null; commitState(); };
-        const getCompletedSubtasks = (t) => t.subtasks.filter(s => s.done).length;
-        const scrollToBottom = () => nextTick(() => chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight);
+        const saveTask = () => {
+            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
+            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
+            editingTask.value = null;
+            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+        };
+
+        const generateBrief = async () => {
+            const prompt = `You are Vora. Provide a Morning Brief for Stanley using ONLY short, colorful Tailwind HTML cards (bg-blue-50 etc). Each card MUST have a 3-5 line description summary of current progress. Data: \n${JSON.stringify(tasks.value)}`;
+            chatHistory.value.push({ role: 'ai', content: "Generating your brief..." });
+            try {
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: 1 }) });
+                chatHistory.value.pop();
+                chatHistory.value.push({ role: 'ai', content: await res.text() });
+            } catch (e) { chatHistory.value.push({ role: 'ai', content: "Failed to load brief." }); }
+        };
 
         onMounted(() => {
             const saved = localStorage.getItem('fitma_os_pro_silver');
-            tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [
-                { id: 1, company: 'Dymek', title: 'Website Launch on Squarespace', priority: 'Urgent', status: 'notstarted', effort: 'High' },
-                { id: 2, company: 'GigaScan', title: ' японская Translation', priority: 'Normal', status: 'waiting', effort: 'High' }
-            ].map(schemaEnhance);
-            commitState();
+            tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [];
+            isDarkMode.value = localStorage.getItem('fitma_dark_mode') === 'true';
+            document.documentElement.classList.toggle('dark', isDarkMode.value);
         });
- 
+
         return {
-            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu,
-            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer,
-            siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture,
-            undo, redo, canUndo, canRedo, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount: (id) => filteredTasks(id).length,
-            wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, parseMarkdown,
-            generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks, cmdSearch, filteredCommands, executeCommand, showCommandPalette
+            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, chatHistory, aiInput, isThinking,
+            siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask,
+            activeTasksCount, completionPercentage, atRiskTasks,
+            toggleDarkMode, parseMarkdown, toggleSiriCapture, addTask, openTask, saveTask, generateBrief, getTaskTitle
         };
     }
 }).mount('#app');
