@@ -905,7 +905,7 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'openai', jsonMode: true })
+                  body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'gpt-4o', jsonMode: true })
                 });
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
@@ -1007,44 +1007,39 @@ createApp({
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
-            let parsedText = null;
+
             try {
                 let parsed = JSON.parse(text);
-                if (parsed.error) throw new Error(parsed.error);
                 
-                if (parsed.choices && parsed.choices[0].message) {
-                    parsedText = parsed.choices[0].message.content || "";
+                // Handle strict JSON output for Morning Brief
+                if (parsed.html) return parsed.html;
+                
+                if (parsed.choices && parsed.choices[0]?.message) {
+                    text = parsed.choices[0].message.content || "";
                 } else if (parsed.content !== undefined) {
-                    parsedText = parsed.content;
-                } else if (parsed.message?.content !== undefined) {
-                    parsedText = parsed.message.content;
+                    text = parsed.content;
                 } else if (parsed.response !== undefined) {
-                    parsedText = parsed.response;
-                } else if (Array.isArray(parsed) && parsed.length > 0) {
-                    parsedText = parsed[0].content || parsed[0].message?.content || "";
-                }
-                
-                if (parsedText !== null) {
-                    text = parsedText;
-                } else if (parsed.reasoning_content) {
-                    return "<div class='p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold border border-slate-200 dark:border-slate-700 shadow-sm'>Vora is processing complex data and needs a moment. Please click Morning Brief again.</div>";
+                    text = parsed.response;
+                } else if (typeof parsed === 'string') {
+                    text = parsed;
                 }
             } catch(e) {
-                if (text.includes('"role":"assistant"') || text.includes('"reasoning_content"')) {
-                    const match = text.match(/"content"\s*:\s*"([\s\S]*?)(?:"\s*\}|"$)/);
-                    if (match && match[1]) {
-                        text = match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                // Rescue incomplete JSON streams if the API falls back to reasoning models
+                if (text.includes('"reasoning_content"')) {
+                    const contentMatch = text.match(/"content"\s*:\s*"([\s\S]*)/);
+                    if (contentMatch && contentMatch[1]) {
+                        text = contentMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                        text = text.replace(/"}$/, '').replace(/}$/, '');
                     } else {
-                        return "<div class='p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold border border-slate-200 dark:border-slate-700 shadow-sm'>Vora timed out while analyzing your tasks. Please click Morning Brief again.</div>";
+                        return "<div class='p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold border border-slate-200 dark:border-slate-700 shadow-sm'>Vora's connection timed out while analyzing. Please click Morning Brief again.</div>";
                     }
                 }
             }
             
+            // Clean markdown blocks
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-            text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```markdown\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
+            
             return text;
         };
  
@@ -1067,7 +1062,8 @@ createApp({
           4. Content: 3 to 5 lines per card.
           5. End with exactly one warm, motivating paragraph of 4-5 lines.
           
-          CRITICAL: Return ONLY the raw HTML and paragraph. DO NOT show any thinking, reasoning logs, backend commands, or intro text. No markdown backticks.
+          CRITICAL INSTRUCTION: Return ONLY a valid JSON object. Do not include markdown formatting or reasoning logs.
+          Format: {"html": "your exact raw html code here"}
           
           Data: \n${snapshot}`;
           
@@ -1078,7 +1074,7 @@ createApp({
               const res = await fetch('https://text.pollinations.ai/', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'openai' })
+                body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'gpt-4o', jsonMode: true })
               });
               const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
@@ -1118,7 +1114,7 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random() * 1000000), model: 'openai' })
+                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random() * 1000000), model: 'gpt-4o' })
                 });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
