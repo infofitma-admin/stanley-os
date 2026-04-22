@@ -105,7 +105,7 @@
                <div>
                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                    <div class="space-y-1">
-                       <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
+                       <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" :key="tab" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
                            <div class="w-2 h-2 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-500':tab==='GigaScan'?'bg-purple-500':'bg-orange-500'"></div>
                            {{ tab }}
                        </button>
@@ -311,7 +311,7 @@
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
+                                       <span :class="'tag tag-' + (task.priority || 'Normal').toLowerCase()">{{ task.priority || 'Normal' }}</span>
                                    </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
                                     
@@ -363,7 +363,7 @@
                                 <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
+                                       <span :class="'tag tag-' + (task.priority || 'Normal').toLowerCase()">{{ task.priority || 'Normal' }}</span>
                                    </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
                                     <span class="text-[10px] font-black bg-slate-100 dark:bg-slate-900 text-slate-500 px-2 py-1 rounded">{{ getColumnTitle(task.status) }}</span>
@@ -393,7 +393,7 @@
                        </div>
                    </main>
  
-                   <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" :key="t.id" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
+                   <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" :key="t.id" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + (t.priority || 'Normal').toLowerCase()">{{ t.priority || 'Normal' }}</span></td></tr></tbody></table></div></main>
  
                    <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
                        <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
@@ -449,7 +449,7 @@
                                <div v-for="t in recycleBin" :key="t.id" class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
                                    <div>
                                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ t.title }}</h4>
-                                       <p v-if="t.deletedAt" class="text-[10px] text-slate-400 uppercase mt-1">Deleted on {{ new Date(t.deletedAt).toLocaleDateString() }}</p>
+                                       <p v-if="t.deletedAt" class="text-[10px] text-slate-400 uppercase mt-1">Deleted on {{ formatDate(t.deletedAt) }}</p>
                                    </div>
                                    <div class="flex space-x-3">
                                        <button @click="restoreTask(t)" class="text-xs font-black uppercase text-brand hover:underline">Restore</button>
@@ -628,7 +628,17 @@
 </div>
  
 <script>
-const { createApp, ref, onMounted, computed, nextTick, watch } = Vue;
+const { createApp, ref, onMounted, computed, nextTick } = Vue;
+
+const safeStorageGet = (key) => {
+    try { return localStorage.getItem(key); } catch(e) { return null; }
+};
+const safeStorageSet = (key, val) => {
+    try { localStorage.setItem(key, val); } catch(e) {}
+};
+const safeStorageRemove = (key) => {
+    try { localStorage.removeItem(key); } catch(e) {}
+};
  
 createApp({
     setup() {
@@ -657,7 +667,6 @@ createApp({
         const chatScrollContainer = ref(null);
         let speechRecog = null;
  
-        // Siri Quick Capture state
         const siriListening = ref(false);
         const siriProcessing = ref(false);
         const isVoraSpeaking = ref(false);
@@ -665,7 +674,6 @@ createApp({
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
         
-        // Undo/Redo State
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
@@ -686,12 +694,16 @@ createApp({
             return 'Good evening';
         });
 
+        const formatDate = (ts) => {
+            if (!ts) return '';
+            try { return new Date(ts).toLocaleDateString(); } catch(e) { return 'Unknown Date'; }
+        };
+
         const getColumnTitle = (id) => {
             const col = columns.find(c => c.id === id);
             return col ? col.title : 'Not Started';
         };
  
-        // Undo/Redo Logic
         const commitState = () => {
             if (historyIndex.value < history.value.length - 1) {
                history.value = history.value.slice(0, historyIndex.value + 1);
@@ -709,8 +721,8 @@ createApp({
                historyIndex.value--;
                try {
                    tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-               } catch(e) { console.error("Undo error", e); }
+                   safeStorageSet('fitma_os_pro_silver', JSON.stringify(tasks.value));
+               } catch(e) {}
                nextTick(initSortable);
             }
         };
@@ -720,8 +732,8 @@ createApp({
                historyIndex.value++;
                try {
                    tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-               } catch(e) { console.error("Redo error", e); }
+                   safeStorageSet('fitma_os_pro_silver', JSON.stringify(tasks.value));
+               } catch(e) {}
                nextTick(initSortable);
             }
         };
@@ -739,8 +751,7 @@ createApp({
         });
  
         const avgCycleTime = computed(() => {
-            const completed = completedTasks.value;
-           if(completed.length === 0) return 0;
+            if(completedTasks.value.length === 0) return 0;
             return 3.4;
         });
  
@@ -788,14 +799,14 @@ createApp({
             } else {
                document.documentElement.classList.remove('dark');
             }
-           localStorage.setItem('fitma_dark_mode', isDarkMode.value);
+           safeStorageSet('fitma_dark_mode', isDarkMode.value);
         };
  
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
  
         const parseMarkdown = (text) => {
             if (!text) return '';
-            return marked.parse(text);
+            try { return typeof marked !== 'undefined' ? marked.parse(text) : text; } catch(e) { return text; }
         };
  
         const commands = computed(() => [
@@ -804,7 +815,7 @@ createApp({
             { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
             { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
             { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
-            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
+            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => { const el = document.querySelector('input[placeholder="Message Vora..."]'); if(el) el.focus(); } }
         ]);
  
         const filteredCommands = computed(() => {
@@ -822,29 +833,17 @@ createApp({
            fileUploadType.value = type;
            showFileMenu.value = false;
             let el = document.getElementById('file-upload');
-            if (type === 'image') {
-               el.accept = "image/*";
-            } else {
-               el.accept = ".pdf,.doc,.docx,.txt";
-            }
+            if (type === 'image') { el.accept = "image/*"; } else { el.accept = ".pdf,.doc,.docx,.txt"; }
            el.click();
         };
  
         const handleFileChange = (e) => {
             if (e.target.files && e.target.files.length > 0) {
-               attachedFile.value = {
-                   name: e.target.files[0].name,
-                   file: e.target.files[0],
-                   type: fileUploadType.value
-                };
+               attachedFile.value = { name: e.target.files[0].name, file: e.target.files[0], type: fileUploadType.value };
             }
         };
-        const removeFile = () => {
-           attachedFile.value = null;
-           document.getElementById('file-upload').value = '';
-        };
+        const removeFile = () => { attachedFile.value = null; const el = document.getElementById('file-upload'); if(el) el.value = ''; };
  
-        // Text to Speech Function
         const speakText = (text, onEndCallback) => {
             if (!('speechSynthesis' in window)) {
                if(onEndCallback) onEndCallback();
@@ -855,13 +854,8 @@ createApp({
             const voices = window.speechSynthesis.getVoices();
             const preferredVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')) || voices[0];
            if(preferredVoice) utterance.voice = preferredVoice;
-           utterance.rate = 1.0;
-           utterance.pitch = 1.1;
-            
-           utterance.onend = () => {
-               isVoraSpeaking.value = false;
-               if(onEndCallback) onEndCallback();
-            };
+           utterance.rate = 1.0; utterance.pitch = 1.1;
+           utterance.onend = () => { isVoraSpeaking.value = false; if(onEndCallback) onEndCallback(); };
            isVoraSpeaking.value = true;
            window.speechSynthesis.speak(utterance);
         };
@@ -870,28 +864,21 @@ createApp({
             if (!('webkitSpeechRecognition' in window)) return;
             if (siriRecog) siriRecog.stop();
             
-            siriRecog = new webkitSpeechRecognition();
+           siriRecog = new webkitSpeechRecognition();
            siriRecog.continuous = true; 
            siriRecog.interimResults = true;
             
-           siriRecog.onstart = () => { 
-               siriListening.value = true; 
-               siriTranscript.value = 'I am listening... (Tap microphone to finish)'; 
-            };
+           siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening... (Tap microphone to finish)'; };
             
            siriRecog.onresult = (e) => {
-                let finalT = '';
-                let interimT = '';
+                let finalT = ''; let interimT = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
                    else interimT += e.results[i][0].transcript;
                 }
                siriTranscript.value = (finalT || interimT).replace(/bora/gi, 'Vora');
             };
-           siriRecog.onerror = (e) => { 
-               siriListening.value = false; 
-               siriProcessing.value = false; 
-            };
+           siriRecog.onerror = (e) => { siriListening.value = false; siriProcessing.value = false; };
            siriRecog.onend = async () => { 
                siriListening.value = false;
                const finalTranscript = siriTranscript.value.trim();
@@ -904,10 +891,8 @@ createApp({
            siriRecog.start();
         };
  
-        // Siri Intent Parsing
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
- 
              const prompt = `Analyze this voice command from Stanley: "${cleanedText}". 
              You are Vora, his helpful AI assistant. You communicate like Siri.
              If he is making a statement, asking a question, or just chatting, you MUST converse back naturally. 
@@ -924,7 +909,6 @@ createApp({
                 });
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
-                
                siriTranscript.value = '';
  
                 if (data.intent === 'chat') {
@@ -944,54 +928,33 @@ createApp({
                    speakText("I've prepared that task for you, Stanley. Please confirm to add it.");
                 }
              } catch(e) {
-                console.error("Failed to parse Voice Command", e);
-                speakText("I'm sorry Stanley, I didn't quite catch that. Could you say it again?", () => {
-                    startSiriListening();
-                 });
+                speakText("I'm sorry Stanley, I didn't quite catch that. Could you say it again?", () => { startSiriListening(); });
              }
         };
  
         const confirmVoiceTask = () => {
             if (!pendingVoiceTask.value) return;
-           tasks.value.push(schemaEnhance({
-                id: Date.now(),
-               ...pendingVoiceTask.value
-            }));
-           localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+           tasks.value.push(schemaEnhance({ id: Date.now(), ...pendingVoiceTask.value }));
+           safeStorageSet('fitma_os_pro_silver', JSON.stringify(tasks.value));
            commitState();
            pendingVoiceTask.value = null;
         };
  
         const toggleSiriCapture = () => {
-            if (siriListening.value) {
-                if (siriRecog) siriRecog.stop();
-                return;
-            }
+            if (siriListening.value) { if (siriRecog) siriRecog.stop(); return; }
             if (isVoraSpeaking.value) {
-               window.speechSynthesis.cancel();
-               isVoraSpeaking.value = false;
-               siriTranscript.value = '';
-               return;
+               if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+               isVoraSpeaking.value = false; siriTranscript.value = ''; return;
             }
            startSiriListening();
         };
  
         const toggleSpeechRecognition = () => {
-            if (isListening.value) {
-                if (speechRecog) speechRecog.stop();
-               isListening.value = false;
-               return;
-            }
-            if (!('webkitSpeechRecognition' in window)) {
-               alert("Voice input not supported.");
-               return;
-            }
+            if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; }
+            if (!('webkitSpeechRecognition' in window)) { alert("Voice input not supported."); return; }
            speechRecog = new webkitSpeechRecognition();
-           speechRecog.continuous = false;
-           speechRecog.interimResults = true;
-            
+           speechRecog.continuous = false; speechRecog.interimResults = true;
            speechRecog.onstart = () => { isListening.value = true; };
-            
             let finalTranscript = '';
            speechRecog.onresult = (e) => {
                 let interimTranscript = '';
@@ -1003,24 +966,17 @@ createApp({
                 const resultText = (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
                aiInput.value = baseText + resultText.replace(/bora/gi, 'Vora');
             };
-           speechRecog.onerror = (e) => { isListening.value = false; };
+           speechRecog.onerror = () => { isListening.value = false; };
            speechRecog.onend = () => { isListening.value = false; };
            speechRecog.start();
         };
  
         const scrollToBottom = () => {
-           nextTick(() => {
-                if (chatScrollContainer.value) {
-                   chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight;
-                }
-            });
+           nextTick(() => { if (chatScrollContainer.value) { chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; } });
         };
  
         const clearChat = () => {
-           if(confirm("Clear conversation history?")) {
-               chatHistory.value = [];
-               localStorage.removeItem('fitma_vora_chat');
-            }
+           if(confirm("Clear conversation history?")) { chatHistory.value = []; safeStorageRemove('fitma_vora_chat'); }
         };
  
         const _parseAiResponse = async (res) => {
@@ -1028,12 +984,12 @@ createApp({
             try {
                 let parsed = JSON.parse(text);
                 if (Array.isArray(parsed) && parsed.length > 0) {
-                   text = parsed[0].content || parsed[0].message?.content || JSON.stringify(parsed);
+                   text = parsed[0].content || (parsed[0].message && parsed[0].message.content) || JSON.stringify(parsed);
                 } 
-                else if (parsed.choices && parsed.choices[0].message) text = parsed.choices[0].message.content;
+                else if (parsed.choices && parsed.choices.length > 0 && parsed.choices[0].message) text = parsed.choices[0].message.content;
                 else if (parsed.content) text = parsed.content;
                 else if (parsed.response) text = parsed.response;
-                else if (parsed.message?.content) text = parsed.message.content;
+                else if (parsed.message && parsed.message.content) text = parsed.message.content;
             } catch(e) {}
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             text = text.replace(/
