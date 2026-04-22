@@ -211,7 +211,7 @@
                                         <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                                    </div>
  
-                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : (msg.isRaw ? msg.content : parseMarkdown(msg.content))"></div>
+                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
                                 </div>
                            </div>
  
@@ -476,12 +476,7 @@
                    <p class="text-[10px] font-bold text-slate-500 uppercase">Voice to Task</p>
                </div>
            </div>
-            <div class="mb-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">You said...</p>
-                <p class="text-xs italic text-slate-600 dark:text-slate-400">"{{ pendingVoiceTask.rawTranscript }}"</p>
-            </div>
             <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 mb-6 border border-slate-100 dark:border-slate-700/50">
-               <p class="text-[10px] font-black text-brand uppercase mb-1">Parsed Task</p>
                 <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">"{{ pendingVoiceTask.title }}"</p>
                <div class="flex flex-wrap gap-2">
                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.company }}</span>
@@ -860,7 +855,6 @@ createApp({
             if (siriRecog) siriRecog.stop();
             
             siriRecog = new webkitSpeechRecognition();
-           // Changed to false so it auto-stops when the user stops talking (like Siri)
            siriRecog.continuous = false;
            siriRecog.interimResults = true;
             
@@ -882,16 +876,13 @@ createApp({
                siriListening.value = false; 
                siriProcessing.value = false; 
             };
-           siriRecog.onend = () => { 
+           siriRecog.onend = async () => { 
                siriListening.value = false;
-               const finalTranscript = siriTranscript.value;
-               // Process only if we have real text and we aren't already processing
-               if (finalTranscript && finalTranscript !== 'I am listening...' && !siriProcessing.value) {
+               if(siriTranscript.value && siriTranscript.value !== 'I am listening...') {
                    siriProcessing.value = true;
-                   processSiriCommand(finalTranscript);
-               } else if (!siriProcessing.value) {
-                   siriTranscript.value = '';
-               }
+                   await processSiriCommand(siriTranscript.value);
+                   siriProcessing.value = false;
+                }
             };
            siriRecog.start();
         };
@@ -915,16 +906,10 @@ createApp({
                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: true })
                 });
                 const responseText = await _parseAiResponse(res);
+                const data = JSON.parse(responseText);
                 
-                let data;
-                // Force extract JSON block if wrapped in markdown or extra text
-                let jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    data = JSON.parse(jsonMatch[0]);
-                } else {
-                    data = JSON.parse(responseText);
-                }
-                
+               siriTranscript.value = '';
+ 
                 if (data.intent === 'chat') {
                    chatHistory.value.push({ role: 'user', content: cleanedText });
                    chatHistory.value.push({ role: 'ai', content: data.response });
@@ -932,7 +917,6 @@ createApp({
                    speakText(data.response);
                 } else {
                    pendingVoiceTask.value = {
-                       rawTranscript: cleanedText,
                        title: data.title || cleanedText,
                        company: data.company || 'Dymek',
                        priority: data.priority || 'Normal',
@@ -943,10 +927,9 @@ createApp({
                 }
              } catch(e) {
                 console.error("Failed to parse Voice Command", e);
-                speakText("I'm sorry Stanley, I didn't quite catch that.");
-             } finally {
-                siriTranscript.value = '';
-                siriProcessing.value = false;
+                speakText("I'm sorry Stanley, I didn't quite catch that. Could you say it again?", () => {
+                    startSiriListening();
+                 });
              }
         };
  
@@ -963,12 +946,13 @@ createApp({
  
         const toggleSiriCapture = () => {
             if (siriListening.value || isVoraSpeaking.value) {
-               if (siriRecog) siriRecog.stop(); // This now properly triggers onend which auto-processes
+                if (siriRecog) siriRecog.stop();
                window.speechSynthesis.cancel();
+               siriListening.value = false;
                isVoraSpeaking.value = false;
+               siriTranscript.value = '';
                return;
             }
-            siriTranscript.value = '';
            startSiriListening();
         };
  
@@ -1021,57 +1005,42 @@ createApp({
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
-            
-            // Standard API JSON extraction
             try {
                 let parsed = JSON.parse(text);
-                if (Array.isArray(parsed) && parsed.length > 0) parsed = parsed[0];
-                if (parsed.choices && parsed.choices[0]?.message?.content) text = parsed.choices[0].message.content;
-                else if (parsed.message?.content) text = parsed.message.content;
+                if (parsed.error) throw new Error(parsed.error);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                   text = parsed[0].content || parsed[0].message?.content || text;
+                } 
+                else if (parsed.choices && parsed.choices[0].message) text = parsed.choices[0].message.content;
                 else if (parsed.content) text = parsed.content;
                 else if (parsed.response) text = parsed.response;
+                else if (parsed.message?.content) text = parsed.message.content;
             } catch(e) {}
-            
-            // Heavy-duty fix for broken/hallucinated JSON strings returned as literal text
-            if (typeof text === 'string' && text.trim().startsWith('{"role"')) {
-                try {
-                    let doubleParsed = JSON.parse(text);
-                    if (doubleParsed.content) text = doubleParsed.content;
-                } catch(e) {
-                    // Manual extraction if JSON.parse fails due to unclosed string
-                    let match = text.match(/"content"\s*:\s*"([\s\S]*)"/);
-                    if (match) {
-                        text = match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
-                    }
-                }
-            }
-            
-            // Aggressive cleaning of reasoning tags and formatting blocks
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-            text = text.replace(/```html\n?/gi, '').replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim();
+            text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
             return text;
         };
  
         const generateBrief = async () => {
            aiStatus.value = "Analyzing data...";
             const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-            const prompt = `You are Vora. Give Stanley a morning brief using ONLY colorful raw HTML Tailwind cards. 
-            Backgrounds: bg-emerald-50, bg-blue-50, bg-amber-50, bg-rose-50.
-            Each card: 3-5 line description with bullet points (max 2 lines per bullet).
-            Output MUST end with exactly ONE supportive paragraph (4-5 sentences/lines) with no headings or titles.
-            CRITICAL: Output ONLY valid raw HTML code starting with <div... DO NOT output any JSON, markdown, or reasoning text. Data: \n${snapshot}`;
+            const prompt = `You are Vora. Give Stanley a morning brief using colorful cards (Tailwind bg-emerald-50, bg-amber-50, etc.). 
+            Descriptions must be 3-5 lines per card. End with exactly ONE supportive paragraph (4-5 lines). 
+            Output ONLY raw HTML. Data: \n${snapshot}`;
             
            chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
            scrollToBottom();
  
             try {
-                const res = await fetch('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
+                const res = await fetch('https://text.pollinations.ai/', {
                    method: 'POST',
                    headers: {'Content-Type': 'application/json'},
                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: false })
                 });
                 const finalResponse = await _parseAiResponse(res);
-               chatHistory.value.push({ role: 'ai', content: finalResponse, isRaw: true });
+               chatHistory.value.push({ role: 'ai', content: finalResponse });
                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
                scrollToBottom();
             } catch (e) {
@@ -1099,7 +1068,7 @@ createApp({
            aiStatus.value = "Generating...";
             const systemPrompt = `You are Vora. Advisor to Stanley. Format: Tables, lists, bold. End with warm sentences (4-5 lines).`;
             try {
-                const res = await fetch('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
+                const res = await fetch('https://text.pollinations.ai/', {
                    method: 'POST',
                    headers: {'Content-Type': 'application/json'},
                    body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random()*1000), model: 'openai' })
