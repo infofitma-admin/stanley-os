@@ -779,6 +779,8 @@ createApp({
  
         const parseMarkdown = (text) => {
             if (!text) return '';
+            // If the text looks like raw HTML (starts with a div), don't process it as markdown
+            if (text.trim().startsWith('<div')) return text;
             return marked.parse(text);
         };
  
@@ -1016,44 +1018,51 @@ createApp({
                 else if (parsed.response) text = parsed.response;
                 else if (parsed.message?.content) text = parsed.message.content;
             } catch(e) {}
+            // Clean up think tags and markdown blocks
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
             text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```markdown\n?/i, '').replace(/\n?```$/i, '').trim();
             text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
             return text;
         };
  
         const generateBrief = async () => {
-          aiStatus.value = "Analyzing data...";
-            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-            
-            // FIXED PROMPT: Enforcing colorful cards, 3-5 line descriptions, and caring tone.
-            const prompt = `You are Vora, Stanley's caring and highly motivating AI assistant. 
-            Format the Morning Brief using ONLY colorful HTML cards (Tailwind classes: bg-emerald-50, bg-amber-50, bg-rose-50, bg-blue-50) with rounded-xl and p-4.
-            Each card MUST have a 3 to 5 line description about priorities, backlogs, or solutions.
-            The brief must be kind and motivating.
-            At the end, add exactly one supportive paragraph of 4-5 lines to boost Stanley's confidence.
-            Output ONLY raw HTML.
-            Data to analyze: \n${snapshot}`;
-            
-          chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
+          aiStatus.value = "Analyzing dashboard...";
+          const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority}) - Current Status: ${t.status}`).join('\n');
+          
+          const prompt = `You are Vora, Stanley's caring and highly motivating AI assistant. 
+          Analyze the following tasks and provide a Morning Brief.
+          
+          STRUCTURE:
+          1. Use exactly 3 colorful HTML cards. 
+          2. Each card MUST have: <div class="rounded-xl p-4 mb-4 shadow-sm [TAILWIND_COLOR_CLASS] flex flex-col">...content...</div>
+          3. Tailwind color classes for cards: bg-emerald-50, bg-amber-50, bg-sky-50 (or similar light shades).
+          4. Each card content MUST be exactly 3-5 lines of text explaining a specific priority or solution for a backlog.
+          5. After the cards, write exactly one supportive paragraph of 4-5 lines to keep Stanley motivated.
+          
+          IMPORTANT: Return ONLY the raw HTML div elements and the final paragraph. No markdown backticks.
+          
+          Data: \n${snapshot}`;
+          
+          chatHistory.value.push({ role: 'user', content: "Generate my Morning Brief." });
           scrollToBottom();
  
-            try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                  method: 'POST',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: false })
-                });
-                const finalResponse = await _parseAiResponse(res);
+          try {
+              const res = await fetch('https://text.pollinations.ai/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Date.now(), model: 'openai' })
+              });
+              const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-            } catch (e) {
-              chatHistory.value.push({ role: 'ai', content: "Error fetching brief." });
-            } finally {
+          } catch (e) {
+              chatHistory.value.push({ role: 'ai', content: "I encountered a glitch while preparing your brief, Stanley. Let's try again in a moment." });
+          } finally {
               aiStatus.value = '';
-            }
+          }
         };
  
         const askAI = async () => {
@@ -1063,7 +1072,7 @@ createApp({
             let fullQuery = query;
             if (attachedFile.value) {
               displayQuery = `[Attached ${attachedFile.value.type}: ${attachedFile.value.name}] \n${query}`;
-                let fileInstruction = attachedFile.value.type === 'image' ? `[System instruction: The user has attached an image. Use your Gemini-like capabilities to see and understand the image content deeply.]` : `[System instruction: The user has attached a document. Use your ChatGPT-like capabilities to analyze the document text and structure.]`;
+                let fileInstruction = attachedFile.value.type === 'image' ? `[Analyze image]` : `[Analyze document]`;
               fullQuery = `${query}\n\n${fileInstruction}`;
             }
           chatHistory.value.push({ role: 'user', content: displayQuery });
@@ -1073,11 +1082,9 @@ createApp({
           removeFile();
           aiStatus.value = "Generating...";
  
-            // FIXED SYSTEM PROMPT: Personality is kind, motivating, and advisor-like.
             const systemPrompt = `You are Vora, an extremely kind, caring, and motivating AI assistant for Stanley. 
-            Your goal is to help him manage his OS (Fitma). 
-            Always analyze OS-related questions with high accuracy to help him use his tools better. 
-            Function exactly like ChatGPT: provide clear, fast, and high-quality responses.
+            Function like ChatGPT. Respond quickly. 
+            Analyze OS-related questions accurately to help Stanley manage his project management system.
             Use proper Markdown: Bolding, Tables, and Lists. 
             End every response with a supportive, warm paragraph of 4-5 lines to keep him motivated.`;
  
@@ -1085,14 +1092,14 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random()*1000), model: 'openai' })
+                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Date.now(), model: 'openai' })
                 });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
             } catch (err) {
-              chatHistory.value.push({ role: 'ai', content: "Error connecting." });
+              chatHistory.value.push({ role: 'ai', content: "Error connecting to server." });
             } finally {
               isThinking.value = false;
               aiStatus.value = '';
