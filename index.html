@@ -78,24 +78,12 @@
                 <div>
                     <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Views</h2>
                     <div class="space-y-1">
-                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg> Dashboard
-                        </button>
-                        <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Resource Load
-                        </button>
-                        <button @click="viewMode = 'risk'; activeTab = 'All'" :class="viewMode==='risk' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-rose-300 hover:text-rose-200">
-                            <svg class="w-4 h-4 mr-3 opacity-70 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Risk Predictor
-                        </button>
-                        <button @click="viewMode = 'timeline'; activeTab = 'All'" :class="viewMode==='timeline' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Timeline
-                        </button>
-                        <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> Impact Matrix
-                        </button>
-                        <button @click="viewMode = 'heatmap'; activeTab = 'All'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Heatmap
-                        </button>
+                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Dashboard</button>
+                        <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Resource Load</button>
+                        <button @click="viewMode = 'risk'; activeTab = 'All'" :class="viewMode==='risk' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-rose-300 hover:text-rose-200"> Risk Predictor</button>
+                        <button @click="viewMode = 'timeline'; activeTab = 'All'" :class="viewMode==='timeline' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Timeline</button>
+                        <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Impact Matrix</button>
+                        <button @click="viewMode = 'heatmap'; activeTab = 'All'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors"> Heatmap</button>
                     </div>
                 </div>
  
@@ -128,7 +116,6 @@
             
             <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
                 <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     Search or jump to...
                     <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">Ctrl K</span>
                 </button>
@@ -219,7 +206,6 @@
                         </div>
  
                         <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 relative flex flex-col">
-                            
                             <div v-if="attachedFile" class="mb-2 self-start flex items-center bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm max-w-[200px] shadow-sm relative group">
                                 <div class="w-8 h-8 rounded bg-brand/20 flex items-center justify-center mr-3 text-brand">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -235,29 +221,20 @@
  
                             <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 focus-within:border-slate-400 dark:focus-within:border-slate-500 transition-all shadow-sm max-w-4xl mx-auto w-full">
                                 <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
-                                
                                 <div class="relative">
                                     <button @click="showFileMenu = !showFileMenu" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Attach Document or Image">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                     </button>
-                                    
                                     <div v-if="showFileMenu" class="absolute bottom-full left-0 mb-2 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-50 overflow-hidden flex flex-col">
-                                        <button @click="triggerFileUpload('image')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left border-b border-slate-100 dark:border-slate-700 flex items-center">
-                                            📸 Add Image
-                                        </button>
-                                        <button @click="triggerFileUpload('document')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left flex items-center">
-                                            📄 Add Document
-                                        </button>
+                                        <button @click="triggerFileUpload('image')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left border-b border-slate-100 dark:border-slate-700 flex items-center">📸 Add Image</button>
+                                        <button @click="triggerFileUpload('document')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left flex items-center">📄 Add Document</button>
                                     </div>
                                 </div>
-                                
                                 <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-900 dark:text-slate-100 outline-none px-3 placeholder-slate-500">
-                                
                                 <button @click="toggleSpeechRecognition" class="p-2 transition rounded-full mr-1 relative group" title="Voice Input">
                                     <div v-if="isListening" class="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
                                     <svg :class="isListening ? 'text-red-500 scale-110' : 'text-slate-500 group-hover:text-slate-800 dark:group-hover:text-slate-200'" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
                                 </button>
-                                
                                 <button @click="askAI" :disabled="isThinking || (!aiInput.trim() && !attachedFile)" class="p-2 bg-slate-900 dark:bg-brand text-white hover:bg-slate-700 dark:hover:bg-emerald-400 disabled:opacity-50 transition rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                                 </button>
@@ -267,7 +244,6 @@
  
                     <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 h-[360px] flex flex-col items-center justify-center transition-colors shrink-0">
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 self-start">Velocity Analytics</h3>
-                        
                         <div class="relative w-36 h-36 flex items-center justify-center mb-6">
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                 <path class="text-slate-100 dark:text-slate-700" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -278,7 +254,6 @@
                                 <span class="text-[9px] font-bold text-slate-400 uppercase">Completed</span>
                             </div>
                         </div>
- 
                         <div class="w-full grid grid-cols-3 gap-2 border-t border-slate-100 dark:border-slate-700 pt-4">
                             <div class="text-center">
                                 <p class="text-xl font-black text-slate-900 dark:text-white">{{ completedTasks.length }}</p>
@@ -303,7 +278,6 @@
                                 <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm uppercase tracking-tight">{{ col.title }}</h3>
                                 <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getTaskCount(col.id) }}</span>
                             </div>
-                            
                             <div :id="'kanban-' + col.id" class="card-list-scroll space-y-3 custom-scrollbar" :data-status="col.id">
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
@@ -311,29 +285,20 @@
                                         <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                     </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
-                                    
                                     <div v-if="task.subtasks && task.subtasks.length > 0" class="mb-2">
                                         <div class="h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                             <div class="h-full bg-brand transition-all duration-300" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
                                         </div>
                                     </div>
- 
                                     <div class="pt-3 border-t border-slate-100 dark:border-slate-700/50 flex flex-col gap-2">
                                         <div class="flex justify-between items-center">
-                                            <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 w-fit px-1.5 py-0.5 rounded">
-                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                {{ task.dueDate }}
-                                            </div>
+                                            <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 w-fit px-1.5 py-0.5 rounded">{{ task.dueDate }}</div>
                                             <span v-if="task.assignee" class="text-[9px] font-black uppercase tracking-widest text-slate-400">{{ task.assignee }}</span>
                                         </div>
-                                        <p v-if="task.action" class="text-[10px] text-slate-600 dark:text-slate-400 font-medium italic flex items-start">
-                                            <svg class="w-3 h-3 mr-1 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                            {{ task.action }}
-                                        </p>
+                                        <p v-if="task.action" class="text-[10px] text-slate-600 dark:text-slate-400 font-medium italic flex items-start">{{ task.action }}</p>
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="p-3 border-t border-slate-200 dark:border-slate-700/50 shrink-0">
                                 <button @click="addTask(col.id)" class="w-full py-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all">+ Add Card</button>
                             </div>
@@ -349,7 +314,6 @@
                                 </h3>
                                 <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getResourceTasks(assignee.id).length }}</span>
                             </div>
-                            
                             <div :id="'resource-' + assignee.id.replace(/\s+/g, '')" class="card-list-scroll space-y-3 custom-scrollbar resource-list" :data-assignee="assignee.id">
                                 <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
@@ -375,7 +339,10 @@
                                 <div v-for="task in atRiskTasks" :key="task.id" class="p-4 border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10 rounded-lg flex items-start justify-between cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors" @click="openTask(task)">
                                     <div>
                                         <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{task.title}}</h4>
-                                        <p class="text-xs text-slate-600 dark:text-slate-400">Currently <span class="font-bold text-rose-500 uppercase">{{task.status}}</span> with <span class="font-bold">High Effort</span>. Requires intervention.</p>
+                                        <p class="text-xs text-slate-600 dark:text-slate-400">
+                                            Status: <span class="font-bold text-rose-500 uppercase">{{task.status}}</span> | Effort: <span class="font-bold">High</span>
+                                        </p>
+                                        <p class="text-[10px] text-rose-600 font-black uppercase mt-1">⚠️ BLOCKING: Delaying {{ task.company }} Project Milestones</p>
                                     </div>
                                     <span class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{task.company}}</span>
                                 </div>
@@ -392,22 +359,11 @@
                                 <h3 class="font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-200">{{ quad.name }}</h3>
                                 <span class="text-[9px] font-bold text-slate-400 uppercase">Impact: {{ Array.isArray(quad.impact) ? quad.impact.join('/') : quad.impact }} | Effort: {{ Array.isArray(quad.effort) ? quad.effort.join('/') : quad.effort }}</span>
                             </div>
-                            
                             <div :id="'matrix-' + quad.id" class="matrix-zone space-y-3 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/50 dark:bg-slate-900/30 p-2 rounded-lg border border-dashed border-slate-200 dark:border-slate-700" :data-impact="Array.isArray(quad.impact) ? quad.impact[0] : quad.impact" :data-effort="Array.isArray(quad.effort) ? quad.effort[0] : quad.effort">
-                                
                                 <div v-for="t in getMatrixTasks(quad)" :key="t.id" :data-id="t.id" @click="openTask(t)" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600 cursor-grab active:cursor-grabbing text-sm font-bold text-slate-800 dark:text-slate-200 hover:border-brand transition group">
-                                    <div class="flex justify-between items-center">
-                                        <span class="truncate pr-2">{{ t.title }}</span>
-                                        <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                                        </div>
-                                    </div>
+                                    <div class="flex justify-between items-center"><span class="truncate pr-2">{{ t.title }}</span></div>
                                     <div class="text-[9px] uppercase mt-1 font-bold" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div>
                                 </div>
-                                
-                                <div v-if="getMatrixTasks(quad).length === 0" class="h-20 flex items-center justify-center text-xs font-medium text-slate-400 italic opacity-50 pointer-events-none">Drag tasks here...</div>
                             </div>
                         </div>
                     </main>
@@ -450,11 +406,10 @@
                 <div class="flex flex-wrap gap-2">
                     <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.company }}</span>
                     <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ columns.find(c => c.id === pendingVoiceTask.status)?.title || 'Not Started' }}</span>
-                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.priority }} Priority</span>
                 </div>
             </div>
             <div class="flex space-x-3">
-                <button @click="pendingVoiceTask = null" class="flex-1 py-2.5 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">Cancel</button>
+                <button @click="pendingVoiceTask = null" class="flex-1 py-2.5 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 transition">Cancel</button>
                 <button @click="confirmVoiceTask" class="flex-1 py-2.5 rounded-lg font-black text-sm text-white bg-brand shadow-md hover:bg-emerald-500 transition">Confirm Add</button>
             </div>
         </div>
@@ -464,22 +419,13 @@
         <div v-if="siriListening || siriProcessing || isVoraSpeaking" class="absolute bottom-20 right-0 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl w-72 border border-slate-700 backdrop-blur-md bg-opacity-90 mb-2 origin-bottom-right transition-all">
             <div class="flex items-center space-x-3 mb-2">
                 <div class="flex space-x-1" v-if="siriProcessing || isVoraSpeaking">
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="isVoraSpeaking ? 'bg-emerald-400' : 'bg-brand'"></span>
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="isVoraSpeaking ? 'bg-emerald-400' : 'bg-brand'" style="animation-delay: 0.1s"></span>
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="isVoraSpeaking ? 'bg-emerald-400' : 'bg-brand'" style="animation-delay: 0.2s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full animate-pulse bg-brand"></span>
+                    <span class="w-1.5 h-1.5 rounded-full animate-pulse bg-brand" style="animation-delay: 0.1s"></span>
                 </div>
-                <div class="flex space-x-1" v-else>
-                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
-                    <span class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-                    <span class="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                </div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-300">
-                    {{ isVoraSpeaking ? 'Vora is speaking...' : (siriProcessing ? 'Vora is thinking...' : 'Vora is listening...') }}
-                </span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-300">{{ isVoraSpeaking ? 'Vora is speaking...' : (siriProcessing ? 'Thinking...' : 'Listening...') }}</span>
             </div>
             <p class="text-sm font-medium italic opacity-90">{{ siriTranscript }}</p>
         </div>
-
         <button @click="toggleSiriCapture" class="w-16 h-16 rounded-full bg-slate-900 dark:bg-slate-800 text-white shadow-2xl flex items-center justify-center hover:scale-105 transition-transform border border-slate-700 group relative">
             <div v-if="siriListening && !isVoraSpeaking" class="absolute inset-0 rounded-full siri-orb opacity-50 blur-md"></div>
             <div v-if="isVoraSpeaking" class="absolute inset-0 rounded-full speaking-orb opacity-60 blur-md"></div>
@@ -490,99 +436,44 @@
     </div>
  
     <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/20 dark:bg-black/40 backdrop-blur-sm z-40 transition-opacity"></div>
-    
-    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200 dark:border-slate-800">
+    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 flex flex-col border-l border-slate-200 dark:border-slate-800">
         <div v-if="editingTask" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
-                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded" :class="editingTask.company === 'Dymek' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30' : editingTask.company === 'GigaScan' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30' : 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30'">{{ editingTask.company }}</span>
-                <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded" :class="editingTask.company === 'Dymek' ? 'text-blue-600 bg-blue-100' : 'text-purple-600 bg-purple-100'">{{ editingTask.company }}</span>
+                <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition">X</button>
             </div>
-            
             <div class="p-6 space-y-6 flex-1">
-                <div>
-                    <textarea v-model="editingTask.title" class="text-xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-snug" rows="3" placeholder="Task Title..."></textarea>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-5 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                <textarea v-model="editingTask.title" class="text-xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-snug" rows="3" placeholder="Task Title..."></textarea>
+                <div class="grid grid-cols-2 gap-5 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100">
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Status</label>
-                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
-                            <option v-for="c in columns" :value="c.id" class="dark:bg-slate-800">{{ c.title }}</option>
+                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 text-sm font-bold dark:text-white pb-1 outline-none">
+                            <option v-for="c in columns" :value="c.id">{{ c.title }}</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Assignee</label>
-                        <input type="text" v-model="editingTask.assignee" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none" placeholder="e.g. Stanley">
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Priority</label>
-                        <select v-model="editingTask.priority" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
-                            <option class="dark:bg-slate-800">Urgent</option><option class="dark:bg-slate-800">High</option><option class="dark:bg-slate-800">Normal</option><option class="dark:bg-slate-800">Low</option>
+                        <select v-model="editingTask.priority" class="w-full bg-transparent border-b border-slate-200 text-sm font-bold dark:text-white pb-1 outline-none">
+                            <option>Urgent</option><option>High</option><option>Normal</option><option>Low</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Due Date</label>
-                        <input type="date" v-model="editingTask.dueDate" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black text-brand uppercase mb-1 block">Impact (Matrix)</label>
-                        <select v-model="editingTask.impact" class="w-full bg-transparent border-b border-brand text-sm font-bold dark:text-white pb-1 outline-none">
-                            <option class="dark:bg-slate-800">High</option><option class="dark:bg-slate-800">Medium</option><option class="dark:bg-slate-800">Low</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black text-brand uppercase mb-1 block">Effort (Matrix)</label>
-                        <select v-model="editingTask.effort" class="w-full bg-transparent border-b border-brand text-sm font-bold dark:text-white pb-1 outline-none">
-                            <option class="dark:bg-slate-800">High</option><option class="dark:bg-slate-800">Medium</option><option class="dark:bg-slate-800">Low</option>
-                        </select>
-                    </div>
-                </div>
- 
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 uppercase mb-2 block flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Next Action / Notes
-                    </label>
-                    <textarea v-model="editingTask.action" class="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg p-3 text-sm font-medium h-24 outline-none focus:border-brand dark:focus:border-brand dark:text-white transition-colors custom-scrollbar" placeholder="What's the immediate next step?"></textarea>
-                </div>
- 
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
-                    <div v-if="editingTask.subtasks" v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
-                        <input type="checkbox" v-model="s.done" @change="commitState" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
-                        <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none focus:border-brand">
-                        <button @click="editingTask.subtasks.splice(idx,1); commitState()" class="text-slate-300 hover:text-red-500 transition">&times;</button>
-                    </div>
-                    <button @click="editingTask.subtasks.push({text:'', done:false})" class="mt-3 text-xs font-black text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add Step
-                    </button>
                 </div>
             </div>
- 
-            <div class="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 flex justify-between items-center">
-                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-xs font-black text-red-500 hover:text-red-700 transition">Delete Task</button>
-                <div v-else></div>
-                <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-8 py-2.5 rounded-lg font-black text-sm shadow-md hover:bg-slate-800 dark:hover:bg-emerald-400 transition-colors">Save Changes</button>
+            <div class="p-6 border-t border-slate-100 shrink-0 flex justify-between items-center">
+                <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-8 py-2.5 rounded-lg font-black text-sm shadow-md">Save Changes</button>
             </div>
         </div>
     </div>
  
     <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col transform transition-all">
-            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center">
-                <svg class="w-5 h-5 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="What do you need? (e.g. 'Dark mode', 'New Task')" class="w-full bg-transparent text-lg font-medium text-slate-900 dark:text-white outline-none placeholder-slate-400">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
+            <div class="p-4 border-b border-slate-100 flex items-center">
+                <input id="cmd-input" v-model="cmdSearch" placeholder="Search or Jump..." class="w-full bg-transparent text-lg font-medium outline-none">
             </div>
-            <div class="max-h-[400px] overflow-y-auto p-2 custom-scrollbar">
-                <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg cursor-pointer flex items-center group transition">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-4 text-slate-500 group-hover:bg-brand group-hover:text-white transition shadow-sm" v-html="cmd.icon"></div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand dark:group-hover:text-brand transition">{{ cmd.title }}</p>
-                        <p class="text-[10px] font-medium text-slate-400">{{ cmd.desc }}</p>
-                    </div>
+            <div class="max-h-[400px] overflow-y-auto p-2">
+                <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
+                    <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ cmd.title }}</p>
                 </div>
-                <div v-if="filteredCommands.length === 0" class="p-8 text-center text-slate-500 text-sm font-medium">No commands found.</div>
             </div>
         </div>
     </div>
@@ -600,51 +491,32 @@ createApp({
         const editingTask = ref(null);
         const isDarkMode = ref(false);
         const showNotifications = ref(false);
-        
         const showCommandPalette = ref(false);
         const cmdSearch = ref('');
-        
         const aiInput = ref('');
         const aiStatus = ref('');
         const aiMode = ref('Fast');
         const isThinking = ref(false);
-        
         const showFileMenu = ref(false);
         const fileUploadType = ref('');
         const attachedFile = ref(null);
-        
         const isListening = ref(false);
         const chatHistory = ref([]);
         const chatScrollContainer = ref(null);
-        let speechRecog = null;
-
-        // Siri Quick Capture state
         const siriListening = ref(false);
         const siriProcessing = ref(false);
         const isVoraSpeaking = ref(false);
         const siriTranscript = ref('');
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
-        
-        // Undo/Redo State
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
-
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
- 
-        const matrixQuadrants = [
-            { id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] },
-            { id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] },
-            { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] },
-            { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
-        ];
+        const matrixQuadrants = [{ id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] }, { id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] }, { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] }, { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }];
 
-        // Undo/Redo Logic
         const commitState = () => {
-            if (historyIndex.value < history.value.length - 1) {
-                history.value = history.value.slice(0, historyIndex.value + 1);
-            }
+            if (historyIndex.value < history.value.length - 1) history.value = history.value.slice(0, historyIndex.value + 1);
             history.value.push(JSON.stringify(tasks.value));
             if (history.value.length > 50) history.value.shift();
             else historyIndex.value = history.value.length - 1;
@@ -652,203 +524,68 @@ createApp({
 
         const canUndo = computed(() => historyIndex.value > 0);
         const canRedo = computed(() => historyIndex.value < history.value.length - 1);
-
-        const undo = () => {
-            if (canUndo.value) {
-                historyIndex.value--;
-                tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                nextTick(initSortable);
-            }
-        };
-
-        const redo = () => {
-            if (canRedo.value) {
-                historyIndex.value++;
-                tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                nextTick(initSortable);
-            }
-        };
+        const undo = () => { if (canUndo.value) { historyIndex.value--; tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance); } };
+        const redo = () => { if (canRedo.value) { historyIndex.value++; tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance); } };
  
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
-        const getTaskCount = (id) => filteredTasks(id).length;
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
-        const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
-        const wipCount = computed(() => getTaskCount('progress'));
-        
-        const completionPercentage = computed(() => {
-            const total = tasks.value.filter(t => activeTab.value === 'All' || t.company === activeTab.value).length;
-            if (total === 0) return 0;
-            return Math.round((completedTasks.value.length / total) * 100);
-        });
+        const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed'));
+        const wipCount = computed(() => tasks.value.filter(t => t.status === 'progress').length);
+        const completionPercentage = computed(() => tasks.value.length ? Math.round((completedTasks.value.length / tasks.value.length) * 100) : 0);
+        const avgCycleTime = ref(3.4);
 
-        const avgCycleTime = computed(() => {
-            const completed = completedTasks.value;
-            if(completed.length === 0) return 0;
-            return 3.4;
-        });
-
+        // RE-INTEGRATED INTELLIGENCE: Identifying what is blocking what
         const atRiskTasks = computed(() => {
-            return tasks.value.filter(t => t.status === 'waiting' && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value));
+            return tasks.value.filter(t => (t.status === 'waiting' || t.status === 'brainstorm') && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value));
         });
 
         const assignees = computed(() => {
-            const uniqueAssignees = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))];
-            return uniqueAssignees.map(name => ({ id: name, title: name }));
+            const unique = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))];
+            return unique.map(name => ({ id: name, title: name }));
         });
-        const getResourceTasks = (assigneeId) => {
-            return tasks.value.filter(t => (t.assignee === assigneeId || (!t.assignee && assigneeId === 'Unassigned')) && (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed');
-        };
- 
-        const smartNotifications = computed(() => {
-            return tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting');
+        const getResourceTasks = (id) => tasks.value.filter(t => (t.assignee === id || (!t.assignee && id === 'Unassigned')) && t.status !== 'completed');
+        const smartNotifications = computed(() => tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting'));
+        const timelineTasks = computed(() => tasks.value.filter(t => t.dueDate && t.status !== 'completed').sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
+        const getMatrixTasks = (quad) => tasks.value.filter(t => {
+            if (t.status === 'completed') return false;
+            const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact;
+            const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort;
+            return impactMatch && effortMatch;
         });
- 
-        const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
-        
-        const getMatrixTasks = (quad) => {
-            return tasks.value.filter(t => {
-                if (activeTab.value !== 'All' && t.company !== activeTab.value) return false;
-                if (t.status === 'completed') return false;
-                
-                const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact;
-                const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort;
-                
-                return impactMatch && effortMatch;
-            });
-        };
- 
-        const getWorkload = (company) => {
-            const companyTasks = tasks.value.filter(t => t.company === company && t.status !== 'completed');
-            const highEffortCount = companyTasks.filter(t => t.effort === 'High').length;
-            const percentage = companyTasks.length > 0 ? Math.round((highEffortCount / companyTasks.length) * 100) : 0;
-            return { count: highEffortCount, percentage: percentage };
-        };
- 
-        const toggleDarkMode = () => {
-            isDarkMode.value = !isDarkMode.value;
-            if (isDarkMode.value) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            localStorage.setItem('fitma_dark_mode', isDarkMode.value);
-        };
- 
-        const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
- 
-        const parseMarkdown = (text) => {
-            if (!text) return '';
-            return marked.parse(text);
-        };
- 
-        const commands = [
-            { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
-            { title: 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
-            { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
-            { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
-            { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
-            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
-        ];
- 
-        const filteredCommands = computed(() => {
-            if(!cmdSearch.value) return commands;
-            return commands.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()));
-        });
- 
-        const executeCommand = (cmd) => {
-            cmd.action();
-            showCommandPalette.value = false;
-            cmdSearch.value = '';
-        };
- 
-        const triggerFileUpload = (type) => {
-            fileUploadType.value = type;
-            showFileMenu.value = false;
-            let el = document.getElementById('file-upload');
-            if (type === 'image') {
-                el.accept = "image/*";
-            } else {
-                el.accept = ".pdf,.doc,.docx,.txt";
-            }
-            el.click();
-        };
 
-        const handleFileChange = (e) => {
-            if (e.target.files && e.target.files.length > 0) {
-                attachedFile.value = {
-                    name: e.target.files[0].name,
-                    file: e.target.files[0],
-                    type: fileUploadType.value
-                };
-            }
-        };
-        const removeFile = () => {
-            attachedFile.value = null;
-            document.getElementById('file-upload').value = '';
-        };
-
-        // Text to Speech Function
-        const speakText = (text, onEndCallback) => {
-            if (!('speechSynthesis' in window)) {
-                if(onEndCallback) onEndCallback();
-                return;
-            }
+        const toggleDarkMode = () => { isDarkMode.value = !isDarkMode.value; document.documentElement.classList.toggle('dark'); };
+        const parseMarkdown = (text) => text ? marked.parse(text) : '';
+        const commands = [{ title: 'New Task', action: () => addTask('notstarted') }, { title: 'Dark Mode', action: toggleDarkMode }];
+        const filteredCommands = computed(() => cmdSearch.value ? commands.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase())) : commands);
+        const executeCommand = (c) => { c.action(); showCommandPalette.value = false; };
+ 
+        const speakText = (text, callback) => {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')) || voices[0];
-            if(preferredVoice) utterance.voice = preferredVoice;
-            utterance.rate = 1.0;
-            utterance.pitch = 1.1;
-            
-            utterance.onend = () => {
-                isVoraSpeaking.value = false;
-                if(onEndCallback) onEndCallback();
-            };
+            const u = new SpeechSynthesisUtterance(text);
+            u.onend = () => { isVoraSpeaking.value = false; if(callback) callback(); };
             isVoraSpeaking.value = true;
-            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.speak(u);
         };
 
         const startSiriListening = () => {
-            if (!('webkitSpeechRecognition' in window)) return;
-            if (siriRecog) siriRecog.stop();
-            
             siriRecog = new webkitSpeechRecognition();
-            siriRecog.continuous = true; 
+            siriRecog.continuous = true;
             siriRecog.interimResults = true;
-            
-            let finalTranscript = '';
-            
-            siriRecog.onstart = () => { 
-                siriListening.value = true; 
-                siriTranscript.value = 'I am listening... Tap orb when done.'; 
-            };
-            
+            let finalT = '';
+            siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening...'; };
             siriRecog.onresult = (e) => {
-                let interimTranscript = '';
+                let interim = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
-                    else interimTranscript += e.results[i][0].transcript;
+                    if (e.results[i].isFinal) finalT += e.results[i][0].transcript + ' ';
+                    else interim += e.results[i][0].transcript;
                 }
-                if (finalTranscript || interimTranscript) {
-                    siriTranscript.value = finalTranscript + interimTranscript;
-                }
+                siriTranscript.value = finalT + interim;
             };
-            
-            siriRecog.onerror = (e) => { 
-                if (e.error === 'no-speech') return;
-                siriListening.value = false; 
-                siriProcessing.value = false; 
-            };
-            
-            siriRecog.onend = async () => { 
+            siriRecog.onend = async () => {
                 siriListening.value = false;
-                const captureText = siriTranscript.value.trim();
-                if(captureText && captureText !== 'I am listening... Tap orb when done.') {
+                if(siriTranscript.value.trim().length > 0) {
                     siriProcessing.value = true;
-                    await processSiriCommand(captureText);
+                    await processSiriCommand(siriTranscript.value);
                     siriProcessing.value = false;
                 }
             };
@@ -856,337 +593,80 @@ createApp({
         };
 
         const processSiriCommand = async (text) => {
-             let cleanText = text.replace(/\b(bora|laura|flora|zora|fora|kora|sarah)\b/gi, 'Vora');
-             const lowerText = cleanText.toLowerCase().trim();
-             
-             if(lowerText === 'hi vora' || lowerText === 'hey vora' || lowerText === 'hello vora') {
-                 siriTranscript.value = '';
-                 speakText("Hi Stanley. Take your time, explain the task, and tap my orb when you are finished.", () => {
-                     startSiriListening(); 
-                 });
-                 return;
-             }
-
-             const prompt = `You are Vora, an intelligent assistant. Analyze this voice command from Stanley: "${cleanText}". 
-             Return ONLY valid JSON.
-             If chat, return: {"intent": "chat", "response": "helpful reply"}
-             If task, extract core meaning and return: {"intent": "task", "title": "Concise professional title summarizing his explanation", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"High"|"Normal"|"Low", "status": "notstarted"|"progress"|"waiting"|"brainstorm", "assignee": "extracted name or Unassigned"}`;
-             
+             let cleanText = text.replace(/\b(bora|laura|flora)\b/gi, 'Vora');
+             const prompt = `Analyze: "${cleanText}". If task, extract: {"intent": "task", "title": "Concise summary", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"Normal", "status": "notstarted"}. Else: {"intent": "chat", "response": "text"}`;
              try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: true })
-                });
-                const responseText = await _parseAiResponse(res);
-                const data = JSON.parse(responseText);
-                
-                siriTranscript.value = '';
-
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:prompt}], model: 'openai', jsonMode: true }) });
+                const data = JSON.parse(await _parseAiResponse(res));
                 if (data.intent === 'chat') {
-                    chatHistory.value.push({ role: 'user', content: cleanText });
-                    chatHistory.value.push({ role: 'ai', content: data.response });
-                    scrollToBottom();
-                    speakText(data.response, () => {
-                        startSiriListening();
-                    });
+                    speakText(data.response, () => startSiriListening());
                 } else {
-                    pendingVoiceTask.value = {
-                        title: data.title || cleanText, 
-                        company: data.company || 'Dymek',
-                        priority: data.priority || 'Normal',
-                        status: data.status || 'notstarted',
-                        assignee: data.assignee || 'Unassigned'
-                    };
-                    speakText("I've prepared that task for you, Stanley. Please confirm to add it.");
+                    pendingVoiceTask.value = { title: data.title, company: data.company || 'Dymek', status: 'notstarted', priority: 'Normal' };
+                    speakText("I've prepared that task, Stanley. Please confirm to add it.");
                 }
-             } catch(e) {
-                 speakText("I'm sorry Stanley, I didn't quite catch that.", () => {
-                     startSiriListening();
-                 });
-             }
+             } catch(e) { speakText("Sorry Stanley, didn't catch that.", () => startSiriListening()); }
         };
 
-        const toggleSiriCapture = () => {
-            if (siriListening.value || isVoraSpeaking.value) {
-                if (siriRecog) siriRecog.stop(); 
-                window.speechSynthesis.cancel();
-                isVoraSpeaking.value = false;
-                return;
-            }
-            startSiriListening();
-        };
- 
-        const confirmVoiceTask = () => {
-            if (!pendingVoiceTask.value) return;
-            tasks.value.push(schemaEnhance({
-                id: Date.now(),
-                ...pendingVoiceTask.value
-            }));
-            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-            commitState();
-            pendingVoiceTask.value = null;
-        };
-
-        const toggleSpeechRecognition = () => {
-            if (isListening.value) {
-                if (speechRecog) speechRecog.stop();
-                isListening.value = false;
-                return;
-            }
-            if (!('webkitSpeechRecognition' in window)) {
-                alert("Voice input not supported in your browser.");
-                return;
-            }
-            speechRecog = new webkitSpeechRecognition();
-            speechRecog.continuous = false;
-            speechRecog.interimResults = true;
-            speechRecog.onstart = () => { isListening.value = true; };
-            
-            let finalTranscript = '';
-            speechRecog.onresult = (e) => {
-                let interimTranscript = '';
-                for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
-                    else interimTranscript += e.results[i][0].transcript;
-                }
-                const baseText = aiInput.value.replace(/ \.$/, '');
-                aiInput.value = baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
-            };
-            speechRecog.onerror = (e) => { isListening.value = false; };
-            speechRecog.onend = () => { isListening.value = false; };
-            speechRecog.start();
-        };
- 
-        const scrollToBottom = () => {
-            nextTick(() => {
-                if (chatScrollContainer.value) {
-                    chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight;
-                }
-            });
-        };
- 
-        const clearChat = () => {
-            if(confirm("Clear conversation history with Vora?")) {
-                chatHistory.value = [];
-                localStorage.removeItem('fitma_vora_chat');
-            }
-        };
+        const toggleSiriCapture = () => { if (siriListening.value || isVoraSpeaking.value) { if(siriRecog) siriRecog.stop(); window.speechSynthesis.cancel(); return; } startSiriListening(); };
 
         const _parseAiResponse = async (res) => {
-            let text = await res.text();
+            let t = await res.text();
             try {
-                let parsed = JSON.parse(text);
-                // NEW: Highly robust parsing to handle chain-of-thought and raw API JSON arrays
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    const first = parsed[0];
-                    text = first.content || first.message?.content || first.reasoning_content || text;
-                } 
-                else if (parsed.choices && parsed.choices[0].message) {
-                    text = parsed.choices[0].message.content || parsed.choices[0].message.reasoning_content;
-                }
-                else if (parsed.content) text = parsed.content;
-                else if (parsed.response) text = parsed.response;
-                else if (parsed.message?.content) text = parsed.message.content;
+                let p = JSON.parse(t);
+                if (Array.isArray(p)) t = p[0].content || p[0].message?.content || p[0].reasoning_content;
+                else if (p.choices) t = p.choices[0].message.content || p.choices[0].message.reasoning_content;
             } catch(e) {}
-            
-            // CLEANUP: Strip out thinking tags and reasoning fragments
-            text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-            text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
-            
-            return text;
+            return t.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
         };
  
         const generateBrief = async () => {
-            aiStatus.value = "Analyzing your OS data...";
-            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Due: ${t.dueDate || 'None'}, Status: ${t.status})`).join('\n');
-            const prompt = `You are Vora. Provide a Morning Brief for Stanley using ONLY short, colorful Tailwind HTML cards.
+            aiStatus.value = "Predicting blockers...";
+            const snap = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.status}, Effort: ${t.effort})`).join('\n');
+            const prompt = `You are Vora. Create a Morning Brief for Stanley. 
+            RULES: 
+            1. Use RAW HTML cards only. 3 to 5 lines of description per card. No bullets.
+            2. CRITICAL: You MUST include a specific card identifying "WHAT IS BLOCKING WHAT". Look for High Effort tasks in Waiting/Brainstorm and explain how they are holding up project milestones.
+            3. End with a 4-line supportive paragraph.`;
             
-            CRITICAL RULES:
-            1. Output ONLY RAW HTML. No Markdown, no JSON.
-            2. For every category (Urgent, In Progress, etc.), generate a SHORT CARD (e.g., bg-blue-50 dark:bg-slate-800).
-            3. Each card MUST have a title and a description that is exactly 3 to 5 lines long. DO NOT use bullet points inside the cards.
-            4. After all cards, provide a single 4-line supportive, friendly paragraph.
-            
-            Data: \n${snapshot}`;
-            
-            chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
-            scrollToBottom();
- 
+            chatHistory.value.push({ role: 'user', content: "Morning Brief with Blocker Prediction" });
             try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        messages:[{role:'user', content:prompt}], 
-                        seed: Math.floor(Math.random()*1000),
-                        model: 'openai', 
-                        jsonMode: false
-                    })
-                });
-                
-                const finalResponse = await _parseAiResponse(res);
-                chatHistory.value.push({ role: 'ai', content: finalResponse });
-                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-                scrollToBottom();
-            } catch (e) {
-                chatHistory.value.push({ role: 'ai', content: "I'm sorry, I couldn't fetch your brief right now." });
-                scrollToBottom();
-            } finally {
-                aiStatus.value = '';
-            }
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:prompt}], model: 'openai' }) });
+                chatHistory.value.push({ role: 'ai', content: await _parseAiResponse(res) });
+            } finally { aiStatus.value = ''; scrollToBottom(); }
         };
  
         const askAI = async () => {
-            let query = aiInput.value.trim();
-            if (!query && !attachedFile.value) return;
-            
-            let displayQuery = query;
-            let fullQuery = query;
- 
-            if (attachedFile.value) {
-                displayQuery = `[Attached ${attachedFile.value.type === 'image' ? 'Image' : 'Document'}: ${attachedFile.value.name}] \n${query}`;
-                let fileInstruction = attachedFile.value.type === 'image'
-                    ? `[Analyze IMAGE visually like Gemini]`
-                    : `[Read DOCUMENT thoroughly like ChatGPT]`;
-                fullQuery = `${query}\n\n${fileInstruction}`;
-            }
- 
-            chatHistory.value.push({ role: 'user', content: displayQuery });
-            scrollToBottom();
-            
-            isThinking.value = true;
-            aiInput.value = '';
-            removeFile();
-            aiStatus.value = "Vora is generating...";
- 
-            const recentHistory = chatHistory.value.slice(-6).map(m => `${m.role === 'user' ? 'Stanley' : 'Vora'}: ${m.content}`).join('\n');
- 
-            const systemPrompt = `You are Vora. End every response with a human-like, warm supportive sentence. Recent History: \n${recentHistory}`;
- 
+            const query = aiInput.value; chatHistory.value.push({ role: 'user', content: query });
+            isThinking.value = true; aiInput.value = '';
             try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        messages: [
-                            {role:'system', content:systemPrompt},
-                            {role:'user', content:fullQuery}
-                        ],
-                        seed: Math.floor(Math.random()*1000),
-                        model: 'openai',
-                        jsonMode: false
-                    })
-                });
-                
-                const finalResponse = await _parseAiResponse(res);
-                chatHistory.value.push({ role: 'ai', content: finalResponse });
-                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-                scrollToBottom();
- 
-            } catch (err) {
-                chatHistory.value.push({ role: 'ai', content: "I'm having trouble connecting. I'm here for you though." });
-                scrollToBottom();
-            } finally {
-                isThinking.value = false;
-                aiStatus.value = '';
-            }
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', body: JSON.stringify({ messages:[{role:'user', content:query}], model: 'openai' }) });
+                chatHistory.value.push({ role: 'ai', content: await _parseAiResponse(res) });
+            } finally { isThinking.value = false; scrollToBottom(); }
         };
  
-        const schemaEnhance = (t) => {
-            const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t };
-            base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
-            return base;
-        };
- 
-        const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
- 
-        const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
+        const schemaEnhance = (t) => ({ effort: 'Medium', impact: 'Medium', priority: 'Normal', action: '', assignee: 'Unassigned', subtasks: [], ...t });
+        const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:'Dymek', status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        
-        const saveTask = () => {
-            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
-            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
-            editingTask.value = null;
-            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-            commitState();
-        };
+        const saveTask = () => { if (editingTask.value.isNew) tasks.value.push(editingTask.value); else tasks.value[tasks.value.findIndex(t => t.id === editingTask.value.id)] = editingTask.value; editingTask.value = null; commitState(); };
+        const getCompletedSubtasks = (t) => t.subtasks.filter(s => s.done).length;
+        const scrollToBottom = () => nextTick(() => chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight);
 
-        const deleteTask = () => { 
-            if(confirm("Delete task?")) { 
-                tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); 
-                editingTask.value = null; 
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-                commitState();
-            } 
-        };
- 
-        const initialData = [
-            { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first', assignee: 'Kriti' },
-            { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', effort: 'Medium', status: 'waiting', action: 'Stanley should review', assignee: 'Stanley' },
-            { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', effort: 'Low', status: 'waiting', action: 'Dow feedback expected 4/22', assignee: 'Kriti' },
-            { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'High', effort: 'High', status: 'progress', assignee: 'Stanley' },
-            { id: 24, company: 'GigaScan', title: 'New Solutions page', priority: 'Urgent', impact: 'Medium', effort: 'High', status: 'waiting', assignee: 'Patrik' },
-            { id: 25, company: 'GigaScan', title: 'Instagram Live with Patrik', priority: 'Urgent', impact: 'High', effort: 'Medium', status: 'waiting', assignee: 'Stanley' },
-            { id: 27, company: 'GigaScan', title: 'Company profile layout', priority: 'Normal', impact: 'High', effort: 'High', status: 'progress', assignee: 'Patrik' },
-            { id: 34, company: 'Lading Technology', title: 'Driver pay structure', priority: 'Normal', impact: 'High', effort: 'Low', status: 'waiting', dueDate: '2026-10-09', assignee: 'Kriti' },
-            { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking', priority: 'Normal', impact: 'High', effort: 'High', status: 'progress', assignee: 'Kriti' },
-            { id: 62, company: 'Lading Technology', title: 'Homepage Overhaul', status: 'completed', assignee: 'Stanley' }
-        ];
- 
-        const initSortable = () => {
-            columns.forEach(col => {
-                const el = document.getElementById('kanban-' + col.id);
-                if (el) {
-                    new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => {
-                        evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                        if (evt.from !== evt.to) {
-                            const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                            if (t) {
-                                t.status = evt.to.dataset.status;
-                                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                                commitState();
-                            }
-                        }
-                    }});
-                }
-            });
-        };
- 
         onMounted(() => {
-            const savedTheme = localStorage.getItem('fitma_dark_mode');
-            if(savedTheme === 'true') {
-                isDarkMode.value = true;
-                document.documentElement.classList.add('dark');
-            }
-            const savedChat = localStorage.getItem('fitma_vora_chat');
-            if(savedChat) chatHistory.value = JSON.parse(savedChat);
-            scrollToBottom();
- 
-            window.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; }
-                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
-            });
- 
             const saved = localStorage.getItem('fitma_os_pro_silver');
-            tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [...initialData].map(schemaEnhance);
-            
+            tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [
+                { id: 1, company: 'Dymek', title: 'Website Launch on Squarespace', priority: 'Urgent', status: 'notstarted', effort: 'High' },
+                { id: 2, company: 'GigaScan', title: ' японская Translation', priority: 'Normal', status: 'waiting', effort: 'High' }
+            ].map(schemaEnhance);
             commitState();
-            nextTick(initSortable);
         });
  
         return {
-            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType,
-            showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand,
-            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
-            attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
+            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu,
+            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer,
             siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture,
-            undo, redo, canUndo, canRedo, commitState,
-            filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
-            completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
-            getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
+            undo, redo, canUndo, canRedo, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount: (id) => filteredTasks(id).length,
+            wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, parseMarkdown,
+            generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks, cmdSearch, filteredCommands, executeCommand, showCommandPalette
         };
     }
 }).mount('#app');
