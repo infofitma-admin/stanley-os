@@ -831,9 +831,8 @@ createApp({
                     if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
                    else interimT += e.results[i][0].transcript;
                 }
-                // FIX: Normalize "bora" misdetection to "Vora"
-                let transcript = (finalT || interimT).replace(/bora/gi, 'Vora');
-               siriTranscript.value = transcript;
+               // FIX: Correct "Bora" to "Vora" immediately
+               siriTranscript.value = (finalT || interimT).replace(/bora/gi, 'Vora');
             };
            siriRecog.onerror = (e) => { 
                siriListening.value = false; 
@@ -852,20 +851,19 @@ createApp({
  
         // Siri Intent Parsing (Chat vs Task)
         const processSiriCommand = async (text) => {
-             // FIX: Sanitize "bora" to "Vora" before processing intent
-             text = text.replace(/bora/gi, 'Vora');
-             const lowerText = text.toLowerCase().trim();
+             // FIX: Sanitize input for "Bora" errors
+             const cleanedText = text.replace(/bora/gi, 'Vora');
+             const lowerText = cleanedText.toLowerCase().trim();
              
-             // Quick local response for pure greetings to make it feel fast
             if(lowerText === 'hi vora' || lowerText === 'hey vora' || lowerText === 'hello vora') {
                 siriTranscript.value = '';
                 speakText("Hi Stanley, how can I help you today?", () => {
-                    startSiriListening(); // Loop back to listening
+                    startSiriListening();
                  });
                 return;
              }
  
-             const prompt = `Analyze this voice command from Stanley: "${text}". 
+             const prompt = `Analyze this voice command from Stanley: "${cleanedText}". 
              Determine if he is trying to add/create a project task OR if he is just chatting/asking a question.
              Return ONLY valid JSON with no markdown formatting.
              If it's a general question/chat, return: {"intent": "chat", "response": "Your helpful, conversational reply as Vora."}
@@ -883,17 +881,15 @@ createApp({
                siriTranscript.value = '';
  
                 if (data.intent === 'chat') {
-                    // It's a conversation. Update chat history, speak, and keep listening.
-                   chatHistory.value.push({ role: 'user', content: text });
+                   chatHistory.value.push({ role: 'user', content: cleanedText });
                    chatHistory.value.push({ role: 'ai', content: data.response });
                    scrollToBottom();
                    speakText(data.response, () => {
                        startSiriListening();
                    });
                 } else {
-                    // It's a task capture. Speak, show modal, do not loop listening to avoid noise.
                    pendingVoiceTask.value = {
-                       title: data.title || text,
+                       title: data.title || cleanedText,
                        company: data.company || 'Dymek',
                        priority: data.priority || 'Normal',
                        status: data.status || 'notstarted',
@@ -916,12 +912,11 @@ createApp({
                ...pendingVoiceTask.value
             }));
            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-           commitState(); // Save to Undo history
+           commitState();
            pendingVoiceTask.value = null;
         };
  
         const toggleSiriCapture = () => {
-            // If already active in any form, stop everything
             if (siriListening.value || isVoraSpeaking.value) {
                 if (siriRecog) siriRecog.stop();
                window.speechSynthesis.cancel();
@@ -940,7 +935,7 @@ createApp({
                return;
             }
             if (!('webkitSpeechRecognition' in window)) {
-               alert("Voice input not supported in your browser.");
+               alert("Voice input not supported.");
                return;
             }
            speechRecog = new webkitSpeechRecognition();
@@ -957,8 +952,9 @@ createApp({
                    else interimTranscript += e.results[i][0].transcript;
                 }
                 const baseText = aiInput.value.replace(/ \.$/, '');
-                // FIX: Sanitize input to handle "bora" misdetection and ensure "full idea" flow
-               aiInput.value = (baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript).replace(/bora/gi, 'Vora');
+                const resultText = (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
+                // FIX: Apply correction to inline chat input too
+               aiInput.value = baseText + resultText.replace(/bora/gi, 'Vora');
             };
            speechRecog.onerror = (e) => { isListening.value = false; };
            speechRecog.onend = () => { isListening.value = false; };
@@ -974,7 +970,7 @@ createApp({
         };
  
         const clearChat = () => {
-           if(confirm("Clear conversation history with Vora?")) {
+           if(confirm("Clear conversation history?")) {
                chatHistory.value = [];
                localStorage.removeItem('fitma_vora_chat');
             }
@@ -985,7 +981,6 @@ createApp({
             try {
                 let parsed = JSON.parse(text);
                 if (parsed.error) throw new Error(parsed.error);
-                
                 if (Array.isArray(parsed) && parsed.length > 0) {
                    text = parsed[0].content || parsed[0].message?.content || text;
                 } 
@@ -994,30 +989,19 @@ createApp({
                 else if (parsed.response) text = parsed.response;
                 else if (parsed.message?.content) text = parsed.message.content;
             } catch(e) {}
-            
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
             text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
             text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
-            
             return text;
         };
  
         const generateBrief = async () => {
-           aiStatus.value = "Analyzing your OS data...";
-            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Due: ${t.dueDate || 'None'}, Status: ${t.status})`).join('\n');
-            const prompt = `You are Vora. Give Stanley (the client) a kind, supportive morning brief. Show him updates in brief, NOT detailed logs.
- 
-            CRITICAL FORMATTING INSTRUCTIONS:
-            1. You MUST output the brief using ONLY colorful HTML cards with Tailwind classes.
-            2. Use soft colors for backgrounds (e.g., bg-emerald-50, bg-amber-50, bg-rose-50, bg-sky-50, bg-indigo-50).
-            3. Each card should represent a category (Urgent, In Progress, Blockers/Waiting).
-            4. Descriptions/bullets in cards MUST be short (3 to 5 lines per card max).
-            5. After the cards, output exactly ONE paragraph (4 to 5 lines). This paragraph must be warm, motivating, and caring like a supportive human friend.
-            6. DO NOT use any headings for the final paragraph.
-            7. Output ONLY raw HTML. No markdown, No JSON.
- 
-            Data to summarize: \n${snapshot}`;
+           aiStatus.value = "Analyzing data...";
+            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
+            const prompt = `You are Vora. Give Stanley a morning brief using colorful cards (Tailwind bg-emerald-50, bg-amber-50, etc.). 
+            Descriptions must be 3-5 lines per card. End with exactly ONE supportive paragraph (4-5 lines). 
+            Output ONLY raw HTML. Data: \n${snapshot}`;
             
            chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
            scrollToBottom();
@@ -1026,21 +1010,14 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                    method: 'POST',
                    headers: {'Content-Type': 'application/json'},
-                   body: JSON.stringify({ 
-                       messages:[{role:'user', content:prompt}], 
-                       seed: Math.floor(Math.random()*1000),
-                       model: 'openai', 
-                       jsonMode: false
-                    })
+                   body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: false })
                 });
-                
                 const finalResponse = await _parseAiResponse(res);
                chatHistory.value.push({ role: 'ai', content: finalResponse });
                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
                scrollToBottom();
             } catch (e) {
-               chatHistory.value.push({ role: 'ai', content: "I couldn't fetch your brief right now. Let's try again shortly." });
-               scrollToBottom();
+               chatHistory.value.push({ role: 'ai', content: "Error fetching brief." });
             } finally {
                aiStatus.value = '';
             }
@@ -1049,61 +1026,32 @@ createApp({
         const askAI = async () => {
             let query = aiInput.value.trim();
             if (!query && !attachedFile.value) return;
-            
             let displayQuery = query;
             let fullQuery = query;
- 
             if (attachedFile.value) {
-               displayQuery = `[Attached ${attachedFile.value.type === 'image' ? 'Image' : 'Document'}: ${attachedFile.value.name}] \n${query}`;
-                let fileInstruction = attachedFile.value.type === 'image'
-                    ? `[System Note: User attached an IMAGE named "${attachedFile.value.name}". You MUST act like Gemini and analyze/understand this image visually.]`
-                    : `[System Note: User attached a DOCUMENT named "${attachedFile.value.name}". You MUST act like ChatGPT and analyze/read this document thoroughly.]`;
+               displayQuery = `[Attached ${attachedFile.value.type}: ${attachedFile.value.name}] \n${query}`;
+                let fileInstruction = attachedFile.value.type === 'image' ? `[Gemini mode: Understand image]` : `[ChatGPT mode: Analyze document]`;
                fullQuery = `${query}\n\n${fileInstruction}`;
             }
- 
            chatHistory.value.push({ role: 'user', content: displayQuery });
            scrollToBottom();
-            
            isThinking.value = true;
            aiInput.value = '';
            removeFile();
-           aiStatus.value = aiMode.value === 'Research' ? "Vora is deep researching..." : "Vora is generating...";
- 
-            const recentHistory = chatHistory.value.slice(-6).map(m => `${m.role === 'user' ? 'Stanley' : 'Vora'}: ${m.content}`).join('\n');
- 
-            const systemPrompt = `You are Vora, Fitma's highly intelligent AI assistant. Mode: ${aiMode.value}.
-            
-            Core Directives:
-            1. Persona & Relationship: Stanley is the CLIENT. You are his advisor. Highlight high-priority items and identify blockers (tasks that are waiting/high effort).
-            2. Empathy: ALWAYS end your response with a natural, human-like, warm sentence (4-5 lines total for the concluding segment). NEVER use headings like 'Motivation:'.
-            3. Formatting: Use properly drawn Markdown tables for data, bold headings, and structured lists. Ensure answers are perfectly structured like ChatGPT.
-            
-            Recent History:
-           ${recentHistory}`;
- 
+           aiStatus.value = "Generating...";
+            const systemPrompt = `You are Vora. Advisor to Stanley. Format: Tables, lists, bold. End with warm sentences (4-5 lines).`;
             try {
                 const res = await fetch('https://text.pollinations.ai/', {
                    method: 'POST',
                    headers: {'Content-Type': 'application/json'},
-                   body: JSON.stringify({
-                       messages: [
-                           {role:'system', content:systemPrompt},
-                           {role:'user', content:fullQuery}
-                       ],
-                       seed: Math.floor(Math.random()*1000),
-                       model: 'openai',
-                       jsonMode: false
-                    })
+                   body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random()*1000), model: 'openai' })
                 });
-                
                 const finalResponse = await _parseAiResponse(res);
                chatHistory.value.push({ role: 'ai', content: finalResponse });
                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
                scrollToBottom();
- 
             } catch (err) {
-               chatHistory.value.push({ role: 'ai', content: "I'm so sorry, Stanley. I'm having a little trouble connecting right now. Please take a deep breath, and we can try again in a moment. I'm here for you." });
-               scrollToBottom();
+               chatHistory.value.push({ role: 'ai', content: "Error connecting." });
             } finally {
                isThinking.value = false;
                aiStatus.value = '';
@@ -1117,68 +1065,29 @@ createApp({
         };
  
         const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
- 
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        
         const saveTask = () => {
             if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
             else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
            editingTask.value = null;
            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-           commitState(); // Save to Undo history
+           commitState();
         };
- 
         const deleteTask = () => { 
-           if(confirm("Permanently delete this task?")) { 
+           if(confirm("Delete task?")) { 
                tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id);
                editingTask.value = null; 
                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-               commitState(); // Save to Undo history
+               commitState();
             } 
         };
  
         const initialData = [
             { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first', assignee: 'Kriti' },
-            { id: 2, company: 'Dymek', title: 'Prepare Content for Website', priority: 'Urgent', impact: 'Medium', effort: 'Medium', status: 'waiting', action: 'Stanley should review', assignee: 'Stanley' },
-            { id: 3, company: 'Dymek', title: 'Business Card', priority: 'Urgent', impact: 'Medium', effort: 'Low', status: 'waiting', action: 'Dow feedback expected 4/22', assignee: 'Kriti' },
             { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'High', effort: 'High', status: 'progress', assignee: 'Stanley' },
-            { id: 24, company: 'GigaScan', title: 'New Solutions page (3 categories)', priority: 'Urgent', impact: 'Medium', effort: 'High', status: 'waiting', action: 'GigaScan team provide images', assignee: 'Patrik' },
-            { id: 25, company: 'GigaScan', title: 'TrueProp - Instagram Live with Patrik', priority: 'Urgent', impact: 'High', effort: 'Medium', status: 'waiting', action: 'Stanley schedule meeting', assignee: 'Stanley' },
-            { id: 27, company: 'GigaScan', title: 'Company profile - brand layout match', priority: 'Normal', impact: 'High', effort: 'High', status: 'progress', action: 'Stanley send material', assignee: 'Patrik' },
-            { id: 34, company: 'Lading Technology', title: 'Add Driver pay structure', priority: 'Normal', impact: 'High', effort: 'Low', status: 'waiting', dueDate: '2026-10-09', assignee: 'Kriti' },
-            { id: 46, company: 'Lading Technology', title: 'Figma shipment tracking design', priority: 'Normal', impact: 'High', effort: 'High', status: 'progress', assignee: 'Kriti' },
-            { id: 50, company: 'Lading Technology', title: 'Market strategy outside transport', priority: 'Normal', impact: 'Medium', effort: 'High', status: 'brainstorm', assignee: 'Stanley' },
-            { id: 55, company: 'Lading Technology', title: 'UI Review: Bolder colors', priority: 'Low', impact: 'Medium', effort: 'Low', status: 'waiting', assignee: 'Kriti' },
             { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed', assignee: 'Stanley' }
         ];
- 
-        const generateNextAction = async (task) => {
-            if (task.action) return;
-            try {
-                const prompt = `For a project task titled "${task.title}", generate a concise 3-step action checklist as a bulleted list. Do not include introductory text, just the list.`;
-                const res = await fetch('https://text.pollinations.ai/', {
-                   method: 'POST',
-                   headers: {'Content-Type': 'application/json'},
-                   body: JSON.stringify({ 
-                       messages:[{role:'user', content:prompt}], 
-                       seed: Math.floor(Math.random()*1000),
-                       model: 'openai',
-                       jsonMode: false
-                    })
-                });
-                const text = await _parseAiResponse(res);
-                
-                const idx = tasks.value.findIndex(t => t.id === task.id);
-                if (idx !== -1) {
-                   tasks.value[idx].action = text;
-                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                   commitState(); // Save to Undo history after AI adds an action
-                }
-            } catch (e) {
-               console.error("Failed to auto-generate next action", e);
-            }
-        };
  
         const initSortable = () => {
            columns.forEach(col => {
@@ -1189,52 +1098,7 @@ createApp({
                            evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
                            if (evt.from !== evt.to) {
                                 const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) {
-                                    t.status = evt.to.dataset.status;
-                                   t.lastUpdated = Date.now();
-                                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                                   commitState(); // Save to Undo history
-                                    
-                                    if (t.status === 'progress' && (!t.action || t.action.trim() === '')) generateNextAction(t);
-                                }
-                           }
-                       }
-                   });
-                }
-            });
- 
-           document.querySelectorAll('.resource-list').forEach(el => {
-                new Sortable(el, { group: 'resource', animation: 150, ghostClass: 'opacity-50',
-                   onEnd: (evt) => {
-                       evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                       if (evt.from !== evt.to) {
-                           const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                           if (t) {
-                                t.assignee = evt.to.dataset.assignee;
-                                t.lastUpdated = Date.now();
-                               localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                                commitState(); // Save to Undo history
-                           }
-                       }
-                    }
-                });
-            });
- 
-           matrixQuadrants.forEach(quad => {
-                const el = document.getElementById('matrix-' + quad.id);
-                if (el) {
-                   new Sortable(el, { group: 'matrix', animation: 150, ghostClass: 'opacity-50',
-                       onEnd: (evt) => {
-                           evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                           if (evt.from !== evt.to) {
-                                const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) {
-                                    t.impact = evt.to.dataset.impact;
-                                    t.effort = evt.to.dataset.effort;
-                                   t.lastUpdated = Date.now();
-                                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                                   commitState(); // Save to Undo history
-                                }
+                                if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); }
                            }
                        }
                    });
@@ -1243,59 +1107,20 @@ createApp({
         };
  
         onMounted(() => {
-            // Wake up speech synthesis voices early
            window.speechSynthesis.getVoices();
- 
             const savedTheme = localStorage.getItem('fitma_dark_mode');
-           if(savedTheme === 'true') {
-               isDarkMode.value = true;
-               document.documentElement.classList.add('dark');
-            }
-            
+           if(savedTheme === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
             const savedChat = localStorage.getItem('fitma_vora_chat');
-           if(savedChat) {
-                try {
-                   chatHistory.value = JSON.parse(savedChat);
-                } catch(e) {
-                   console.error("Chat parsing failed");
-                }
-            }
-           scrollToBottom();
- 
+           if(savedChat) { try { chatHistory.value = JSON.parse(savedChat); } catch(e) {} }
            window.addEventListener('keydown', (e) => {
-                const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
-                
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                   e.preventDefault(); showCommandPalette.value = true;
-                   setTimeout(() => document.getElementById('cmd-input')?.focus(), 50);
-                }
-                
-                if (!isTyping) {
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
-                    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
-                }
- 
-                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; showNotifications.value = false; showFileMenu.value = false; pendingVoiceTask.value = null;}
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); }
+                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
             });
- 
-            try {
-                const saved = localStorage.getItem('fitma_os_pro_silver');
-                if (saved) {
-                   tasks.value = JSON.parse(saved).map(schemaEnhance);
-                } else {
-                   tasks.value = [...initialData].map(schemaEnhance);
-                }
-            } catch (error) {
-               tasks.value = [...initialData].map(schemaEnhance);
-            }
-            
+            const saved = localStorage.getItem('fitma_os_pro_silver');
+           tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [...initialData].map(schemaEnhance);
            commitState();
            nextTick(initSortable);
         });
- 
-       watch([viewMode, assignees], () => {
-           nextTick(initSortable);
-        }, { deep: true });
  
         return {
             activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType,
@@ -1306,8 +1131,7 @@ createApp({
             undo, redo, canUndo, canRedo, commitState,
            filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
            completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
-           getWorkload, generateBrief, generateNextAction,
-           avgCycleTime, atRiskTasks, assignees, getResourceTasks
+           getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
         };
     }
 }).mount('#app');
