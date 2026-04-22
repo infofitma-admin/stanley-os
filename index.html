@@ -1009,14 +1009,18 @@ createApp({
             let text = await res.text();
             try {
                 let parsed = JSON.parse(text);
-                if (parsed.error) throw new Error(parsed.error);
-                if (Array.isArray(parsed) && parsed.length > 0) {
+                // NEW FIX: Aggressively target content field while ignoring reasoning_content
+                if (parsed.choices && parsed.choices[0].message) {
+                  text = parsed.choices[0].message.content || "";
+                } else if (parsed.content) {
+                  text = parsed.content;
+                } else if (parsed.message?.content) {
+                  text = parsed.message.content;
+                } else if (parsed.response) {
+                  text = parsed.response;
+                } else if (Array.isArray(parsed) && parsed.length > 0) {
                   text = parsed[0].content || parsed[0].message?.content || text;
-                } 
-                else if (parsed.choices && parsed.choices[0].message) text = parsed.choices[0].message.content;
-                else if (parsed.content) text = parsed.content;
-                else if (parsed.response) text = parsed.response;
-                else if (parsed.message?.content) text = parsed.message.content;
+                }
             } catch(e) {}
             // Clean up think tags and markdown blocks
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
@@ -1032,20 +1036,21 @@ createApp({
           const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Effort: ${t.effort}, Status: ${t.status})`).join('\n');
           
           const prompt = `You are Vora, Stanley's caring and highly motivating AI assistant. 
-          Analyze the following task list and provide a Morning Brief.
+          Analyze the task list and provide a Morning Brief. 
           
-          TASK ANALYSIS REQUIREMENTS:
-          1. Identify the Top Priorities (High/Urgent), then Normal and Low.
-          2. Specifically identify "Blockers"—tasks that are High Effort, in 'Waiting' status, or 'Paused' that might prevent Top Priorities from finishing.
+          MUST INCLUDE:
+          1. The Critical List (Top/Urgent Priorities).
+          2. Maintenance & Flow (Normal and Low priorities).
+          3. Blocker Radar (Tasks that are stalled, in 'Waiting' status, or High Effort that block progress).
           
           STRUCTURE:
-          1. Use exactly 3 colorful HTML cards. 
-          2. Each card MUST have: <div class="rounded-xl p-4 mb-4 shadow-sm [COLOR_CLASS] flex flex-col">...content...</div>
-          3. Tailwind color classes: Card 1 (Top Priorities) = bg-rose-50/80; Card 2 (Normal/Low Priorities) = bg-emerald-50/80; Card 3 (Blockers/Risks) = bg-amber-50/80.
-          4. Each card content MUST be exactly 3-5 lines of text summarizing the findings.
-          5. After the cards, write exactly one supportive paragraph of 4-5 lines to keep Stanley motivated.
+          1. Exactly 3 colorful HTML cards. 
+          2. Each card MUST have: <div class="rounded-xl p-4 mb-4 shadow-sm [COLOR_CLASS] flex flex-col">...description...</div>
+          3. Tailwind colors: bg-rose-50/dark:bg-rose-900/10 (Critical), bg-sky-50/dark:bg-sky-900/10 (Flow), bg-amber-50/dark:bg-amber-900/10 (Blockers).
+          4. Content: 3 to 5 lines per card.
+          5. End with exactly one warm, motivating paragraph of 4-5 lines.
           
-          IMPORTANT: Return ONLY raw HTML div elements and the paragraph. No markdown backticks or pre-text.
+          IMPORTANT: Return ONLY the raw HTML and paragraph. DO NOT show any thinking, backend commands, or intro text. No markdown backticks.
           
           Data: \n${snapshot}`;
           
