@@ -88,7 +88,7 @@
                       <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-white/10 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white'" class="w-full flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200">
                           <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg> Dashboard
                       </button>
-                      <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources')" ? 'bg-white/10 text-white' : 'hover:bg-white/5 hover:text-white'" class="w-full flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all">
+                      <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources' && activeTab==='All') ? 'bg-white/10 text-white' : 'hover:bg-white/5 hover:text-white'" class="w-full flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all">
                           <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Resource Load
                       </button>
                       <button @click="viewMode = 'risk'; activeTab = 'All'" :class="viewMode==='risk' ? 'bg-white/10 text-white' : 'hover:bg-white/5 hover:text-white'" class="w-full flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all text-rose-400">
@@ -178,7 +178,7 @@
 
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-10 custom-scrollbar relative">
                 
-               <div class="flex gap-8 mb-10 max-w-[1600px] mx-auto" v-show="viewMode === 'kanban'">
+               <div class="flex gap-8 mb-10 max-w-[1600px] mx-auto">
                     
                   <div class="flex-1 bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col relative overflow-hidden h-[380px] transition-all">
                       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 flex justify-between items-center bg-slate-50/30 dark:bg-slate-900/30 shrink-0">
@@ -229,6 +229,7 @@
                       </div>
 
                       <div class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0 relative flex flex-col">
+                          
                           <div v-if="attachedFile" class="mb-4 self-start flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs max-w-[240px] shadow-sm relative group">
                                 <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center mr-3 text-brand">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -244,10 +245,12 @@
 
                           <div class="relative flex items-center bg-slate-100/80 dark:bg-slate-800/80 rounded-2xl px-3 py-2 border border-slate-200/50 dark:border-slate-700/50 focus-within:border-brand/50 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all shadow-inner max-w-5xl mx-auto w-full">
                                 <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
+                                
                                 <div class="relative">
                                     <button @click="showFileMenu = !showFileMenu" class="p-2.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition rounded-xl hover:bg-white dark:hover:bg-slate-700 shadow-sm" title="Upload">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                   </button>
+                                    
                                     <div v-if="showFileMenu" class="absolute bottom-full left-0 mb-4 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col p-1.5">
                                       <button @click="triggerFileUpload('image')" class="text-xs font-bold text-slate-700 dark:text-slate-200 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl text-left flex items-center">
                                             <span class="mr-3 text-lg">📸</span> Visual Context
@@ -257,11 +260,14 @@
                                       </button>
                                    </div>
                                 </div>
+                                
                                 <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Ask Vora anything..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none px-4 placeholder-slate-400">
+                                
                                 <button @click="toggleSpeechRecognition" class="p-2.5 transition rounded-xl mr-2 relative group" title="Voice">
                                     <div v-if="isListening" class="absolute inset-0 bg-rose-500/10 rounded-xl animate-ping"></div>
                                     <svg :class="isListening ? 'text-rose-500 scale-110' : 'text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'" class="w-5 h-5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
                                 </button>
+                                
                                 <button @click="askAI" :disabled="isThinking || (!aiInput.trim() && !attachedFile)" class="p-2 bg-slate-900 dark:bg-brand text-white hover:scale-105 disabled:opacity-30 disabled:scale-100 transition-all rounded-xl w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand/10">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                                 </button>
@@ -269,8 +275,9 @@
                       </div>
                   </div>
 
-                  <div class="w-80 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-8 h-[380px] flex flex-col items-center transition-all shrink-0" v-show="viewMode === 'kanban'">
+                  <div class="w-80 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-8 h-[380px] flex flex-col items-center transition-all shrink-0">
                       <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 self-start">Velocity</h3>
+                      
                       <div class="relative w-40 h-40 flex items-center justify-center mb-8">
                           <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                 <path class="text-slate-100 dark:text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -281,12 +288,13 @@
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Efficiency</span>
                           </div>
                       </div>
+
                       <div class="w-full grid grid-cols-2 gap-1 border-t border-slate-100 dark:border-slate-800/50 pt-6">
-                          <div class="text-center">
+                          <div class="text-center border-r border-slate-100 dark:border-slate-800/50">
                                 <p class="text-xl font-display font-extrabold text-slate-900 dark:text-white">{{ completedTasks.length }}</p>
                                 <p class="text-[9px] font-black text-slate-400 uppercase">Closed</p>
                           </div>
-                          <div class="text-center border-l border-slate-100 dark:border-slate-800/50">
+                          <div class="text-center">
                                 <p class="text-xl font-display font-extrabold text-brand">{{ wipCount }}</p>
                                 <p class="text-[9px] font-black text-slate-400 uppercase">WIP</p>
                           </div>
@@ -301,6 +309,7 @@
                                 <h3 class="font-display font-extrabold text-slate-900 dark:text-slate-200 text-xs uppercase tracking-[0.1em]">{{ col.title }}</h3>
                                 <span class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-300 px-2.5 py-0.5 rounded-full text-[10px] font-black shadow-sm border border-slate-200/50 dark:border-slate-700/50">{{ getTaskCount(col.id) }}</span>
                           </div>
+                          
                           <div :id="'kanban-' + col.id" class="card-list-scroll space-y-4 custom-scrollbar" :data-status="col.id">
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800/80 rounded-2xl p-5 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
                                     <div class="flex justify-between items-start mb-4">
@@ -308,11 +317,13 @@
                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                    </div>
                                     <h4 class="text-[14px] font-bold text-slate-900 dark:text-white leading-relaxed mb-4">{{ task.title }}</h4>
+                                    
                                     <div v-if="task.subtasks && task.subtasks.length > 0" class="mb-4">
                                         <div class="h-1.5 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden">
                                           <div class="h-full bg-brand transition-all duration-500 rounded-full" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
                                       </div>
                                     </div>
+
                                     <div class="pt-4 border-t border-slate-50 dark:border-slate-700/50 flex flex-col gap-3">
                                         <div class="flex justify-between items-center">
                                           <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-2 py-1 rounded-md">
@@ -328,6 +339,7 @@
                                     </div>
                                 </div>
                           </div>
+                          
                           <div class="p-4 border-t border-slate-200/50 dark:border-slate-800/50 shrink-0">
                                 <button @click="addTask(col.id)" class="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-brand hover:border-brand transition-all">+ New Card</button>
                           </div>
@@ -336,93 +348,105 @@
 
                   <main v-show="viewMode === 'resources'" class="flex gap-6 overflow-x-auto pb-6 custom-scrollbar">
                       <div v-for="assignee in assignees" :key="assignee.id" class="bg-slate-200/30 dark:bg-slate-900/30 rounded-[1.5rem] flex flex-col kanban-col shrink-0 border border-slate-200/50 dark:border-slate-800/50 h-[620px]">
-                          <div class="p-5 border-b border-slate-200/50 dark:border-slate-800/50 shrink-0">
-                                <div class="flex justify-between items-center mb-3">
+                          <div class="p-5 border-b border-slate-200 dark:border-slate-800/50 shrink-0">
+                                <div class="flex justify-between items-center mb-4">
                                     <h3 class="font-display font-extrabold text-slate-900 dark:text-slate-200 text-xs tracking-tight flex items-center">
-                                       <span class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px] font-black mr-3 shadow-sm">{{ assignee.id.charAt(0) }}</span>
+                                       <span class="w-7 h-7 rounded-lg bg-slate-900 dark:bg-brand text-white flex items-center justify-center text-[10px] font-black mr-3 shadow-md">{{ assignee.id.charAt(0) }}</span>
                                         {{ assignee.title }}
                                     </h3>
-                                    <span class="bg-brand/10 text-brand px-2.5 py-0.5 rounded-full text-[10px] font-black">{{ getResourceTasks(assignee.id).length }} active</span>
+                                    <span class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-3 py-1 rounded-full text-[10px] font-black shadow-sm border border-slate-200/50 dark:border-slate-700/50">{{ getResourceTasks(assignee.id).length }}</span>
                                 </div>
-                                <div class="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                    <div class="h-full transition-all duration-500 rounded-full" :style="'width: ' + Math.min((getResourceTasks(assignee.id).length / 5) * 100, 100) + '%'" :class="getResourceTasks(assignee.id).length > 4 ? 'bg-rose-500' : 'bg-brand'"></div>
+                                <div class="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full transition-all duration-700" :style="'width: ' + Math.min((getResourceTasks(assignee.id).length / 5) * 100, 100) + '%'" :class="getResourceTasks(assignee.id).length > 4 ? 'bg-rose-500' : 'bg-brand'"></div>
                                 </div>
                           </div>
-                          <div class="card-list-scroll space-y-4 custom-scrollbar">
-                                <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800/80 rounded-2xl p-5 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
-                                    <h4 class="text-[13px] font-bold text-slate-900 dark:text-white leading-relaxed mb-3">{{ task.title }}</h4>
-                                    <span class="text-[10px] font-black uppercase tracking-widest" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
+                          <div :id="'resource-' + assignee.id.replace(/\s+/g, '')" class="card-list-scroll space-y-4 custom-scrollbar resource-list" :data-assignee="assignee.id">
+                                <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">{{ task.title }}</h4>
+                                    <div class="mt-3 flex items-center justify-between">
+                                        <span class="text-[9px] font-black uppercase text-slate-400">{{ task.company }}</span>
+                                        <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
+                                    </div>
                                 </div>
                           </div>
                       </div>
                   </main>
 
-                  <main v-show="viewMode === 'risk'" class="pb-10 max-w-4xl mx-auto pt-4">
-                      <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-10 border border-rose-200 dark:border-rose-900/30 shadow-sm relative overflow-hidden">
-                          <h2 class="text-2xl font-display font-extrabold mb-2 tracking-tight text-slate-900 dark:text-white flex items-center">
-                                <svg class="w-7 h-7 mr-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                AI Blocker Predictor
+                  <main v-show="viewMode === 'risk'" class="pb-10 max-w-5xl mx-auto pt-6">
+                      <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-10 border border-rose-200 dark:border-rose-900/40 shadow-sm relative overflow-hidden">
+                          <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+                          <h2 class="text-2xl font-display font-extrabold mb-3 tracking-tight text-slate-900 dark:text-white flex items-center">
+                                <svg class="w-7 h-7 mr-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                Risk Predictor
                           </h2>
-                          <div class="space-y-4 mt-8">
-                                <div v-for="task in atRiskTasks" :key="task.id" class="p-5 border border-rose-100 dark:border-rose-900/20 bg-rose-50/30 dark:bg-rose-900/10 rounded-2xl flex items-start justify-between cursor-pointer hover:bg-rose-50 transition-colors" @click="openTask(task)">
+                          <p class="text-[11px] font-black text-slate-400 mb-10 uppercase tracking-[0.2em]">Dependency Blocker Analysis</p>
+                          <div class="grid gap-4">
+                                <div v-for="task in atRiskTasks" :key="task.id" class="p-5 border border-rose-100 dark:border-rose-900/30 bg-rose-50/30 dark:bg-rose-900/10 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-rose-50 transition-colors" @click="openTask(task)">
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{task.title}}</h4>
-                                        <p class="text-xs text-slate-500 font-medium">Critical bottleneck detected in <span class="text-rose-500 font-bold uppercase tracking-wider">{{task.company}}</span> portfolio.</p>
+                                        <h4 class="text-[15px] font-bold text-slate-900 dark:text-white mb-1">{{task.title}}</h4>
+                                        <p class="text-xs text-slate-500">Stalled in <span class="font-bold text-rose-500">{{task.status}}</span> • Requires immediate attention.</p>
                                    </div>
+                                    <span class="text-[10px] font-black uppercase text-rose-500 bg-white dark:bg-slate-800 px-3 py-1 rounded-full shadow-sm">{{task.company}}</span>
                                 </div>
-                                <div v-if="atRiskTasks.length === 0" class="text-sm font-bold text-slate-400 text-center py-20 uppercase tracking-widest italic">All clear. No detected risks.</div>
+                                <div v-if="atRiskTasks.length === 0" class="text-sm font-bold text-slate-400 text-center py-20 uppercase tracking-widest opacity-50">No Critical Risks Detected</div>
                           </div>
                       </div>
                   </main>
 
-                  <main v-show="viewMode === 'timeline'" class="pb-10">
-                      <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
-                          <table class="w-full text-left">
-                              <thead class="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
-                                  <tr>
-                                      <th class="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Schedule</th>
-                                      <th class="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Initiative</th>
-                                      <th class="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Priority</th>
-                                  </tr>
-                              </thead>
-                              <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
-                                  <tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition">
-                                      <td class="p-6 text-sm font-bold text-slate-900 dark:text-slate-300">{{ t.dueDate }}</td>
-                                      <td class="p-6">
-                                          <div class="text-sm font-bold dark:text-white">{{ t.title }}</div>
-                                          <div class="text-[9px] font-black uppercase text-slate-400 mt-1 tracking-widest">{{ t.company }}</div>
-                                      </td>
-                                      <td class="p-6"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
+                  <main v-show="viewMode === 'timeline'" class="pb-10 max-w-6xl mx-auto">
+                    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="p-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Deadline</th>
+                                    <th class="p-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Task Objective</th>
+                                    <th class="p-6 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+                                <tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 cursor-pointer transition">
+                                    <td class="p-6 text-sm font-bold dark:text-slate-300">{{ t.dueDate }}</td>
+                                    <td class="p-6">
+                                        <div class="text-[14px] font-bold dark:text-white">{{ t.title }}</div>
+                                        <div class="text-[9px] font-black uppercase tracking-wider text-brand mt-1">{{ t.company }}</div>
+                                    </td>
+                                    <td class="p-6 text-right"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                   </main>
 
                   <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-8 h-[720px]">
-                      <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200/50 dark:border-slate-800/50 flex flex-col shadow-sm">
+                      <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 flex flex-col shadow-sm">
                           <div class="flex justify-between items-center mb-6">
-                                <h3 class="font-display font-extrabold text-[11px] uppercase tracking-[0.2em] text-slate-400">{{ quad.name }}</h3>
+                                <h3 class="font-display font-extrabold text-xs uppercase tracking-widest text-slate-900 dark:text-slate-200">{{ quad.name }}</h3>
+                                <div class="flex gap-2">
+                                    <span class="text-[9px] font-black text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded uppercase tracking-tighter">Impact: {{ Array.isArray(quad.impact) ? 'Med/Low' : quad.impact }}</span>
+                                    <span class="text-[9px] font-black text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded uppercase tracking-tighter">Effort: {{ Array.isArray(quad.effort) ? 'Med/Low' : quad.effort }}</span>
+                                </div>
                           </div>
-                          <div class="matrix-zone space-y-4 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/30 dark:bg-slate-900/30 p-4 rounded-3xl border-2 border-dashed border-slate-100 dark:border-slate-800">
-                                <div v-for="t in getMatrixTasks(quad)" :key="t.id" @click="openTask(t)" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-700/50 cursor-pointer text-sm font-bold text-slate-800 dark:text-slate-200 hover:border-brand transition">
-                                    {{ t.title }}
+                          <div :id="'matrix-' + quad.id" class="matrix-zone space-y-3 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/30 dark:bg-slate-800/20 p-3 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800" :data-impact="Array.isArray(quad.impact) ? quad.impact[0] : quad.impact" :data-effort="Array.isArray(quad.effort) ? quad.effort[0] : quad.effort">
+                                <div v-for="t in getMatrixTasks(quad)" :key="t.id" :data-id="t.id" @click="openTask(t)" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing hover:border-brand transition group">
+                                    <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ t.title }}</h4>
+                                    <p class="text-[9px] font-black uppercase text-brand mt-1">{{ t.company }}</p>
                                 </div>
                           </div>
                       </div>
                   </main>
 
                   <main v-show="viewMode === 'heatmap'" class="pb-10 max-w-4xl mx-auto pt-8">
-                      <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-10 border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-                          <h2 class="text-2xl font-display font-extrabold mb-10 tracking-tight text-slate-900 dark:text-white uppercase tracking-widest">Load Matrix</h2>
+                      <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-12 border border-slate-200 dark:border-slate-800 shadow-sm">
+                          <h2 class="text-2xl font-display font-extrabold mb-2 tracking-tight text-slate-900 dark:text-white text-center">Workload Distribution</h2>
+                          <p class="text-[11px] font-black text-slate-400 mb-16 uppercase tracking-[0.3em] text-center">High Effort Bottleneck Tracking</p>
                           <div class="space-y-12">
                                 <div v-for="company in ['Dymek', 'GigaScan', 'Lading Technology']" :key="company">
-                                    <div class="flex justify-between text-[11px] font-black uppercase tracking-widest mb-3">
-                                       <span class="text-slate-400">{{company}}</span>
-                                       <span :class="getWorkload(company).count > 3 ? 'text-rose-500' : 'text-slate-400'">{{getWorkload(company).count}} High-Effort Tasks</span>
+                                    <div class="flex justify-between text-[11px] font-black uppercase tracking-widest mb-4">
+                                       <span class="text-slate-900 dark:text-white">{{company}}</span>
+                                       <span :class="getWorkload(company).count > 3 ? 'text-rose-500' : 'text-slate-400'">{{getWorkload(company).count}} Overload Indicators</span>
                                    </div>
-                                    <div class="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div class="h-full transition-all duration-1000 rounded-full" :style="'width: ' + getWorkload(company).percentage + '%'" :class="getWorkload(company).count > 3 ? 'bg-rose-500' : 'bg-brand'"></div>
+                                    <div class="h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 p-0.5">
+                                        <div class="h-full transition-all duration-1000 rounded-full shadow-lg" :style="'width: ' + getWorkload(company).percentage + '%'" :class="getWorkload(company).count > 3 ? 'bg-rose-500' : 'bg-brand'"></div>
                                    </div>
                                 </div>
                           </div>
@@ -430,22 +454,24 @@
                   </main>
 
                   <main v-show="viewMode === 'recycle'" class="pb-10 max-w-4xl mx-auto pt-4">
-                      <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-10 border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-                          <h2 class="text-2xl font-display font-extrabold mb-2 text-slate-900 dark:text-white uppercase tracking-widest flex items-center">
-                                <svg class="w-7 h-7 mr-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Archives
+                      <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
+                          <h2 class="text-xl font-display font-extrabold mb-1 text-slate-900 dark:text-white flex items-center">
+                                <svg class="w-6 h-6 mr-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Recycle Bin
                           </h2>
-                          <div class="space-y-4 mt-8">
-                               <div v-for="t in recycleBin" :key="t.id" class="flex items-center justify-between p-6 bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800">
+                          <p class="text-[10px] font-black text-slate-400 mb-10 uppercase tracking-widest">Temporal storage for deleted assets</p>
+                          <div class="space-y-4">
+                               <div v-for="t in recycleBin" :key="t.id" class="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                                    <div>
-                                       <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ t.title }}</h4>
-                                       <p class="text-[10px] font-black text-slate-400 uppercase mt-1 tracking-wider">Archived Task</p>
+                                       <h4 class="text-[15px] font-bold text-slate-900 dark:text-white">{{ t.title }}</h4>
+                                       <p class="text-[10px] text-slate-400 uppercase font-black mt-1">Archived: {{ new Date(t.deletedAt).toLocaleDateString() }}</p>
                                    </div>
                                    <div class="flex space-x-6">
-                                      <button @click="restoreTask(t)" class="text-[10px] font-black uppercase tracking-widest text-brand hover:brightness-110">Restore</button>
-                                      <button @click="permanentDelete(t)" class="text-[10px] font-black uppercase tracking-widest text-rose-500 hover:brightness-110">Purge</button>
+                                      <button @click="restoreTask(t)" class="text-[10px] font-black uppercase text-brand tracking-widest hover:brightness-110">Restore</button>
+                                      <button @click="permanentDelete(t)" class="text-[10px] font-black uppercase text-rose-500 tracking-widest hover:brightness-110">Purge</button>
                                    </div>
                                </div>
-                               <div v-if="recycleBin.length === 0" class="text-xs font-black text-slate-400 text-center py-24 uppercase tracking-widest italic">Archive Empty</div>
+                               <div v-if="recycleBin.length === 0" class="text-sm font-bold text-slate-400 text-center py-20 opacity-30 italic">Repository Clear</div>
                           </div>
                       </div>
                   </main>
@@ -454,55 +480,49 @@
         </main>
     </div>
 
-    <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 transition-opacity"></div>
-    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200/50 dark:border-slate-800/50">
+    <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 transition-opacity"></div>
+    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200 dark:border-slate-800">
         <div v-if="editingTask" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-            <div class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
-              <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-md text-slate-500">{{ editingTask.company }}</span>
-              <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-rose-500 transition">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
+            <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg" :class="editingTask.company === 'Dymek' ? 'text-blue-600 bg-blue-50' : editingTask.company === 'GigaScan' ? 'text-purple-600 bg-purple-50' : 'text-orange-600 bg-orange-50'">{{ editingTask.company }}</span>
+                <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-rose-500 transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
             <div class="p-8 space-y-8 flex-1">
-                <textarea v-model="editingTask.title" class="text-2xl font-display font-extrabold text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-tight" rows="3" placeholder="Task Title..."></textarea>
-                <div class="grid grid-cols-2 gap-6 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800">
-                    <div>
+                <textarea v-model="editingTask.title" class="text-2xl font-display font-extrabold text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-tight" rows="3" placeholder="Objective title..."></textarea>
+                <div class="grid grid-cols-2 gap-6 p-6 bg-slate-50/50 dark:bg-slate-800/40 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                    <div class="col-span-1">
                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Status</label>
-                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
+                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs font-bold dark:text-white py-1 outline-none">
                             <option v-for="c in columns" :value="c.id">{{ c.title }}</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Owner</label>
-                        <input type="text" v-model="editingTask.assignee" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
+                    <div class="col-span-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Assignee</label>
+                        <input type="text" v-model="editingTask.assignee" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs font-bold dark:text-white py-1 outline-none">
+                    </div>
+                    <div class="col-span-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Priority</label>
+                        <select v-model="editingTask.priority" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs font-bold dark:text-white py-1 outline-none">
+                            <option>Urgent</option><option>High</option><option>Normal</option><option>Low</option>
+                        </select>
+                    </div>
+                    <div class="col-span-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Due Date</label>
+                        <input type="date" v-model="editingTask.dueDate" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs font-bold dark:text-white py-1 outline-none">
                     </div>
                 </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-900 dark:text-slate-300 uppercase tracking-widest mb-4 block">Action Strategy</label>
+                    <textarea v-model="editingTask.action" class="w-full border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl p-4 text-sm font-medium h-32 outline-none focus:border-brand transition-all dark:text-white" placeholder="Next operational steps..."></textarea>
+                </div>
             </div>
-            <div class="p-8 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-[10px] font-black text-rose-500 uppercase tracking-widest">Delete</button>
-                <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all hover:scale-105">Commit Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-start justify-center pt-[15vh] px-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
-            <div class="p-6 border-b border-slate-50 dark:border-slate-800 flex items-center">
-               <svg class="w-6 h-6 text-brand mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="Command Terminal..." class="w-full bg-transparent text-xl font-display font-extrabold text-slate-900 dark:text-white outline-none placeholder-slate-300 uppercase tracking-widest" autofocus>
-            </div>
-            <div class="max-h-[420px] overflow-y-auto p-4 custom-scrollbar">
-               <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl cursor-pointer flex items-center group transition">
-                  <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-5 text-slate-500 group-hover:bg-brand group-hover:text-white transition shadow-sm font-bold">{{ cmd.icon }}</div>
-                  <div>
-                      <p class="text-sm font-bold text-slate-900 dark:text-slate-100 transition tracking-wide uppercase">{{ cmd.title }}</p>
-                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ cmd.desc }}</p>
-                  </div>
-              </div>
+            <div class="p-8 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <button v-if="!editingTask.isNew" @click="deleteTask" class="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:brightness-110">Purge Task</button>
+                <div v-else></div>
+                <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-10 py-3 rounded-xl font-black text-xs shadow-lg uppercase tracking-[0.1em] hover:scale-105 transition-all">Save Changes</button>
             </div>
         </div>
     </div>
-
 </div>
 
 <script>
@@ -512,6 +532,7 @@ createApp({
     setup() {
         const activeTab = ref('All');
         const viewMode = ref('kanban');
+        const zenMode = ref(false);
         const editingTask = ref(null);
         const isDarkMode = ref(false);
         const showNotifications = ref(false);
@@ -534,206 +555,99 @@ createApp({
         const isVoraSpeaking = ref(false);
         const siriTranscript = ref('');
         const pendingVoiceTask = ref(null);
+        let siriRecog = null;
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
-        const matrixQuadrants = [
-            { id: 'q1', name: 'Quick Wins', impact: 'High', effort: ['Low', 'Medium'] },
-            { id: 'q2', name: 'Major Projects', impact: 'High', effort: ['High'] },
-            { id: 'q3', name: 'Fill-Ins', impact: ['Low', 'Medium'], effort: ['Low', 'Medium'] },
-            { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
-        ];
+        const matrixQuadrants = [{id:'q1', name:'Quick Wins', impact:'High', effort:['Low','Medium']}, {id:'q2', name:'Major Projects', impact:'High', effort:['High']}, {id:'q3', name:'Fill-Ins', impact:['Low','Medium'], effort:['Low','Medium']}, {id:'q4', name:'Re-evaluate', impact:['Low','Medium'], effort:['High']}];
 
-        const timeGreeting = computed(() => {
-            const hr = new Date().getHours();
-            if (hr < 12) return 'Good morning';
-            if (hr < 17) return 'Good afternoon';
-            return 'Good evening';
-        });
-
-        const commitState = () => {
-            if (historyIndex.value < history.value.length - 1) {
-              history.value = history.value.slice(0, historyIndex.value + 1);
-            }
-            history.value.push(JSON.stringify(tasks.value));
-            if (history.value.length > 50) history.value.shift();
-            else historyIndex.value = history.value.length - 1;
-        };
-
+        const timeGreeting = computed(() => { const hr = new Date().getHours(); if (hr < 12) return 'Good morning'; if (hr < 17) return 'Good afternoon'; return 'Good evening'; });
+        const commitState = () => { if (historyIndex.value < history.value.length - 1) { history.value = history.value.slice(0, historyIndex.value + 1); } history.value.push(JSON.stringify(tasks.value)); if (history.value.length > 50) history.value.shift(); else historyIndex.value = history.value.length - 1; };
         const canUndo = computed(() => historyIndex.value > 0);
         const canRedo = computed(() => historyIndex.value < history.value.length - 1);
-
-        const undo = () => {
-            if (canUndo.value) {
-              historyIndex.value--;
-              tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-              localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-              nextTick(initSortable);
-            }
-        };
-
-        const redo = () => {
-            if (canRedo.value) {
-              historyIndex.value++;
-              tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-              localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-              nextTick(initSortable);
-            }
-        };
-
+        const undo = () => { if (canUndo.value) { historyIndex.value--; tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); nextTick(initSortable); } };
+        const redo = () => { if (canRedo.value) { historyIndex.value++; tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); nextTick(initSortable); } };
         const filteredTasks = (id) => tasks.value.filter(t => t.status === id && (activeTab.value === 'All' || t.company === activeTab.value));
         const getTaskCount = (id) => filteredTasks(id).length;
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
         const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
         const wipCount = computed(() => getTaskCount('progress'));
-        
-        const completionPercentage = computed(() => {
-            const total = tasks.value.filter(t => activeTab.value === 'All' || t.company === activeTab.value).length;
-            if (total === 0) return 0;
-            return Math.round((completedTasks.value.length / total) * 100);
-        });
-
-        const atRiskTasks = computed(() => {
-            return tasks.value.filter(t => t.status === 'waiting' && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value));
-        });
-
-        const assignees = computed(() => {
-            const uniqueAssignees = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))];
-            return uniqueAssignees.map(name => ({ id: name, title: name }));
-        });
-        const getResourceTasks = (assigneeId) => {
-            return tasks.value.filter(t => (t.assignee === assigneeId || (!t.assignee && assigneeId === 'Unassigned')) && (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed');
-        };
-
-        const smartNotifications = computed(() => {
-            return tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting');
-        });
-
+        const completionPercentage = computed(() => { const total = tasks.value.filter(t => activeTab.value === 'All' || t.company === activeTab.value).length; if (total === 0) return 0; return Math.round((completedTasks.value.length / total) * 100); });
+        const avgCycleTime = computed(() => { const completed = tasks.value.filter(t => t.status === 'completed'); if (completed.length === 0) return 0; const now = Date.now(); const totalDays = completed.reduce((acc, t) => { const created = t.id; const diff = (t.lastUpdated || now) - created; return acc + (diff / (1000 * 60 * 60 * 24)); }, 0); return (totalDays / completed.length).toFixed(1); });
+        const atRiskTasks = computed(() => tasks.value.filter(t => t.status === 'waiting' && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value)));
+        const assignees = computed(() => { const uniqueAssignees = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))]; return uniqueAssignees.map(name => ({ id: name, title: name })); });
+        const getResourceTasks = (assigneeId) => tasks.value.filter(t => (t.assignee === assigneeId || (!t.assignee && assigneeId === 'Unassigned')) && (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed');
+        const smartNotifications = computed(() => tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting'));
         const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
+        const getMatrixTasks = (quad) => tasks.value.filter(t => { if (activeTab.value !== 'All' && t.company !== activeTab.value) return false; if (t.status === 'completed') return false; const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact; const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort; return impactMatch && effortMatch; });
+        const getWorkload = (company) => { const companyTasks = tasks.value.filter(t => t.company === company && t.status !== 'completed'); const highEffortCount = companyTasks.filter(t => t.effort === 'High').length; const percentage = companyTasks.length > 0 ? Math.round((highEffortCount / companyTasks.length) * 100) : 0; return { count: highEffortCount, percentage: percentage }; };
+        const toggleDarkMode = () => { isDarkMode.value = !isDarkMode.value; document.documentElement.classList.toggle('dark', isDarkMode.value); localStorage.setItem('fitma_dark_mode', isDarkMode.value); };
+        const parseMarkdown = (text) => { if (!text) return ''; if (text.trim().startsWith('<div')) return text; return marked.parse(text); };
         
-        const getMatrixTasks = (quad) => {
-            return tasks.value.filter(t => {
-                if (activeTab.value !== 'All' && t.company !== activeTab.value) return false;
-                if (t.status === 'completed') return false;
-                const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact;
-                const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort;
-                return impactMatch && effortMatch;
-            });
-        };
-
-        const getWorkload = (company) => {
-            const companyTasks = tasks.value.filter(t => t.company === company && t.status !== 'completed');
-            const highEffortCount = companyTasks.filter(t => t.effort === 'High').length;
-            const percentage = companyTasks.length > 0 ? Math.round((highEffortCount / companyTasks.length) * 100) : 0;
-            return { count: highEffortCount, percentage: percentage };
-        };
-
-        const toggleDarkMode = () => {
-          isDarkMode.value = !isDarkMode.value;
-          document.documentElement.classList.toggle('dark', isDarkMode.value);
-          localStorage.setItem('fitma_dark_mode', isDarkMode.value);
-        };
-
-        const parseMarkdown = (text) => {
-            if (!text) return '';
-            if (text.trim().startsWith('<div')) return text;
-            return marked.parse(text);
-        };
-
         const commands = computed(() => [
-            { title: 'Create Task', desc: 'Add new portfolio item', icon: '➕', action: () => addTask('notstarted') },
-            { title: 'Toggle Theme', desc: 'Light / Dark mode', icon: '🌓', action: toggleDarkMode },
-            { title: 'Dashboard', desc: 'Kanban view', icon: '📊', action: () => { viewMode.value = 'kanban'; activeTab.value = 'All'; } },
-            { title: 'Matrix', desc: 'Impact analysis', icon: '📐', action: () => { viewMode.value = 'matrix'; } }
+            { title: 'Create New Task', desc: 'Add operational asset', icon: '➕', action: () => addTask('notstarted') },
+            { title: 'Theme Toggle', desc: 'Luminance adjustment', icon: '🌓', action: toggleDarkMode },
+            { title: 'Portfolio Dashboard', desc: 'High-level overview', icon: '📊', action: () => { viewMode.value = 'kanban'; activeTab.value = 'All'; } },
+            { title: 'Timeline Schedule', desc: 'Time-bound analysis', icon: '📅', action: () => { viewMode.value = 'timeline'; } }
         ]);
 
-        const filteredCommands = computed(() => {
-          if(!cmdSearch.value) return commands.value;
-            return commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()) || c.desc.toLowerCase().includes(cmdSearch.value.toLowerCase()));
-        });
-
+        const filteredCommands = computed(() => !cmdSearch.value ? commands.value : commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()) || c.desc.toLowerCase().includes(cmdSearch.value.toLowerCase())));
         const executeCommand = (cmd) => { cmd.action(); showCommandPalette.value = false; cmdSearch.value = ''; };
-
         const triggerFileUpload = (type) => { fileUploadType.value = type; showFileMenu.value = false; let el = document.getElementById('file-upload'); el.accept = type === 'image' ? "image/*" : ".pdf,.doc,.docx,.txt"; el.click(); };
-
-        const handleFileChange = (e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              attachedFile.value = { name: e.target.files[0].name, file: e.target.files[0], type: fileUploadType.value };
-            }
-        };
+        const handleFileChange = (e) => { if (e.target.files && e.target.files.length > 0) attachedFile.value = { name: e.target.files[0].name, file: e.target.files[0], type: fileUploadType.value }; };
         const removeFile = () => { attachedFile.value = null; document.getElementById('file-upload').value = ''; };
-
-        const toggleSpeechRecognition = () => {
-            if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; }
-            speechRecog = new webkitSpeechRecognition();
-            speechRecog.onstart = () => { isListening.value = true; };
-            speechRecog.onresult = (e) => { aiInput.value += e.results[0][0].transcript; };
-            speechRecog.onend = () => { isListening.value = false; };
-            speechRecog.start();
-        };
-
+        const toggleSpeechRecognition = () => { if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; } speechRecog = new webkitSpeechRecognition(); speechRecog.onstart = () => { isListening.value = true; }; speechRecog.onresult = (e) => { aiInput.value += e.results[0][0].transcript; }; speechRecog.onend = () => { isListening.value = false; }; speechRecog.start(); };
         const scrollToBottom = () => { nextTick(() => { if (chatScrollContainer.value) chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; }); };
-        const clearChat = () => { if(confirm("Clear history?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
-
-        const filterAdMessage = (text) => {
-            return text.replace(/--- \*\*Support Pollinations\.AI:\*\* ---[\s\S]*?accessible for everyone\./gi, '').trim();
-        };
+        const clearChat = () => { if(confirm("Clear conversation history?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
 
         const _parseAiResponse = async (res) => {
             let text = await res.text();
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
-            return filterAdMessage(text);
+            // STRICT FILTER: Remove Pollinations AI ads/footers
+            text = text.replace(/--- \*\*Support Pollinations\.AI:\*\* ---[\s\S]*kofi\)/gi, '').trim();
+            text = text.replace(/Powered by Pollinations\.AI/gi, '').trim();
+            return text;
         };
 
         const generateBrief = async () => {
-          aiStatus.value = "Auditing Portfolios...";
+          aiStatus.value = "Auditing assets...";
           const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-          const prompt = `You are Vora. Create a Morning Brief. Exactly 3 colorful HTML cards. 3-5 lines each. End with 4 lines of motivation. Data: \n${snapshot}`;
-          chatHistory.value.push({ role: 'user', content: "Request Brief." }); scrollToBottom();
+          const prompt = `You are Vora. Create a Morning Brief. Exactly 3 HTML cards (use styles like: bg-rose-50 border-rose-100 for high priority, bg-sky-50 for progress, etc). 3-5 lines per card. End with 4 lines of motivation. DATA:\n${snapshot}`;
+          chatHistory.value.push({ role: 'user', content: "Requesting Portfolio Brief." }); scrollToBottom();
           try {
               const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
               const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-          } catch (e) { chatHistory.value.push({ role: 'ai', content: "System audit failed." }); }
+          } catch (e) { chatHistory.value.push({ role: 'ai', content: "Quantum link failed." }); }
           finally { aiStatus.value = ''; }
         };
 
         const askAI = async () => {
             let query = aiInput.value.trim(); if (!query && !attachedFile.value) return;
             chatHistory.value.push({ role: 'user', content: query }); scrollToBottom();
-            isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Linking...";
+            isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Thinking...";
             try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora. End with 4 lines of motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, a kind and expert OS assistant. Use tables and markdown. Do NOT include Pollinations AI ads. End with 4 lines of motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-            } catch (err) { chatHistory.value.push({ role: 'ai', content: "Connection timeout." }); }
+            } catch (err) { chatHistory.value.push({ role: 'ai', content: "Processing error." }); }
             finally { isThinking.value = false; aiStatus.value = ''; }
         };
 
-        const schemaEnhance = (t) => {
-            const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t };
-            base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
-            return base;
-        };
-
+        const schemaEnhance = (t) => { const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t }; base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : []; return base; };
         const getCompletedSubtasks = (t) => t.subtasks?.filter(s => s.done).length || 0;
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        const saveTask = () => { 
-            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); } 
-            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; } 
-            editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); 
-        };
-        const deleteTask = () => { if(confirm("Archive?")) { const taskToDel = tasks.value.find(t => t.id === editingTask.value.id); if (taskToDel) { recycleBin.value.push(taskToDel); } tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } };
-        const restoreTask = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); tasks.value.push(task); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); nextTick(initSortable); };
-        const permanentDelete = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); };
-
+        const saveTask = () => { if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); } else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; } editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); };
+        const deleteTask = () => { if(confirm("Confirm deletion?")) { const tToDel = tasks.value.find(t => t.id === editingTask.value.id); if (tToDel) { tToDel.deletedAt = Date.now(); recycleBin.value.push(tToDel); } tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } };
+        const restoreTask = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); delete task.deletedAt; tasks.value.push(task); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); nextTick(initSortable); };
+        const permanentDelete = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value)); };
         const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
 
         onMounted(() => {
@@ -745,11 +659,11 @@ createApp({
             tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [].map(schemaEnhance);
             commitState();
             nextTick(initSortable);
-            window.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; } });
+            window.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; } });
         });
 
         return {
-            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType, showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting, aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat, attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition, siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown, getWorkload, generateBrief, atRiskTasks, assignees, getResourceTasks
+            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType, showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting, aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat, attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition, siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, undo, redo, canUndo, canRedo, restoreTask, permanentDelete, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown, getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
         };
     }
 }).mount('#app');
