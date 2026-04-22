@@ -905,7 +905,7 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: true })
+                  body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'openai', jsonMode: true })
                 });
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
@@ -1052,7 +1052,7 @@ createApp({
               const res = await fetch('https://text.pollinations.ai/', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Date.now(), model: 'openai' })
+                body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'openai' })
               });
               const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
@@ -1092,7 +1092,7 @@ createApp({
                 const res = await fetch('https://text.pollinations.ai/', {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Date.now(), model: 'openai' })
+                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random() * 1000000), model: 'openai' })
                 });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
