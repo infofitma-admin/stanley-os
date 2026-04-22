@@ -625,7 +625,6 @@ createApp({
         const siriTranscript = ref('');
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
-        let siriSilenceTimer = null; // Used for continuous auto-stop
         
         // Undo/Redo State
         const history = ref([]);
@@ -812,82 +811,72 @@ createApp({
             window.speechSynthesis.speak(utterance);
         };
 
-        // Deep Listening Logic (Continuous Mode + Auto Stop)
+        // CONTINUOUS LISTENING ENGINE
         const startSiriListening = () => {
-            if (!('webkitSpeechRecognition' in window)) {
-                alert("Voice input not supported in your browser. Please use Chrome or Edge.");
-                return;
-            }
+            if (!('webkitSpeechRecognition' in window)) return;
             if (siriRecog) siriRecog.stop();
             
             siriRecog = new webkitSpeechRecognition();
-            siriRecog.continuous = true; // CHANGED to handle rambling/pauses
+            siriRecog.continuous = true; // CHANGED: Allows long, continuous explanations without cutting off
             siriRecog.interimResults = true;
+            
+            let finalTranscript = ''; // Stores the ongoing long transcript
             
             siriRecog.onstart = () => { 
                 siriListening.value = true; 
-                siriTranscript.value = 'Listening... (Explain fully, tap again when done)'; 
+                siriTranscript.value = 'I am listening... Tap orb when done.'; 
             };
             
             siriRecog.onresult = (e) => {
-                let finalT = '';
-                let interimT = '';
+                let interimTranscript = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
-                    else interimT += e.results[i][0].transcript;
+                    if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+                    else interimTranscript += e.results[i][0].transcript;
                 }
-
-                // 1. Phonetic Correction for Vora
-                let rawText = finalT || interimT;
-                let correctedText = rawText.replace(/\b(bora|flora|laura|dora|zora|korra|for a|vo ra)\b/gi, 'Vora');
-                
-                siriTranscript.value = correctedText;
-
-                // Auto-stop after 4 seconds of silence
-                clearTimeout(siriSilenceTimer);
-                siriSilenceTimer = setTimeout(() => {
-                    if(siriListening.value) siriRecog.stop();
-                }, 4000);
+                if (finalTranscript || interimTranscript) {
+                    siriTranscript.value = finalTranscript + interimTranscript;
+                }
             };
-
+            
             siriRecog.onerror = (e) => { 
+                if (e.error === 'no-speech') return; // Ignore long pauses, keep listening
                 siriListening.value = false; 
                 siriProcessing.value = false; 
-                clearTimeout(siriSilenceTimer);
-                if(e.error === 'not-allowed') alert("Microphone access was denied.");
             };
-
+            
             siriRecog.onend = async () => { 
                 siriListening.value = false;
-                clearTimeout(siriSilenceTimer);
-                if(siriTranscript.value && siriTranscript.value !== 'Listening... (Explain fully, tap again when done)') {
+                const captureText = siriTranscript.value.trim();
+                // Only process if they actually spoke
+                if(captureText && captureText !== 'I am listening... Tap orb when done.') {
                     siriProcessing.value = true;
-                    await processSiriCommand(siriTranscript.value);
+                    await processSiriCommand(captureText);
                     siriProcessing.value = false;
                 }
             };
             siriRecog.start();
         };
 
-        // Siri Intent Parsing (Chat vs Task + Filter Rambling)
         const processSiriCommand = async (text) => {
-             const lowerText = text.toLowerCase().trim();
+             // 1. Fix speech-to-text mishearing the wake word locally BEFORE sending to AI
+             let cleanText = text.replace(/\b(bora|laura|flora|zora|fora|kora|sarah)\b/gi, 'Vora');
+             const lowerText = cleanText.toLowerCase().trim();
              
+             // 2. Quick local conversational loop
              if(lowerText === 'hi vora' || lowerText === 'hey vora' || lowerText === 'hello vora') {
                  siriTranscript.value = '';
-                 speakText("Hi Stanley, how can I help you today?", () => {
-                     startSiriListening();
+                 speakText("Hi Stanley. Take your time, explain the task, and tap my orb when you are finished.", () => {
+                     startSiriListening(); 
                  });
                  return;
              }
 
-             // 3. Smart Extraction Prompting
-             const prompt = `Analyze this detailed voice transcript from Stanley: "${text}". 
-             Stanley often explains a lot of context. Filter out the rambling and extract the core actionable intent.
-             Determine if he is trying to add/create a project task OR if he is just chatting/asking a question.
+             // 3. Smart AI Engine for Long, Messy Transcripts
+             const prompt = `You are Vora, an intelligent assistant. Analyze this voice command from Stanley: "${cleanText}". 
+             He might explain a task in detail with a long rambling sentence, multiple steps, filler words, or just be chatting.
              Return ONLY valid JSON with no markdown formatting.
              If it's a general question/chat, return: {"intent": "chat", "response": "Your helpful, conversational reply as Vora."}
-             If he is adding a task, return: {"intent": "task", "title": "A concise summary of the actual task to be done (ignoring background story)", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"High"|"Normal"|"Low", "status": "notstarted"|"progress"|"waiting"|"brainstorm", "assignee": "extracted name or Unassigned"}`;
+             If he is describing a task, extract the core meaning and return: {"intent": "task", "title": "Create a clear, concise task title summarizing his long explanation", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"High"|"Normal"|"Low", "status": "notstarted"|"progress"|"waiting"|"brainstorm", "assignee": "extracted name or Unassigned"}`;
              
              try {
                 const res = await fetch('https://text.pollinations.ai/', {
@@ -901,15 +890,17 @@ createApp({
                 siriTranscript.value = '';
 
                 if (data.intent === 'chat') {
-                    chatHistory.value.push({ role: 'user', content: text });
+                    // Chat Mode
+                    chatHistory.value.push({ role: 'user', content: cleanText });
                     chatHistory.value.push({ role: 'ai', content: data.response });
                     scrollToBottom();
                     speakText(data.response, () => {
-                        startSiriListening();
+                        startSiriListening(); // Loop back to listening after she speaks
                     });
                 } else {
+                    // Task Capture Mode
                     pendingVoiceTask.value = {
-                        title: data.title || text,
+                        title: data.title || cleanText, // Fallback to raw text if title generation fails
                         company: data.company || 'Dymek',
                         priority: data.priority || 'Normal',
                         status: data.status || 'notstarted',
@@ -919,12 +910,23 @@ createApp({
                 }
              } catch(e) {
                  console.error("Failed to parse Voice Command", e);
-                 speakText("I'm sorry Stanley, I didn't quite catch that. Could you say it again?", () => {
+                 speakText("I'm sorry Stanley, I didn't quite catch that. Could you try again?", () => {
                      startSiriListening();
                  });
              }
         };
 
+        const toggleSiriCapture = () => {
+            // If anything is running (listening or speaking), stop it entirely to reset or process
+            if (siriListening.value || isVoraSpeaking.value) {
+                if (siriRecog) siriRecog.stop(); // Triggers the onend process
+                window.speechSynthesis.cancel();
+                isVoraSpeaking.value = false;
+                return;
+            }
+            startSiriListening();
+        };
+ 
         const confirmVoiceTask = () => {
             if (!pendingVoiceTask.value) return;
             tasks.value.push(schemaEnhance({
@@ -936,19 +938,6 @@ createApp({
             pendingVoiceTask.value = null;
         };
 
-        const toggleSiriCapture = () => {
-            if (siriListening.value || isVoraSpeaking.value) {
-                if (siriRecog) siriRecog.stop();
-                window.speechSynthesis.cancel();
-                clearTimeout(siriSilenceTimer);
-                siriListening.value = false;
-                isVoraSpeaking.value = false;
-                siriTranscript.value = '';
-                return;
-            }
-            startSiriListening();
-        };
- 
         const toggleSpeechRecognition = () => {
             if (isListening.value) {
                 if (speechRecog) speechRecog.stop();
