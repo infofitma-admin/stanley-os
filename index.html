@@ -860,7 +860,8 @@ createApp({
             if (siriRecog) siriRecog.stop();
             
             siriRecog = new webkitSpeechRecognition();
-           siriRecog.continuous = true;
+           // Changed to false so it auto-stops when the user stops talking (like Siri)
+           siriRecog.continuous = false;
            siriRecog.interimResults = true;
             
            siriRecog.onstart = () => { 
@@ -883,6 +884,14 @@ createApp({
             };
            siriRecog.onend = () => { 
                siriListening.value = false;
+               const finalTranscript = siriTranscript.value;
+               // Process only if we have real text and we aren't already processing
+               if (finalTranscript && finalTranscript !== 'I am listening...' && !siriProcessing.value) {
+                   siriProcessing.value = true;
+                   processSiriCommand(finalTranscript);
+               } else if (!siriProcessing.value) {
+                   siriTranscript.value = '';
+               }
             };
            siriRecog.start();
         };
@@ -906,7 +915,15 @@ createApp({
                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: true })
                 });
                 const responseText = await _parseAiResponse(res);
-                const data = JSON.parse(responseText);
+                
+                let data;
+                // Force extract JSON block if wrapped in markdown or extra text
+                let jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    data = JSON.parse(jsonMatch[0]);
+                } else {
+                    data = JSON.parse(responseText);
+                }
                 
                 if (data.intent === 'chat') {
                    chatHistory.value.push({ role: 'user', content: cleanedText });
@@ -946,20 +963,12 @@ createApp({
  
         const toggleSiriCapture = () => {
             if (siriListening.value || isVoraSpeaking.value) {
-                const finalTranscript = siriTranscript.value;
-                if (siriRecog) siriRecog.stop();
+               if (siriRecog) siriRecog.stop(); // This now properly triggers onend which auto-processes
                window.speechSynthesis.cancel();
-               siriListening.value = false;
                isVoraSpeaking.value = false;
-
-               if(finalTranscript && finalTranscript !== 'I am listening...') {
-                   siriProcessing.value = true;
-                   processSiriCommand(finalTranscript);
-                } else {
-                   siriTranscript.value = '';
-                }
                return;
             }
+            siriTranscript.value = '';
            startSiriListening();
         };
  
@@ -1012,39 +1021,51 @@ createApp({
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
+            
+            // Standard API JSON extraction
             try {
                 let parsed = JSON.parse(text);
-                // Priority extraction of 'content' field if it exists (DeepSeek/GPT-style)
-                if (parsed.content) text = parsed.content;
+                if (Array.isArray(parsed) && parsed.length > 0) parsed = parsed[0];
+                if (parsed.choices && parsed.choices[0]?.message?.content) text = parsed.choices[0].message.content;
                 else if (parsed.message?.content) text = parsed.message.content;
-                else if (parsed.choices && parsed.choices[0]?.message?.content) text = parsed.choices[0].message.content;
-                else if (Array.isArray(parsed) && parsed.length > 0) {
-                   text = parsed[0].content || parsed[0].message?.content || text;
-                }
+                else if (parsed.content) text = parsed.content;
+                else if (parsed.response) text = parsed.response;
             } catch(e) {}
             
-            // Aggressive cleaning of reasoning tags and technical headers
+            // Heavy-duty fix for broken/hallucinated JSON strings returned as literal text
+            if (typeof text === 'string' && text.trim().startsWith('{"role"')) {
+                try {
+                    let doubleParsed = JSON.parse(text);
+                    if (doubleParsed.content) text = doubleParsed.content;
+                } catch(e) {
+                    // Manual extraction if JSON.parse fails due to unclosed string
+                    let match = text.match(/"content"\s*:\s*"([\s\S]*)"/);
+                    if (match) {
+                        text = match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                    }
+                }
+            }
+            
+            // Aggressive cleaning of reasoning tags and formatting blocks
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-            text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
-            text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/```html\n?/gi, '').replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim();
             return text;
         };
  
         const generateBrief = async () => {
            aiStatus.value = "Analyzing data...";
             const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-            const prompt = `You are Vora. Give Stanley a morning brief using colorful raw HTML Tailwind cards. 
+            const prompt = `You are Vora. Give Stanley a morning brief using ONLY colorful raw HTML Tailwind cards. 
             Backgrounds: bg-emerald-50, bg-blue-50, bg-amber-50, bg-rose-50.
             Each card: 3-5 line description with bullet points (max 2 lines per bullet).
             Output MUST end with exactly ONE supportive paragraph (4-5 sentences/lines) with no headings or titles.
-            Output ONLY raw HTML. Data: \n${snapshot}`;
+            CRITICAL: Output ONLY valid raw HTML code starting with <div... DO NOT output any JSON, markdown, or reasoning text. Data: \n${snapshot}`;
             
            chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
            scrollToBottom();
  
             try {
-                const res = await fetch('https://text.pollinations.ai/', {
+                const res = await fetch('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
                    method: 'POST',
                    headers: {'Content-Type': 'application/json'},
                    body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: false })
@@ -1078,7 +1099,7 @@ createApp({
            aiStatus.value = "Generating...";
             const systemPrompt = `You are Vora. Advisor to Stanley. Format: Tables, lists, bold. End with warm sentences (4-5 lines).`;
             try {
-                const res = await fetch('https://text.pollinations.ai/', {
+                const res = await fetch('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
                    method: 'POST',
                    headers: {'Content-Type': 'application/json'},
                    body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random()*1000), model: 'openai' })
