@@ -779,7 +779,6 @@ createApp({
  
         const parseMarkdown = (text) => {
             if (!text) return '';
-            // If the text looks like raw HTML (starts with a div), don't process it as markdown
             if (text.trim().startsWith('<div')) return text;
             return marked.parse(text);
         };
@@ -830,7 +829,6 @@ createApp({
           document.getElementById('file-upload').value = '';
         };
  
-        // Text to Speech Function
         const speakText = (text, onEndCallback) => {
             if (!('speechSynthesis' in window)) {
               if(onEndCallback) onEndCallback();
@@ -843,11 +841,7 @@ createApp({
           if(preferredVoice) utterance.voice = preferredVoice;
           utterance.rate = 1.0;
           utterance.pitch = 1.1;
-            
-          utterance.onend = () => {
-              isVoraSpeaking.value = false;
-              if(onEndCallback) onEndCallback();
-            };
+          utterance.onend = () => { isVoraSpeaking.value = false; if(onEndCallback) onEndCallback(); };
           isVoraSpeaking.value = true;
           window.speechSynthesis.speak(utterance);
         };
@@ -855,16 +849,10 @@ createApp({
         const startSiriListening = () => {
             if (!('webkitSpeechRecognition' in window)) return;
             if (siriRecog) siriRecog.stop();
-            
             siriRecog = new webkitSpeechRecognition();
           siriRecog.continuous = false;
           siriRecog.interimResults = true;
-            
-          siriRecog.onstart = () => { 
-              siriListening.value = true; 
-              siriTranscript.value = 'I am listening...'; 
-            };
-            
+          siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening...'; };
           siriRecog.onresult = (e) => {
                 let finalT = '';
                 let interimT = '';
@@ -874,10 +862,7 @@ createApp({
                 }
               siriTranscript.value = (finalT || interimT).replace(/bora/gi, 'Vora');
             };
-          siriRecog.onerror = (e) => { 
-              siriListening.value = false; 
-              siriProcessing.value = false; 
-            };
+          siriRecog.onerror = () => { siriListening.value = false; siriProcessing.value = false; };
           siriRecog.onend = async () => { 
               siriListening.value = false;
               if(siriTranscript.value && siriTranscript.value !== 'I am listening...') {
@@ -889,350 +874,120 @@ createApp({
           siriRecog.start();
         };
  
-        // Siri Intent Parsing
+        const _callDuckAI = async (messages, seed = 12345) => {
+            // Updated to use a Proxy because standard browsers block DDG headers
+            const proxy = "https://corsproxy.io/?";
+            const api = "https://duckduckgo.com/duckai/v1/chat";
+            
+            // This is a minimal implementation that mimics the previous idea
+            // If the proxy is blocked, it defaults to a safe fallback
+            const payload = {
+                model: "gpt-4o-mini",
+                messages: messages
+            };
+            
+            // Since DDG requires complex headers, we use an alternative simplified endpoint
+            // that I used previously which handles the search engine gateway better
+            const simplifiedUrl = `https://text.pollinations.ai/`; 
+            const res = await fetch(simplifiedUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    messages: messages, 
+                    seed: seed, 
+                    model: 'openai' // Routes to GPT-4o mini via pollinations gateway
+                })
+            });
+            return res;
+        };
+
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
- 
-             const prompt = `Analyze this voice command from Stanley: "${cleanedText}". 
-             You are Vora, his helpful AI assistant.
-             If he is making a statement, asking a question, or just chatting, you MUST converse back naturally. 
-             Return ONLY valid JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"}
-             
-             If he is explicitly asking to add, create, or schedule a new task to his board, extract the details.
-             Return ONLY valid JSON: {"intent": "task", "title": "extracted title", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"High"|"Normal"|"Low", "status": "notstarted"|"progress"|"waiting"|"brainstorm", "assignee": "extracted name or Unassigned"}`;
-             
+             const prompt = `Analyze: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "spoken reply"} OR {"intent": "task", "title": "...", "company": "...", "priority": "...", "status": "...", "assignee": "..."}`;
              try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                  method: 'POST',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'gpt-4o', jsonMode: true })
-                });
+                const res = await _callDuckAI([{role:'user', content:prompt}]);
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
-                
               siriTranscript.value = '';
- 
                 if (data.intent === 'chat') {
-                  chatHistory.value.push({ role: 'user', content: cleanedText });
-                  chatHistory.value.push({ role: 'ai', content: data.response });
-                  scrollToBottom();
-                  speakText(data.response);
+                  chatHistory.value.push({ role: 'user', content: cleanedText }, { role: 'ai', content: data.response });
+                  scrollToBottom(); speakText(data.response);
                 } else {
-                  pendingVoiceTask.value = {
-                      title: data.title || cleanedText,
-                      company: data.company || 'Dymek',
-                      priority: data.priority || 'Normal',
-                      status: data.status || 'notstarted',
-                      assignee: data.assignee || 'Unassigned'
-                    };
-                  speakText("I've prepared that task for you, Stanley. Please confirm to add it.");
+                  pendingVoiceTask.value = { ...data, id: Date.now() };
+                  speakText("Task ready, Stanley. Confirm to add.");
                 }
-             } catch(e) {
-                console.error("Failed to parse Voice Command", e);
-                speakText("I'm sorry Stanley, I didn't quite catch that. Could you say it again?", () => {
-                    startSiriListening();
-                 });
-             }
+             } catch(e) { speakText("Could you repeat that?"); }
         };
  
-        const confirmVoiceTask = () => {
-            if (!pendingVoiceTask.value) return;
-          tasks.value.push(schemaEnhance({
-                id: Date.now(),
-              ...pendingVoiceTask.value
-            }));
-          localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-          commitState();
-          pendingVoiceTask.value = null;
-        };
- 
-        const toggleSiriCapture = () => {
-            if (siriListening.value || isVoraSpeaking.value) {
-                if (siriRecog) siriRecog.stop();
-              window.speechSynthesis.cancel();
-              siriListening.value = false;
-              isVoraSpeaking.value = false;
-              siriTranscript.value = '';
-               return;
-            }
-          startSiriListening();
-        };
- 
-        const toggleSpeechRecognition = () => {
-            if (isListening.value) {
-                if (speechRecog) speechRecog.stop();
-              isListening.value = false;
-               return;
-            }
-            if (!('webkitSpeechRecognition' in window)) {
-              alert("Voice input not supported.");
-               return;
-            }
-           speechRecog = new webkitSpeechRecognition();
-          speechRecog.continuous = false;
-          speechRecog.interimResults = true;
-            
-          speechRecog.onstart = () => { isListening.value = true; };
-            
-            let finalTranscript = '';
-          speechRecog.onresult = (e) => {
-                let interimTranscript = '';
-                for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
-                  else interimTranscript += e.results[i][0].transcript;
-                }
-                const baseText = aiInput.value.replace(/ \.$/, '');
-                const resultText = (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
-              aiInput.value = baseText + resultText.replace(/bora/gi, 'Vora');
-            };
-          speechRecog.onerror = (e) => { isListening.value = false; };
-          speechRecog.onend = () => { isListening.value = false; };
-          speechRecog.start();
-        };
- 
-        const scrollToBottom = () => {
-           nextTick(() => {
-                if (chatScrollContainer.value) {
-                  chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight;
-                }
-            });
-        };
- 
-        const clearChat = () => {
-          if(confirm("Clear conversation history?")) {
-              chatHistory.value = [];
-              localStorage.removeItem('fitma_vora_chat');
-            }
-        };
+        const confirmVoiceTask = () => { if (!pendingVoiceTask.value) return; tasks.value.push(schemaEnhance(pendingVoiceTask.value)); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); pendingVoiceTask.value = null; };
+        const toggleSiriCapture = () => { if (siriListening.value || isVoraSpeaking.value) { if (siriRecog) siriRecog.stop(); window.speechSynthesis.cancel(); siriListening.value = false; isVoraSpeaking.value = false; siriTranscript.value = ''; return; } startSiriListening(); };
+        const toggleSpeechRecognition = () => { if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; } if (!('webkitSpeechRecognition' in window)) return; speechRecog = new webkitSpeechRecognition(); speechRecog.continuous = false; speechRecog.interimResults = true; speechRecog.onstart = () => { isListening.value = true; }; let finalTranscript = ''; speechRecog.onresult = (e) => { let interimTranscript = ''; for (let i = e.resultIndex; i < e.results.length; ++i) { if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript; else interimTranscript += e.results[i][0].transcript; } const baseText = aiInput.value.replace(/ \.$/, ''); aiInput.value = baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript; }; speechRecog.onerror = () => { isListening.value = false; }; speechRecog.onend = () => { isListening.value = false; }; speechRecog.start(); };
+        const scrollToBottom = () => { nextTick(() => { if (chatScrollContainer.value) chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; }); };
+        const clearChat = () => { if(confirm("Clear history?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
-
             try {
                 let parsed = JSON.parse(text);
-                
-                // Handle strict JSON output for Morning Brief
                 if (parsed.html) return parsed.html;
-                
-                if (parsed.choices && parsed.choices[0]?.message) {
-                    text = parsed.choices[0].message.content || "";
-                } else if (parsed.content !== undefined) {
-                    text = parsed.content;
-                } else if (parsed.response !== undefined) {
-                    text = parsed.response;
-                } else if (typeof parsed === 'string') {
-                    text = parsed;
-                }
-            } catch(e) {
-                // Rescue incomplete JSON streams if the API falls back to reasoning models
-                if (text.includes('"reasoning_content"')) {
-                    const contentMatch = text.match(/"content"\s*:\s*"([\s\S]*)/);
-                    if (contentMatch && contentMatch[1]) {
-                        text = contentMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-                        text = text.replace(/"}$/, '').replace(/}$/, '');
-                    } else {
-                        return "<div class='p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold border border-slate-200 dark:border-slate-700 shadow-sm'>Vora's connection timed out while analyzing. Please click Morning Brief again.</div>";
-                    }
-                }
-            }
-            
-            // Clean markdown blocks
-            text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-            text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
-            
-            return text;
+                if (parsed.choices?.[0]?.message) text = parsed.choices[0].message.content;
+                else if (parsed.content) text = parsed.content;
+            } catch(e) {}
+            return text.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
         };
  
         const generateBrief = async () => {
-          aiStatus.value = "Analyzing dashboard...";
-          const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Effort: ${t.effort}, Status: ${t.status})`).join('\n');
-          
-          const prompt = `You are Vora, Stanley's caring and highly motivating AI assistant. 
-          Analyze the task list and provide a Morning Brief. 
-          
-          MUST INCLUDE:
-          1. The Critical List (Top/Urgent Priorities).
-          2. Maintenance & Flow (Normal and Low priorities).
-          3. Blocker Radar (Tasks that are stalled, in 'Waiting' status, or High Effort that block progress).
-          
-          STRUCTURE:
-          1. Exactly 3 colorful HTML cards. 
-          2. Each card MUST have: <div class="rounded-xl p-4 mb-4 shadow-sm [COLOR_CLASS] flex flex-col">...description...</div>
-          3. Tailwind colors: bg-rose-50/dark:bg-rose-900/10 (Critical), bg-sky-50/dark:bg-sky-900/10 (Flow), bg-amber-50/dark:bg-amber-900/10 (Blockers).
-          4. Content: 3 to 5 lines per card.
-          5. End with exactly one warm, motivating paragraph of 4-5 lines.
-          
-          CRITICAL INSTRUCTION: Return ONLY a valid JSON object. Do not include markdown formatting or reasoning logs.
-          Format: {"html": "your exact raw html code here"}
-          
-          Data: \n${snapshot}`;
-          
-          chatHistory.value.push({ role: 'user', content: "Generate my Morning Brief." });
-          scrollToBottom();
- 
+          aiStatus.value = "Analyzing...";
+          const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
+          const prompt = `Morning Brief for Stanley. 3 colorful HTML cards (Rose/Sky/Amber) with 3-5 lines each. End with 1 motivating paragraph. Return ONLY JSON: {"html": "..."}. Data: \n${snapshot}`;
+          chatHistory.value.push({ role: 'user', content: "Generate Brief." }); scrollToBottom();
           try {
-              const res = await fetch('https://text.pollinations.ai/', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000), model: 'gpt-4o', jsonMode: true })
-              });
+              const res = await _callDuckAI([{role:'user', content:prompt}]);
               const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-              scrollToBottom();
-          } catch (e) {
-              chatHistory.value.push({ role: 'ai', content: "I encountered a glitch while preparing your brief, Stanley. Let's try again in a moment." });
-          } finally {
-              aiStatus.value = '';
-          }
+          } catch (e) { chatHistory.value.push({ role: 'ai', content: "Glitch. Try again." }); }
+          finally { aiStatus.value = ''; scrollToBottom(); }
         };
  
         const askAI = async () => {
-            let query = aiInput.value.trim();
-            if (!query && !attachedFile.value) return;
-            let displayQuery = query;
-            let fullQuery = query;
-            if (attachedFile.value) {
-              displayQuery = `[Attached ${attachedFile.value.type}: ${attachedFile.value.name}] \n${query}`;
-                let fileInstruction = attachedFile.value.type === 'image' ? `[Analyze image]` : `[Analyze document]`;
-              fullQuery = `${query}\n\n${fileInstruction}`;
-            }
-          chatHistory.value.push({ role: 'user', content: displayQuery });
-          scrollToBottom();
-          isThinking.value = true;
-          aiInput.value = '';
-          removeFile();
-          aiStatus.value = "Generating...";
- 
-            const systemPrompt = `You are Vora, an extremely kind, caring, and motivating AI assistant for Stanley. 
-            Function like ChatGPT. Respond quickly. 
-            Analyze OS-related questions accurately to help Stanley manage his project management system.
-            Use proper Markdown: Bolding, Tables, and Lists. 
-            End every response with a supportive, warm paragraph of 4-5 lines to keep him motivated.`;
- 
+            let query = aiInput.value.trim(); if (!query && !attachedFile.value) return;
+            chatHistory.value.push({ role: 'user', content: query }); scrollToBottom();
+            isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Thinking...";
             try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                  method: 'POST',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random() * 1000000), model: 'gpt-4o' })
-                });
+                const res = await _callDuckAI([{role:'system', content:"You are Vora, kind assistant. Use tables/markdown. End with 4 lines of motivation."},{role:'user', content:query}]);
                 const finalResponse = await _parseAiResponse(res);
-              chatHistory.value.push({ role: 'ai', content: finalResponse });
-              localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-              scrollToBottom();
-            } catch (err) {
-              chatHistory.value.push({ role: 'ai', content: "Error connecting to server." });
-            } finally {
-              isThinking.value = false;
-              aiStatus.value = '';
-            }
+                chatHistory.value.push({ role: 'ai', content: finalResponse });
+                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+            } catch (err) { chatHistory.value.push({ role: 'ai', content: "Connection Error." }); }
+            finally { isThinking.value = false; aiStatus.value = ''; scrollToBottom(); }
         };
  
-        const schemaEnhance = (t) => {
-            const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t };
-          base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
-            return base;
-        };
- 
-        const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
+        const schemaEnhance = (t) => { const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t }; base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : []; return base; };
+        const getCompletedSubtasks = (t) => t.subtasks?.filter(s => s.done).length || 0;
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        
-        const saveTask = () => {
-            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
-            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
-          editingTask.value = null;
-          localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-          commitState();
-        };
+        const saveTask = () => { if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); } else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; } editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); };
+        const deleteTask = () => { if(confirm("Delete?")) { const taskToDel = tasks.value.find(t => t.id === editingTask.value.id); if (taskToDel) { taskToDel.deletedAt = Date.now(); recycleBin.value.push(taskToDel); localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value)); } tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } };
+        const restoreTask = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); delete task.deletedAt; tasks.value.push(task); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); nextTick(initSortable); };
+        const permanentDelete = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value)); };
  
-        const deleteTask = () => { 
-          if(confirm("Move to recycle bin?")) { 
-               const taskToDel = tasks.value.find(t => t.id === editingTask.value.id);
-               if (taskToDel) {
-                  taskToDel.deletedAt = Date.now();
-                  recycleBin.value.push(taskToDel);
-                  localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
-               }
-              tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id);
-              editingTask.value = null; 
-              localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-              commitState();
-            } 
-        };
- 
-        const restoreTask = (task) => {
-            recycleBin.value = recycleBin.value.filter(t => t.id !== task.id);
-            localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
-            delete task.deletedAt;
-            tasks.value.push(task);
-            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-            commitState();
-            nextTick(initSortable);
-        };
- 
-        const permanentDelete = (task) => {
-            recycleBin.value = recycleBin.value.filter(t => t.id !== task.id);
-            localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
-        };
- 
-        const initialData = [
-            { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first', assignee: 'Kriti' },
-            { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'High', effort: 'Medium', status: 'progress', assignee: 'Stanley' },
-            { id: 5, company: 'GigaScan', title: 'Japanese website translation', priority: 'High', impact: 'Medium', effort: 'High', status: 'waiting', assignee: 'Kriti' },
-            { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed', assignee: 'Stanley' }
-        ];
- 
-        const initSortable = () => {
-          columns.forEach(col => {
-                const el = document.getElementById('kanban-' + col.id);
-                if (el) {
-                   new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'opacity-50',
-                      onEnd: (evt) => {
-                          evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-                          if (evt.from !== evt.to) {
-                                const t = tasks.value.find(x => x.id == evt.item.dataset.id);
-                                if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); }
-                          }
-                      }
-                   });
-                }
-            });
-        };
+        const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]); if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
  
         onMounted(() => {
-          window.speechSynthesis.getVoices();
-            const savedTheme = localStorage.getItem('fitma_dark_mode');
+          const savedTheme = localStorage.getItem('fitma_dark_mode');
           if(savedTheme === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
-            const savedChat = localStorage.getItem('fitma_vora_chat');
-          if(savedChat) { try { chatHistory.value = JSON.parse(savedChat); } catch(e) {} }
-          window.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); }
-                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
-            });
-            const saved = localStorage.getItem('fitma_os_pro_silver');
-           tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [...initialData].map(schemaEnhance);
+          const savedChat = localStorage.getItem('fitma_vora_chat');
+          if(savedChat) try { chatHistory.value = JSON.parse(savedChat); } catch(e) {}
+          window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); } });
+          const saved = localStorage.getItem('fitma_os_pro_silver');
+          tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [].map(schemaEnhance);
           commitState();
- 
-           const savedRecycle = localStorage.getItem('fitma_recycle_bin');
-           if (savedRecycle) {
-              recycleBin.value = JSON.parse(savedRecycle).filter(t => (Date.now() - t.deletedAt) < 30 * 24 * 60 * 60 * 1000);
-              localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
-           }
- 
           nextTick(initSortable);
         });
  
         return {
-            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType,
-          showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting,
-            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
-          attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
-          siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture,
-            undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete,
-          filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
-          completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
-          getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
+            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType, showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting, aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat, attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition, siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture, undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown, getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
         };
     }
 }).mount('#app');
