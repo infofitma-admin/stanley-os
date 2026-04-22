@@ -24,108 +24,144 @@
     <style>
         [v-cloak] { display: none; }
         body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100vh; width: 100vw; font-size: 16px; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .kanban-col { min-width: 320px; max-width: 320px; transition: all 0.3s ease; display: flex; flex-direction: column; max-height: 100%; }
         .card-list-scroll { flex-grow: 1; overflow-y: auto; overflow-x: hidden; min-height: 150px; padding: 12px; }
         .task-card { cursor: grab; border: 1px solid transparent; transition: all 0.2s ease; overflow-wrap: break-word; word-break: break-word; }
         .task-card:active { cursor: grabbing; }
-        .task-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #e2e8f0; }
-        .dark .task-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); border-color: #334155; }
-        .tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .tag-urgent { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
-        .tag-high { background: #fffbeb; color: #92400e; border: 1px solid #fef3c7; }
-        .tag-normal { background: #f5f3ff; color: #5b21b6; border: 1px solid #ede9fe; }
-        .tag-low { background: #f8fafc; color: #475569; border: 1px solid #f1f5f9; }
-        .dark .tag-urgent { background: #450a0a; color: #fecaca; border-color: #7f1d1d; }
-        .dark .tag-high { background: #451a03; color: #fde68a; border-color: #78350f; }
-        .dark .tag-normal { background: #2e1065; color: #ddd6fe; border-color: #4c1d95; }
-        .dark .tag-low { background: #0f172a; color: #94a3b8; border-color: #1e293b; }
-        .markdown-body { font-size: 15px; line-height: 1.6; color: inherit; }
-        .markdown-body strong { font-weight: 700; }
-        .markdown-body table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
-        .markdown-body th, .markdown-body td { border: 1px solid #e2e8f0; padding: 8px 12px; }
-        .dark .markdown-body th, .dark .markdown-body td { border-color: #334155; }
-        .markdown-body th { background-color: #f8fafc; }
-        .dark .markdown-body th { background-color: #1e293b; }
+        .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #94a3b8; }
+        .dark .task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.4); border-color: #64748b; }
+        .tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-urgent { background: #fee2e2; color: #b91c1c; }
+        .tag-high { background: #fef3c7; color: #b45309; }
+        .tag-normal { background: #e0e7ff; color: #4338ca; }
+        .tag-low { background: #f1f5f9; color: #475569; }
+        .dark .tag-urgent { background: #7f1d1d; color: #fca5a5; }
+        .dark .tag-high { background: #78350f; color: #fcd34d; }
+        .dark .tag-normal { background: #312e81; color: #a5b4fc; }
+        .dark .tag-low { background: #334155; color: #cbd5e1; }
+        .markdown-body { font-size: 16px; line-height: 1.6; color: inherit; }
+        .markdown-body p { margin-bottom: 0.8em; }
+        .markdown-body strong { font-weight: 700; color: #0f172a; }
+        .dark .markdown-body strong { color: #f8fafc !important; }
+        .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.8em; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; font-size: 14px; }
+        .markdown-body th, .markdown-body td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; }
+        .dark .markdown-body th, .dark .markdown-body td { border-color: #475569; }
+        .markdown-body th { background-color: #f8fafc; font-weight: bold; color: #0f172a; }
+        .dark .markdown-body th { background-color: #1e293b; color: #f8fafc; }
+        .dark .markdown-body { color: #f8fafc !important; }
+        .dark .markdown-body h1, .dark .markdown-body h2, .dark .markdown-body h3, .dark .markdown-body h4, .dark .markdown-body h5, .dark .markdown-body h6 { color: #ffffff !important; }
+        .dark .markdown-body p, .dark .markdown-body li, .dark .markdown-body span { color: #f1f5f9 !important; }
     </style>
 </head>
-<body class="bg-white text-slate-900 transition-colors duration-300">
+<body class="bg-slate-50 text-slate-900 transition-colors duration-300">
 
 <div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen w-full flex overflow-hidden">
-    <div class="flex w-full h-full dark:bg-[#0b0f1a] dark:text-slate-200 transition-colors duration-300 text-base">
+    <div class="flex w-full h-full dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 text-base">
         
-        <aside class="w-64 bg-slate-950 text-slate-400 flex flex-col flex-shrink-0 border-r border-slate-800 transition-all z-20 h-full">
-            <div class="h-16 flex items-center px-6 border-b border-white/5 flex-shrink-0">
-               <div class="w-6 h-6 bg-brand rounded flex items-center justify-center mr-3">
-                   <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 transition-all z-20 h-full">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800 flex-shrink-0">
+               <div class="w-6 h-6 bg-brand rounded flex items-center justify-center mr-3 shadow-lg shadow-brand/20">
+                   <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                </div>
-                <h1 class="text-sm font-bold text-white tracking-tight uppercase">Fitma <span class="font-normal opacity-40">System</span></h1>
+                <h1 class="text-base font-black text-white tracking-tight">Fitma <span class="font-normal opacity-50">| Stanley OS</span></h1>
             </div>
             
-            <div class="flex-1 overflow-y-auto py-6 px-3 space-y-8 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8 custom-scrollbar">
                 <div>
-                    <h2 class="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4 px-3">Intelligence</h2>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2">Views</h2>
                     <div class="space-y-1">
-                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-white/10 text-white shadow-sm' : 'hover:text-slate-200'" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg> Dashboard
+                        <button @click="viewMode = 'kanban'; activeTab = 'All'" :class="(viewMode==='kanban' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z" /></svg> Dashboard
                         </button>
-                        <button @click="viewMode = 'resources'" :class="viewMode==='resources' ? 'bg-white/10 text-white' : 'hover:text-slate-200'" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> Resources
+                        <button @click="viewMode = 'resources'; activeTab = 'All'" :class="(viewMode==='resources' && activeTab==='All') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> Resource Load
                         </button>
-                        <button @click="viewMode = 'risk'" :class="viewMode==='risk' ? 'bg-white/10 text-white' : 'hover:text-slate-200'" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all text-rose-400">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg> Risk Predictor
+                        <button @click="viewMode = 'risk'; activeTab = 'All'" :class="viewMode==='risk' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-rose-300 hover:text-rose-200">
+                            <svg class="w-4 h-4 mr-3 opacity-70 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Risk Predictor
                         </button>
-                        <button @click="viewMode = 'timeline'" :class="viewMode==='timeline' ? 'bg-white/10 text-white' : 'hover:text-slate-200'" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg> Timeline
+                        <button @click="viewMode = 'timeline'; activeTab = 'All'" :class="viewMode==='timeline' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> Timeline
+                        </button>
+                        <button @click="viewMode = 'matrix'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg> Impact Matrix
+                        </button>
+                        <button @click="viewMode = 'heatmap'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Heatmap
+                        </button>
+                        <button @click="viewMode = 'recycle'" :class="viewMode==='recycle' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-slate-400">
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Recycle Bin
                         </button>
                     </div>
                 </div>
 
                 <div>
-                    <h2 class="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4 px-3">Portfolios</h2>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                     <div class="space-y-1">
-                        <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-white/5 text-white border-l-2 border-brand' : 'hover:text-slate-200 border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-medium transition-all">
-                            <div class="w-1.5 h-1.5 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-400':tab==='GigaScan'?'bg-purple-400':'bg-orange-400'"></div>
+                        <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
+                            <div class="w-2.5 h-2.5 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-500':tab==='GigaScan'?'bg-purple-500':'bg-orange-500'"></div>
                             {{ tab }}
                         </button>
                     </div>
                 </div>
             </div>
             
-            <div class="p-4 border-t border-white/5 bg-black/20 flex-shrink-0">
+            <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex-shrink-0">
                <div class="flex items-center space-x-3">
-                   <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-emerald-400">
-                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                   <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center relative">
+                       <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                       <div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
                    </div>
-                   <div class="flex-grow overflow-hidden">
-                       <p class="text-[11px] font-bold text-white leading-none mb-1">Vora Assistant</p>
-                       <p class="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">System Active</p>
+                   <div>
+                       <p class="text-xs font-bold text-white">Vora AI</p>
+                       <p class="text-[10px] font-medium text-emerald-400">Online & Ready</p>
                    </div>
                </div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-[#0b0f1a] relative">
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
             
-            <header class="h-16 bg-white dark:bg-[#0b0f1a] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10">
-               <button @click="showCommandPalette = true" class="flex items-center px-3 py-1.5 bg-slate-100 dark:bg-slate-900 text-slate-500 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition">
-                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
-                   Search Command...
-                   <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-black rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">⌘K</span>
+            <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
+               <button @click="showCommandPalette = true" class="flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                   Search or jump to...
+                   <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase">Ctrl K</span>
                </button>
 
                <div class="flex items-center space-x-6">
-                   <div class="flex items-center space-x-1 border-r border-slate-200 dark:border-slate-800 pr-5">
-                       <button @click="undo" :disabled="!canUndo" class="p-1.5 text-slate-400 hover:text-slate-600 disabled:opacity-20"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg></button>
-                       <button @click="redo" :disabled="!canRedo" class="p-1.5 text-slate-400 hover:text-slate-600 disabled:opacity-20"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" /></svg></button>
+                   <div class="flex items-center space-x-1 border-r border-slate-200 dark:border-slate-700 pr-5 mr-1">
+                       <button @click="undo" :disabled="!canUndo" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Undo (Ctrl+Z)">
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                       </button>
+                       <button @click="redo" :disabled="!canRedo" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Redo (Ctrl+Y)">
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" /></svg>
+                       </button>
+                   </div>
+
+                   <div class="relative">
+                       <button @click="showNotifications = !showNotifications" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition relative">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                           <span v-if="smartNotifications.length > 0" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                       </button>
+                       
+                       <div v-if="showNotifications" class="absolute right-0 mt-3 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2">
+                           <h3 class="px-4 py-2 text-[10px] font-black uppercase text-slate-500 border-b border-slate-100 dark:border-slate-700">Notifications</h3>
+                           <div v-if="smartNotifications.length === 0" class="p-4 text-xs font-medium text-slate-500 text-center">No new notifications.</div>
+                           <button v-for="notif in smartNotifications" @click="openTask(notif); showNotifications = false" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b border-slate-50 dark:border-slate-700/50 last:border-0 block">
+                                <p class="text-[10px] font-bold text-red-500 mb-1 uppercase tracking-wider">Urgent Reminder</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{{ notif.title }}</p>
+                           </button>
+                       </div>
                    </div>
                     
-                   <button @click="toggleDarkMode" class="text-slate-400 hover:text-slate-600">
-                       <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
-                       <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+                   <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 dark:hover:text-amber-300 transition">
+                       <svg v-if="isDarkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                       <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                    </button>
                </div>
             </header>
@@ -134,56 +170,93 @@
                 
                <div class="flex gap-6 mb-8 max-w-[1600px] mx-auto">
                     
-                   <div class="flex-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col relative overflow-hidden h-[400px]">
-                       <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+                   <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col relative overflow-hidden h-[400px] transition-colors">
+                       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
                            <div class="flex items-center space-x-2">
-                                <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                                <div class="w-7 h-7 rounded-full bg-slate-800 dark:bg-slate-950 flex items-center justify-center shadow-sm">
+                                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
                                 </div>
-                                <span class="font-bold text-slate-800 dark:text-white tracking-tight">Vora Advisor</span>
+                                <span class="font-black text-slate-800 dark:text-white tracking-tight">Vora</span>
                            </div>
                            <div class="flex items-center space-x-3">
-                                <button @click="generateBrief" class="px-2 py-1 bg-brand text-white text-[10px] font-bold rounded hover:bg-emerald-600 shadow-sm flex items-center uppercase tracking-wider">
-                                    <svg class="w-3 h-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Morning Brief
+                                <button @click="generateBrief" class="px-3 py-1.5 bg-brand text-white text-[10px] font-bold rounded-md hover:bg-emerald-600 transition-colors shadow-sm flex items-center uppercase tracking-wider">
+                                    <svg class="w-3.5 h-3.5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Morning Brief
                                 </button>
-                                <button @click="clearChat" class="text-slate-400 hover:text-red-500 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg></button>
+                                <button @click="clearChat" class="text-slate-400 hover:text-red-500 transition-colors" title="Clear Conversation">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                                <div class="flex space-x-1 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-lg">
+                                    <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
+                                </div>
                            </div>
                        </div>
 
-                       <div class="flex-grow p-6 overflow-y-auto flex flex-col space-y-6 bg-white dark:bg-slate-900 relative custom-scrollbar" ref="chatScrollContainer">
-                           <div v-if="chatHistory.length === 0 && !aiStatus" class="m-auto text-center opacity-40 py-12">
-                                <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">{{ timeGreeting }}, Stanley.</h2>
-                                <p class="text-sm font-medium">Ready to coordinate your portfolio.</p>
-                           </div>
-
-                           <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.role === 'user' ? 'flex justify-end' : 'flex items-start space-x-4'">
-                                <div v-if="msg.role === 'ai'" class="w-8 h-8 rounded bg-slate-800 flex-shrink-0 flex items-center justify-center text-emerald-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                       <div class="flex-grow p-6 overflow-y-auto flex flex-col bg-white dark:bg-slate-800 relative custom-scrollbar" ref="chatScrollContainer">
+                           <div v-if="chatHistory.length === 0 && !aiStatus" class="m-auto text-center flex flex-col items-center justify-center opacity-80 pb-6">
+                                <div class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4">
+                                    <svg class="w-7 h-7 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
                                 </div>
-                                <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg px-4 py-3 text-sm max-w-[80%]' : 'markdown-body text-slate-700 dark:text-slate-300 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
+                                <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">{{ timeGreeting }}, Stanley.</h2>
+                                <p class="text-base font-medium text-slate-500 dark:text-slate-400">I am here to support you. How can I help today?</p>
                            </div>
 
-                           <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-500 font-bold text-[11px] uppercase tracking-widest px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg w-fit">
-                                <svg class="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                           <div class="flex flex-col space-y-8 w-full pb-2">
+                                <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.role === 'user' ? 'flex justify-end pl-12' : 'flex items-start space-x-4 pr-12'">
+                                    <div v-if="msg.role === 'ai'" class="w-9 h-9 rounded-full bg-slate-800 dark:bg-slate-950 flex-shrink-0 flex items-center justify-center shadow-sm mt-1">
+                                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                                   </div>
+                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-5 py-4 text-base whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
+                                </div>
+                           </div>
+
+                           <div v-if="aiStatus" class="flex items-center space-x-3 text-slate-600 dark:text-slate-300 font-bold text-sm p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl w-fit mt-4">
+                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 <span>{{ aiStatus }}</span>
                            </div>
                        </div>
 
-                       <div class="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0">
-                           <div class="relative flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-2 border border-transparent focus-within:border-brand/40 transition-all">
-                                <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Ask Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-900 dark:text-white outline-none px-2 placeholder-slate-400">
-                                <button @click="askAI" :disabled="isThinking || !aiInput.trim()" class="p-1.5 bg-slate-900 dark:bg-brand text-white hover:bg-slate-800 dark:hover:bg-emerald-400 disabled:opacity-30 transition rounded flex items-center justify-center">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" /></svg>
+                       <div class="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 relative flex flex-col">
+                           <div v-if="attachedFile" class="mb-4 self-start flex items-center bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-3 text-sm max-w-[240px] shadow-sm relative group">
+                                <div class="w-9 h-9 rounded bg-brand/20 flex items-center justify-center mr-4 text-brand">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <p class="truncate font-black text-slate-800 dark:text-slate-200 text-base">{{ attachedFile.name }}</p>
+                                    <p class="text-[10px] text-slate-500 uppercase tracking-widest">{{ attachedFile.type }}</p>
+                                </div>
+                                <button @click="removeFile" class="absolute -top-3 -right-3 bg-slate-800 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-500">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                           </div>
+
+                           <div class="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-2xl px-3 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-slate-400 dark:focus-within:border-slate-500 transition-all shadow-sm max-w-5xl mx-auto w-full">
+                                <input type="file" id="file-upload" class="hidden" @change="handleFileChange">
+                                <div class="relative">
+                                    <button @click="showFileMenu = !showFileMenu" class="p-2.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Attach Document or Image">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                   </button>
+                                    <div v-if="showFileMenu" class="absolute bottom-full left-0 mb-3 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col">
+                                       <button @click="triggerFileUpload('image')" class="text-sm font-black text-slate-700 dark:text-slate-200 p-4 hover:bg-slate-50 dark:hover:bg-slate-700 text-left border-b border-slate-100 dark:border-slate-700 flex items-center">📸 Add Image</button>
+                                       <button @click="triggerFileUpload('document')" class="text-sm font-black text-slate-700 dark:text-slate-200 p-4 hover:bg-slate-50 dark:hover:bg-slate-700 text-left flex items-center">📄 Add Document</button>
+                                    </div>
+                                </div>
+                                <input v-model="aiInput" @keyup.enter="askAI" :disabled="isThinking" placeholder="Message Vora..." class="flex-grow bg-transparent border-none focus:ring-0 text-base font-bold text-slate-900 dark:text-slate-100 outline-none px-4 placeholder-slate-500">
+                                <button @click="toggleSpeechRecognition" class="p-2.5 transition rounded-full mr-1 relative group" title="Voice Input">
+                                    <div v-if="isListening" class="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
+                                    <svg :class="isListening ? 'text-red-500 scale-110' : 'text-slate-500 group-hover:text-slate-800 dark:group-hover:text-slate-200'" class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                                </button>
+                                <button @click="askAI" :disabled="isThinking || (!aiInput.trim() && !attachedFile)" class="p-2.5 bg-slate-900 dark:bg-brand text-white hover:bg-slate-700 dark:hover:bg-emerald-400 disabled:opacity-50 transition rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" /></svg>
                                 </button>
                            </div>
                        </div>
                    </div>
 
-                   <div class="w-80 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 h-[400px] flex flex-col items-center justify-center shrink-0">
-                       <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-8 self-start">Velocity Analytics</h3>
+                   <div class="w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8 h-[400px] flex flex-col items-center justify-center transition-colors shrink-0">
+                       <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 self-start">Velocity Analytics</h3>
                        <div class="relative w-40 h-40 flex items-center justify-center mb-8">
                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <path class="text-slate-100 dark:text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="text-slate-100 dark:text-slate-700" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <path class="text-brand transition-all duration-1000 ease-out" stroke-width="3.5" :stroke-dasharray="completionPercentage + ', 100'" stroke="currentColor" fill="none" stroke-linecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                            </svg>
                            <div class="absolute flex flex-col items-center">
@@ -192,16 +265,16 @@
                            </div>
                        </div>
 
-                       <div class="w-full grid grid-cols-3 gap-2 border-t border-slate-100 dark:border-slate-800 pt-6">
+                       <div class="w-full grid grid-cols-3 gap-2 border-t border-slate-100 dark:border-slate-700 pt-6">
                            <div class="text-center">
                                 <p class="text-2xl font-black text-slate-900 dark:text-white">{{ completedTasks.length }}</p>
                                 <p class="text-[9px] font-bold text-slate-400 uppercase">Done</p>
                            </div>
-                           <div class="text-center border-l border-slate-100 dark:border-slate-800">
+                           <div class="text-center border-l border-slate-100 dark:border-slate-700">
                                 <p class="text-2xl font-black text-brand">{{ wipCount }}</p>
                                 <p class="text-[9px] font-bold text-slate-400 uppercase">WIP</p>
                            </div>
-                           <div class="text-center border-l border-slate-100 dark:border-slate-800">
+                           <div class="text-center border-l border-slate-100 dark:border-slate-700">
                                 <p class="text-2xl font-black text-amber-500">{{ avgCycleTime }}d</p>
                                 <p class="text-[9px] font-bold text-slate-400 uppercase">Cycle</p>
                            </div>
@@ -211,54 +284,104 @@
 
                <div class="max-w-[1600px] mx-auto pb-10">
                    <main v-show="viewMode === 'kanban'" class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
-                       <div v-for="col in columns" :key="col.id" class="bg-slate-200/40 dark:bg-slate-900/40 rounded-xl flex flex-col kanban-col shrink-0 border border-slate-200 dark:border-slate-800/50 h-[650px]">
-                           <div class="p-5 flex justify-between items-center border-b border-slate-200 dark:border-slate-800/50 shrink-0">
-                                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-widest">{{ col.title }}</h3>
-                                <span class="bg-white dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded text-[10px] font-black border border-slate-100 dark:border-slate-700">{{ getTaskCount(col.id) }}</span>
+                       <div v-for="col in columns" :key="col.id" class="bg-slate-200/50 dark:bg-slate-800/40 rounded-2xl flex flex-col kanban-col shrink-0 border border-slate-200 dark:border-slate-700/50 h-[650px]">
+                           <div class="p-5 flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 shrink-0">
+                                <h3 class="font-black text-slate-800 dark:text-slate-200 text-sm uppercase tracking-widest">{{ col.title }}</h3>
+                                <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm">{{ getTaskCount(col.id) }}</span>
                            </div>
                            <div :id="'kanban-' + col.id" class="card-list-scroll space-y-4 custom-scrollbar" :data-status="col.id">
-                                <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-900 rounded-lg p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+                                <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 transition-all">
                                     <div class="flex justify-between items-start mb-4">
-                                       <span class="text-[10px] font-bold uppercase tracking-widest" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
+                                       <span class="text-[10px] font-black uppercase tracking-widest" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
                                        <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                    </div>
-                                    <h4 class="text-[15px] font-bold text-slate-900 dark:text-slate-100 leading-snug mb-4">{{ task.title }}</h4>
-                                    <div class="pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
-                                       <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-400 uppercase">
-                                           <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
-                                           {{ task.dueDate }}
+                                    <h4 class="text-base font-black text-slate-900 dark:text-slate-100 leading-snug mb-4">{{ task.title }}</h4>
+                                    <div v-if="task.subtasks && task.subtasks.length > 0" class="mb-3">
+                                        <div class="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                           <div class="h-full bg-brand transition-all duration-300" :style="'width: ' + (getCompletedSubtasks(task) / task.subtasks.length * 100) + '%'"></div>
                                        </div>
-                                       <span v-if="task.assignee" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ task.assignee }}</span>
+                                    </div>
+                                    <div class="pt-4 border-t border-slate-100 dark:border-slate-700/50 flex flex-col gap-3">
+                                        <div class="flex justify-between items-center">
+                                           <div v-if="task.dueDate" class="flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/50 w-fit px-2 py-1 rounded-lg">
+                                               <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                               {{ task.dueDate }}
+                                           </div>
+                                           <span v-if="task.assignee" class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ task.assignee }}</span>
+                                       </div>
+                                        <p v-if="task.action" class="text-sm text-slate-600 dark:text-slate-400 font-medium italic flex items-start">
+                                           <svg class="w-4 h-4 mr-2 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                            {{ task.action }}
+                                        </p>
                                     </div>
                                 </div>
                            </div>
-                           <div class="p-4 border-t border-slate-200 dark:border-slate-800/50 shrink-0">
-                                <button @click="addTask(col.id)" class="w-full py-2.5 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-[11px] font-bold text-slate-400 uppercase tracking-widest hover:bg-white dark:hover:bg-slate-800 transition-all">+ Capture Card</button>
+                           <div class="p-4 border-t border-slate-200 dark:border-slate-700/50 shrink-0">
+                                <button @click="addTask(col.id)" class="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-sm font-black text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-white transition-all">+ Add Card</button>
                            </div>
                        </div>
-                   </main>
-
-                   <main v-show="viewMode !== 'kanban'" class="bg-white dark:bg-slate-900 rounded-xl p-12 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-                       <p class="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">View Context</p>
-                       <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase">{{ viewMode }} Analytics</h2>
                    </main>
                </div>
             </div>
         </main>
     </div>
 
-    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col transform transition-all">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center">
-               <svg class="w-5 h-5 text-slate-400 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
-               <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="Navigate OS or manage tasks..." class="w-full bg-transparent text-xl font-medium text-slate-900 dark:text-white outline-none placeholder-slate-400">
+    <div v-if="editingTask" @click="editingTask = null" class="fixed inset-0 bg-slate-900/20 dark:bg-black/40 backdrop-blur-sm z-40 transition-opacity"></div>
+    
+    <div :class="editingTask ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-l border-slate-200 dark:border-slate-800">
+        <div v-if="editingTask" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+            <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+               <span class="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg" :class="editingTask.company === 'Dymek' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30' : editingTask.company === 'GigaScan' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30' : 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30'">{{ editingTask.company }}</span>
+               <button @click="editingTask = null" class="p-2.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
+               </button>
+           </div>
+            
+            <div class="p-8 space-y-8 flex-1">
+                <div>
+                   <textarea v-model="editingTask.title" class="text-2xl font-black text-slate-900 dark:text-white w-full border-none focus:ring-0 outline-none bg-transparent resize-none p-0 leading-tight" rows="3" placeholder="Enter task title..."></textarea>
+                </div>
+                
+               <div class="grid grid-cols-2 gap-6 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                   <div>
+                       <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Status</label>
+                       <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-black dark:text-white pb-2 outline-none">
+                           <option v-for="c in columns" :value="c.id" class="dark:bg-slate-800">{{ c.title }}</option>
+                       </select>
+                   </div>
+                   <div>
+                       <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Assignee</label>
+                       <input type="text" v-model="editingTask.assignee" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-black dark:text-white pb-2 outline-none" placeholder="Unassigned">
+                   </div>
+               </div>
+
+                <div>
+                   <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 block flex items-center">
+                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Execution Plan / Notes
+                   </label>
+                   <textarea v-model="editingTask.action" class="w-full border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl p-4 text-base font-medium h-32 outline-none focus:border-brand dark:focus:border-brand dark:text-white transition-all custom-scrollbar" placeholder="Define the immediate next step..."></textarea>
+                </div>
             </div>
-            <div class="max-h-[400px] overflow-y-auto p-2 custom-scrollbar">
-               <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg cursor-pointer flex items-center group transition-all">
-                   <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-5 text-slate-500 group-hover:bg-brand group-hover:text-white transition-all shadow-sm" v-html="cmd.icon"></div>
+
+            <div class="p-8 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shrink-0 flex justify-between items-center">
+               <button v-if="!editingTask.isNew" @click="deleteTask" class="text-sm font-black text-red-500 hover:text-red-700 transition uppercase tracking-widest">Archive</button>
+               <button @click="saveTask" class="bg-slate-900 dark:bg-brand text-white px-10 py-3.5 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-slate-800 dark:hover:bg-emerald-400 transition-all">Commit Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="showCommandPalette" @click.self="showCommandPalette = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start justify-center pt-[15vh] px-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col transform transition-all">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center">
+               <svg class="w-6 h-6 text-slate-400 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+               <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="Navigate OS or manage tasks..." class="w-full bg-transparent text-xl font-bold text-slate-900 dark:text-white outline-none placeholder-slate-400">
+            </div>
+            <div class="max-h-[450px] overflow-y-auto p-3 custom-scrollbar">
+               <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl cursor-pointer flex items-center group transition-all">
+                   <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-5 text-slate-500 group-hover:bg-brand group-hover:text-white transition-all shadow-sm" v-html="cmd.icon"></div>
                    <div class="flex-grow">
-                       <p class="text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand transition-all uppercase tracking-wider">{{ cmd.title }}</p>
-                       <p class="text-[11px] font-medium text-slate-400 uppercase tracking-widest opacity-60">{{ cmd.desc }}</p>
+                       <p class="text-base font-black text-slate-800 dark:text-slate-200 group-hover:text-brand dark:group-hover:text-brand transition-all uppercase tracking-wider">{{ cmd.title }}</p>
+                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest opacity-80">{{ cmd.desc }}</p>
                    </div>
                </div>
             </div>
@@ -276,88 +399,32 @@ createApp({
         const viewMode = ref('kanban');
         const editingTask = ref(null);
         const isDarkMode = ref(false);
+        const showNotifications = ref(false);
         const recycleBin = ref([]);
         const showCommandPalette = ref(false);
         const cmdSearch = ref('');
         const aiInput = ref('');
         const aiStatus = ref('');
+        const aiMode = ref('Fast');
         const isThinking = ref(false);
+        const showFileMenu = ref(false);
+        const fileUploadType = ref('');
+        const attachedFile = ref(null);
+        const isListening = ref(false);
         const chatHistory = ref([]);
         const chatScrollContainer = ref(null);
+        let speechRecog = null;
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
-
+        
         const timeGreeting = computed(() => {
             const hr = new Date().getHours();
             if (hr < 12) return 'Good morning';
             if (hr < 17) return 'Good afternoon';
             return 'Good evening';
         });
-
-        // Bug Fix: Enhanced Vora AI Logic
-        const _parseAiResponse = async (res) => {
-            const text = await res.text();
-            try {
-                const json = JSON.parse(text);
-                return json.choices?.[0]?.message?.content || json.response || text;
-            } catch {
-                return text; // Fallback to raw text if not JSON
-            }
-        };
-
-        const askAI = async () => {
-            const query = aiInput.value.trim();
-            if (!query) return;
-            chatHistory.value.push({ role: 'user', content: query });
-            aiInput.value = '';
-            isThinking.value = true;
-            aiStatus.value = "Consulting Vora Database...";
-            
-            try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                   method: 'POST',
-                   headers: {'Content-Type': 'application/json'},
-                   body: JSON.stringify({ 
-                       messages: [
-                           {role:'system', content:'You are Vora, an executive project advisor for Stanley. Provide expert-level, professional project insights.'},
-                           {role:'user', content: query}
-                       ],
-                       model: 'openai' 
-                   })
-                });
-                const response = await _parseAiResponse(res);
-                chatHistory.value.push({ role: 'ai', content: response });
-                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-            } catch (e) {
-                chatHistory.value.push({ role: 'ai', content: "Connection Error: Vora engine is currently unreachable. Please check your network." });
-            } finally {
-                isThinking.value = false;
-                aiStatus.value = '';
-                scrollToBottom();
-            }
-        };
-
-        const generateBrief = async () => {
-            aiStatus.value = "Generating Intelligence Brief...";
-            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-            const prompt = `STANLEY OS BRIEF: Present the status of the following tasks in 3-5 colorful HTML cards using Tailwind (bg-emerald-50, bg-amber-50, bg-rose-50). Keep descriptions to 2 lines max. Followed by a single professional summary paragraph.\nDATA:\n${snapshot}`;
-            
-            try {
-                const res = await fetch('https://text.pollinations.ai/', {
-                   method: 'POST',
-                   headers: {'Content-Type': 'application/json'},
-                   body: JSON.stringify({ messages:[{role:'user', content:prompt}], model: 'openai' })
-                });
-                const response = await _parseAiResponse(res);
-                chatHistory.value.push({ role: 'ai', content: response });
-                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-            } finally {
-                aiStatus.value = '';
-                scrollToBottom();
-            }
-        };
 
         const commitState = () => {
             const snapshot = JSON.stringify(tasks.value);
@@ -370,8 +437,11 @@ createApp({
             else historyIndex.value = history.value.length - 1;
         };
 
+        const canUndo = computed(() => historyIndex.value > 0);
+        const canRedo = computed(() => historyIndex.value < history.value.length - 1);
+
         const undo = () => {
-            if (historyIndex.value > 0) {
+            if (canUndo.value) {
                historyIndex.value--;
                tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
@@ -380,7 +450,7 @@ createApp({
         };
 
         const redo = () => {
-            if (historyIndex.value < history.value.length - 1) {
+            if (canRedo.value) {
                historyIndex.value++;
                tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
@@ -393,12 +463,35 @@ createApp({
         const activeTasksCount = computed(() => tasks.value.filter(t => t.status !== 'completed').length);
         const completedTasks = computed(() => tasks.value.filter(t => t.status === 'completed' && (activeTab.value === 'All' || t.company === activeTab.value)));
         const wipCount = computed(() => getTaskCount('progress'));
+        
         const completionPercentage = computed(() => {
-            const total = tasks.value.length;
+            const total = tasks.value.filter(t => activeTab.value === 'All' || t.company === activeTab.value).length;
             if (total === 0) return 0;
             return Math.round((completedTasks.value.length / total) * 100);
         });
-        const avgCycleTime = computed(() => 3.4);
+
+        const avgCycleTime = computed(() => {
+            const completed = completedTasks.value.filter(t => t.completedAt && t.createdAt);
+            if(completed.length === 0) return 3.4;
+            const totalDays = completed.reduce((sum, t) => sum + (t.completedAt - t.createdAt), 0) / (1000 * 60 * 60 * 24);
+            return (totalDays / completed.length).toFixed(1);
+        });
+
+        const atRiskTasks = computed(() => tasks.value.filter(t => t.status === 'waiting' && t.effort === 'High' && (activeTab.value === 'All' || t.company === activeTab.value)));
+        const assignees = computed(() => {
+            const uniqueAssignees = [...new Set(tasks.value.map(t => t.assignee || 'Unassigned'))];
+            return uniqueAssignees.map(name => ({ id: name, title: name }));
+        });
+        const getResourceTasks = (assigneeId) => tasks.value.filter(t => (t.assignee === assigneeId || (!t.assignee && assigneeId === 'Unassigned')) && (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed');
+        const smartNotifications = computed(() => tasks.value.filter(t => t.priority === 'Urgent' && t.status === 'waiting'));
+        const timelineTasks = computed(() => tasks.value.filter(t => (activeTab.value === 'All' || t.company === activeTab.value) && t.status !== 'completed' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)));
+        
+        const getWorkload = (company) => {
+            const companyTasks = tasks.value.filter(t => t.company === company && t.status !== 'completed');
+            const highEffortCount = companyTasks.filter(t => t.effort === 'High').length;
+            const percentage = companyTasks.length > 0 ? Math.round((highEffortCount / companyTasks.length) * 100) : 0;
+            return { count: highEffortCount, percentage: percentage };
+        };
 
         const toggleDarkMode = () => {
            isDarkMode.value = !isDarkMode.value;
@@ -406,12 +499,20 @@ createApp({
            localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
 
-        const parseMarkdown = (text) => DOMPurify.sanitize(marked.parse(text));
-        
+        const parseMarkdown = (text) => {
+            if (!text) return '';
+            const rawHtml = marked.parse(text);
+            return DOMPurify.sanitize(rawHtml);
+        };
+
         const commands = computed(() => [
-            { title: 'New Task', desc: 'Capture task immediately', icon: '⚡', action: () => addTask('notstarted') },
-            { title: 'Timeline', desc: 'Executive Schedule', icon: '📅', action: () => { viewMode.value = 'timeline'; } },
-            { title: isDarkMode.value ? 'Light Theme' : 'Dark Theme', desc: 'Toggle Interface', icon: '🌗', action: toggleDarkMode }
+            { title: 'New Task', desc: 'Add task to current board', icon: '⚡', action: () => addTask('notstarted') },
+            { title: 'Dashboard', desc: 'Go to Kanban View', icon: '📋', action: () => { viewMode.value = 'kanban'; activeTab.value = 'All'; } },
+            { title: 'Timeline', desc: 'Schedule & Planning', icon: '📅', action: () => { viewMode.value = 'timeline'; } },
+            { title: 'Impact Matrix', desc: 'Prioritize by value', icon: '📈', action: () => { viewMode.value = 'matrix'; } },
+            { title: 'Heatmap', desc: 'Visual workload density', icon: '🔥', action: () => { viewMode.value = 'heatmap'; } },
+            { title: 'Archive', desc: 'Recycle bin', icon: '🗑️', action: () => { viewMode.value = 'recycle'; } },
+            { title: isDarkMode.value ? 'Light Mode' : 'Dark Mode', desc: 'Switch theme', icon: '🌗', action: toggleDarkMode }
         ]);
 
         const filteredCommands = computed(() => cmdSearch.value ? commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase())) : commands.value);
@@ -422,43 +523,154 @@ createApp({
             cmdSearch.value = '';
         };
 
-        const schemaEnhance = (t) => ({ effort: 'Medium', lastUpdated: Date.now(), priority: 'Normal', dueDate: '', assignee: 'Unassigned', createdAt: Date.now(), ...t });
+        const triggerFileUpload = (type) => {
+            fileUploadType.value = type;
+            showFileMenu.value = false;
+            let el = document.getElementById('file-upload');
+            el.accept = type === 'image' ? "image/*" : ".pdf,.doc,.docx,.txt";
+            el.click();
+        };
+
+        const handleFileChange = (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                attachedFile.value = { name: e.target.files[0].name, file: e.target.files[0], type: fileUploadType.value };
+            }
+        };
+        const removeFile = () => {
+            attachedFile.value = null;
+            document.getElementById('file-upload').value = '';
+        };
+
+        const toggleSpeechRecognition = () => {
+            if (isListening.value) return speechRecog?.stop();
+            if (!('webkitSpeechRecognition' in window)) return alert("Voice input not supported.");
+            speechRecog = new webkitSpeechRecognition();
+            speechRecog.continuous = false;
+            speechRecog.interimResults = true;
+            speechRecog.onstart = () => { isListening.value = true; };
+            speechRecog.onresult = (e) => {
+                let interim = '';
+                for (let i = e.resultIndex; i < e.results.length; ++i) interim += e.results[i][0].transcript;
+                aiInput.value = (aiInput.value + ' ' + interim).replace(/bora/gi, 'Vora').trim();
+            };
+            speechRecog.onend = () => { isListening.value = false; };
+            speechRecog.start();
+        };
+
+        const scrollToBottom = () => nextTick(() => { if (chatScrollContainer.value) chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; });
+        const clearChat = () => { if(confirm("Clear conversation history?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
+
+        const _parseAiResponse = async (res) => {
+            let text = await res.text();
+            try {
+                let p = JSON.parse(text);
+                text = p.choices?.[0]?.message?.content || p.content || p.response || text;
+            } catch(e) {}
+            return text.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/```(html|json)?/gi, '').trim();
+        };
+
+        const generateBrief = async () => {
+            aiStatus.value = "Consulting Database...";
+            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
+            const prompt = `STANLEY OS BRIEF: Create 3-5 colorful HTML cards using Tailwind (bg-emerald-50, bg-amber-50, bg-rose-50). Keep descriptions to 3 lines max. Summarize data succinctly. End with 1 supportive 5-line paragraph. DATA:\n${snapshot}`;
+            chatHistory.value.push({ role: 'user', content: "Requesting Morning Brief." }); scrollToBottom();
+            try {
+                const res = await fetch('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
+                   method: 'POST',
+                   headers: {'Content-Type': 'application/json'},
+                   body: JSON.stringify({ messages:[{role:'user', content:prompt}], model: 'openai' })
+                });
+                chatHistory.value.push({ role: 'ai', content: await _parseAiResponse(res) });
+                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+            } catch (e) { chatHistory.value.push({ role: 'ai', content: "Error fetching brief." }); }
+            finally { aiStatus.value = ''; scrollToBottom(); }
+        };
+
+        const askAI = async () => {
+            let query = aiInput.value.trim();
+            if (!query && !attachedFile.value) return;
+            chatHistory.value.push({ role: 'user', content: query });
+            isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Analyzing...";
+            try {
+                const res = await fetch('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
+                   method: 'POST',
+                   headers: {'Content-Type': 'application/json'},
+                   body: JSON.stringify({ messages: [{role:'system', content:`You are Vora, Stanley's authentic and adaptive project advisor. You are insightful, kind, and supportive with a touch of wit. Provide structured feedback using proper lines and tables.`},{role:'user', content:query}], model: 'openai' })
+                });
+                chatHistory.value.push({ role: 'ai', content: await _parseAiResponse(res) });
+                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+            } finally { isThinking.value = false; aiStatus.value = ''; scrollToBottom(); }
+        };
+
+        const schemaEnhance = (t) => {
+            return { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', createdAt: Date.now(), subtasks: [], ...t };
+        };
+
+        const getCompletedSubtasks = (t) => t.subtasks?.filter(s => s.done).length || 0;
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
         
         const saveTask = () => {
+            if (editingTask.value.status === 'completed' && !editingTask.value.completedAt) editingTask.value.completedAt = Date.now();
             if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
             else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
             editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState();
         };
 
-        const scrollToBottom = () => nextTick(() => { if (chatScrollContainer.value) chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; });
-        const clearChat = () => { if(confirm("Purge conversation history?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
+        const deleteTask = () => { 
+           if(confirm("Move to archive?")) { 
+               const taskToDel = tasks.value.find(t => t.id === editingTask.value.id);
+               if (taskToDel) { taskToDel.deletedAt = Date.now(); recycleBin.value.push(taskToDel); }
+               tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id);
+               editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState();
+            } 
+        };
+
+        const restoreTask = (task) => {
+            recycleBin.value = recycleBin.value.filter(t => t.id !== task.id);
+            delete task.deletedAt; tasks.value.push(task); commitState();
+        };
+
+        const permanentDelete = (task) => {
+            recycleBin.value = recycleBin.value.filter(t => t.id !== task.id);
+            localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
+        };
 
         const initSortable = () => {
             columns.forEach(col => {
                 const el = document.getElementById('kanban-' + col.id);
-                if (el) {
-                    new Sortable(el, { 
-                        group: 'tasks', animation: 150, 
-                        onEnd: (evt) => {
-                            const taskId = evt.item.dataset.id;
-                            const task = tasks.value.find(x => x.id == taskId);
-                            if (task) {
-                                task.status = evt.to.dataset.status;
-                                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                                commitState();
-                            }
-                        }
-                    });
+                if (el) createSortableInstance(el, 'status');
+            });
+            assignees.value.forEach(a => {
+                const el = document.getElementById('resource-' + a.id.replace(/\s+/g, ''));
+                if (el) createSortableInstance(el, 'assignee');
+            });
+        };
+
+        const createSortableInstance = (el, type) => {
+            new Sortable(el, { 
+                group: 'tasks', animation: 150, ghostClass: 'opacity-50',
+                onEnd: (evt) => {
+                    const taskId = evt.item.dataset.id;
+                    const taskIndex = tasks.value.findIndex(x => x.id == taskId);
+                    if (taskIndex === -1) return;
+                    const task = tasks.value.splice(taskIndex, 1)[0];
+                    if (type === 'status') task.status = evt.to.dataset.status;
+                    if (type === 'assignee') task.assignee = evt.to.dataset.assignee;
+                    const siblingId = evt.to.children[evt.newIndex + 1]?.dataset.id;
+                    const newPos = siblingId ? tasks.value.findIndex(x => x.id == siblingId) : tasks.value.length;
+                    tasks.value.splice(newPos, 0, task);
+                    localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+                    commitState();
                 }
             });
         };
 
         onMounted(() => {
-            if(localStorage.getItem('fitma_dark_mode') === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
+            const savedTheme = localStorage.getItem('fitma_dark_mode');
+            if(savedTheme === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
             const savedChat = localStorage.getItem('fitma_vora_chat');
-            if(savedChat) { chatHistory.value = JSON.parse(savedChat); }
+            if(savedChat) { try { chatHistory.value = JSON.parse(savedChat); } catch(e) {} }
             const saved = localStorage.getItem('fitma_os_pro_silver');
             tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [];
             commitState();
@@ -469,12 +681,17 @@ createApp({
             nextTick(initSortable);
         });
 
+        watch(viewMode, () => nextTick(initSortable));
+
         return {
-            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, showCommandPalette, cmdSearch, filteredCommands,
-            executeCommand, timeGreeting, aiInput, aiStatus, isThinking, chatHistory, chatScrollContainer, clearChat,
-            undo, redo, canUndo: computed(() => historyIndex.value > 0), canRedo: computed(() => historyIndex.value < history.value.length - 1),
-            completedTasks, wipCount, completionPercentage, avgCycleTime, activeTasksCount, filteredTasks, getTaskCount,
-            toggleDarkMode, askAI, addTask, openTask, saveTask, parseMarkdown, generateBrief
+            activeTab, viewMode, tasks, editingTask, columns, isDarkMode, showNotifications, showFileMenu, fileUploadType,
+            showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting,
+            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
+            attachedFile, triggerFileUpload, handleFileChange, removeFile, isListening, toggleSpeechRecognition,
+            undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete,
+            filteredTasks, completedTasks, timelineTasks, getTaskCount, wipCount, activeTasksCount,
+            completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
+            getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
         };
     }
 }).mount('#app');
