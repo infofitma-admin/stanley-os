@@ -97,7 +97,7 @@
                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Heatmap
                        </button>
                        <button @click="viewMode = 'recycle'; activeTab = 'All'" :class="viewMode==='recycle' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors text-slate-400">
-                           <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16"/></svg> Recycle Bin
+                           <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Recycle Bin
                        </button>
                    </div>
                </div>
@@ -105,7 +105,7 @@
                <div>
                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                    <div class="space-y-1">
-                       <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" :key="tab" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
+                       <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
                            <div class="w-2 h-2 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-500':tab==='GigaScan'?'bg-purple-500':'bg-orange-500'"></div>
                            {{ tab }}
                        </button>
@@ -155,7 +155,7 @@
                        <div v-if="showNotifications" class="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2">
                            <h3 class="px-4 py-2 text-[10px] font-black uppercase text-slate-500 border-b border-slate-100 dark:border-slate-700">Notifications</h3>
                            <div v-if="smartNotifications.length === 0" class="p-4 text-xs font-medium text-slate-500 text-center">No new notifications.</div>
-                           <button v-for="notif in smartNotifications" :key="notif.id" @click="openTask(notif); showNotifications = false" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b border-slate-50 dark:border-slate-700/50 last:border-0 block">
+                           <button v-for="notif in smartNotifications" @click="openTask(notif); showNotifications = false" class="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b border-slate-50 dark:border-slate-700/50 last:border-0 block">
                                 <p class="text-xs font-bold text-red-500 mb-1">Urgent Reminder</p>
                                 <p class="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">{{ notif.title }}</p>
                            </button>
@@ -189,7 +189,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                                 <div class="flex space-x-1 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-lg">
-                                    <button v-for="(mode, index) in ['Fast', 'Think', 'Research']" :key="index" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
+                                    <button v-for="mode in ['Fast', 'Think', 'Research']" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
                                 </div>
                            </div>
                        </div>
@@ -211,7 +211,7 @@
                                         <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                                    </div>
  
-                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : parseMarkdown(msg.content)"></div>
+                                    <div :class="msg.role === 'user' ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm whitespace-pre-wrap' : 'markdown-body text-slate-800 dark:text-slate-200 w-full'" v-html="msg.role === 'user' ? msg.content : (msg.isRaw ? msg.content : parseMarkdown(msg.content))"></div>
                                 </div>
                            </div>
  
@@ -311,7 +311,7 @@
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                       <span :class="'tag tag-' + (task.priority || 'Normal').toLowerCase()">{{ task.priority || 'Normal' }}</span>
+                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                    </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
                                     
@@ -348,7 +348,7 @@
                            <div class="p-4 border-b border-slate-200 dark:border-slate-700/50 shrink-0">
                                 <div class="flex justify-between items-center mb-3">
                                     <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm tracking-tight flex items-center">
-                                        <span class="w-6 h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-black mr-2">{{ assignee.id ? assignee.id.charAt(0) : 'U' }}</span>
+                                        <span class="w-6 h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-black mr-2">{{ assignee.id.charAt(0) }}</span>
                                         {{ assignee.title }}
                                     </h3>
                                     <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getResourceTasks(assignee.id).length }} active</span>
@@ -363,10 +363,10 @@
                                 <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                       <span :class="'tag tag-' + (task.priority || 'Normal').toLowerCase()">{{ task.priority || 'Normal' }}</span>
+                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                    </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
-                                    <span class="text-[10px] font-black bg-slate-100 dark:bg-slate-900 text-slate-500 px-2 py-1 rounded">{{ getColumnTitle(task.status) }}</span>
+                                    <span class="text-[10px] font-black bg-slate-100 dark:bg-slate-900 text-slate-500 px-2 py-1 rounded">{{ columns.find(c => c.id === task.status)?.title || task.status }}</span>
                                 </div>
                            </div>
                        </div>
@@ -393,7 +393,7 @@
                        </div>
                    </main>
  
-                   <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" :key="t.id" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + (t.priority || 'Normal').toLowerCase()">{{ t.priority || 'Normal' }}</span></td></tr></tbody></table></div></main>
+                   <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
  
                    <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
                        <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
@@ -449,7 +449,7 @@
                                <div v-for="t in recycleBin" :key="t.id" class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
                                    <div>
                                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ t.title }}</h4>
-                                       <p v-if="t.deletedAt" class="text-[10px] text-slate-400 uppercase mt-1">Deleted on {{ formatDate(t.deletedAt) }}</p>
+                                       <p class="text-[10px] text-slate-400 uppercase mt-1">Deleted on {{ new Date(t.deletedAt).toLocaleDateString() }}</p>
                                    </div>
                                    <div class="flex space-x-3">
                                        <button @click="restoreTask(t)" class="text-xs font-black uppercase text-brand hover:underline">Restore</button>
@@ -476,16 +476,16 @@
                    <p class="text-[10px] font-bold text-slate-500 uppercase">Voice to Task</p>
                </div>
            </div>
+            <div class="mb-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">You said...</p>
+                <p class="text-xs italic text-slate-600 dark:text-slate-400">"{{ pendingVoiceTask.rawTranscript }}"</p>
+            </div>
             <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 mb-6 border border-slate-100 dark:border-slate-700/50">
-                <div class="mb-3 pb-3 border-b border-slate-200 dark:border-slate-700">
-                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">You said:</p>
-                    <p class="text-xs italic text-slate-600 dark:text-slate-400">"{{ pendingVoiceTask.originalText }}"</p>
-                </div>
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Parsed Task:</p>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">{{ pendingVoiceTask.title }}</p>
+               <p class="text-[10px] font-black text-brand uppercase mb-1">Parsed Task</p>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">"{{ pendingVoiceTask.title }}"</p>
                <div class="flex flex-wrap gap-2">
                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.company }}</span>
-                   <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ getColumnTitle(pendingVoiceTask.status) }}</span>
+                   <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ columns.find(c => c.id === pendingVoiceTask.status)?.title || 'Not Started' }}</span>
                    <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700">{{ pendingVoiceTask.priority }} Priority</span>
                </div>
            </div>
@@ -545,7 +545,7 @@
                    <div>
                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Status</label>
                        <select v-model="editingTask.status" class="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white pb-1 outline-none">
-                           <option v-for="c in columns" :key="c.id" :value="c.id" class="dark:bg-slate-800">{{ c.title }}</option>
+                           <option v-for="c in columns" :value="c.id" class="dark:bg-slate-800">{{ c.title }}</option>
                        </select>
                    </div>
                    <div>
@@ -585,13 +585,11 @@
  
                <div>
                    <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
-                   <template v-if="editingTask && editingTask.subtasks">
-                       <div v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
-                           <input type="checkbox" v-model="s.done" @change="commitState" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
-                           <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none focus:border-brand">
-                           <button @click="editingTask.subtasks.splice(idx,1); commitState()" class="text-slate-300 hover:text-red-500 transition">&times;</button>
-                       </div>
-                   </template>
+                   <div v-if="editingTask.subtasks" v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
+                       <input type="checkbox" v-model="s.done" @change="commitState" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
+                       <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none focus:border-brand">
+                       <button @click="editingTask.subtasks.splice(idx,1); commitState()" class="text-slate-300 hover:text-red-500 transition">&times;</button>
+                   </div>
                    <button @click="editingTask.subtasks.push({text:'', done:false})" class="mt-3 text-xs font-black text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition flex items-center">
                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add Step
                    </button>
@@ -628,17 +626,7 @@
 </div>
  
 <script>
-const { createApp, ref, onMounted, computed, nextTick } = Vue;
-
-const safeStorageGet = (key) => {
-    try { return localStorage.getItem(key); } catch(e) { return null; }
-};
-const safeStorageSet = (key, val) => {
-    try { localStorage.setItem(key, val); } catch(e) {}
-};
-const safeStorageRemove = (key) => {
-    try { localStorage.removeItem(key); } catch(e) {}
-};
+const { createApp, ref, onMounted, computed, nextTick, watch } = Vue;
  
 createApp({
     setup() {
@@ -667,6 +655,7 @@ createApp({
         const chatScrollContainer = ref(null);
         let speechRecog = null;
  
+        // Siri Quick Capture state
         const siriListening = ref(false);
         const siriProcessing = ref(false);
         const isVoraSpeaking = ref(false);
@@ -674,6 +663,7 @@ createApp({
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
         
+        // Undo/Redo State
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
@@ -693,17 +683,8 @@ createApp({
             if (hr < 17) return 'Good afternoon';
             return 'Good evening';
         });
-
-        const formatDate = (ts) => {
-            if (!ts) return '';
-            try { return new Date(ts).toLocaleDateString(); } catch(e) { return 'Unknown Date'; }
-        };
-
-        const getColumnTitle = (id) => {
-            const col = columns.find(c => c.id === id);
-            return col ? col.title : 'Not Started';
-        };
  
+        // Undo/Redo Logic
         const commitState = () => {
             if (historyIndex.value < history.value.length - 1) {
                history.value = history.value.slice(0, historyIndex.value + 1);
@@ -719,10 +700,8 @@ createApp({
         const undo = () => {
             if (canUndo.value) {
                historyIndex.value--;
-               try {
-                   tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-                   safeStorageSet('fitma_os_pro_silver', JSON.stringify(tasks.value));
-               } catch(e) {}
+               tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
+               localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
                nextTick(initSortable);
             }
         };
@@ -730,10 +709,8 @@ createApp({
         const redo = () => {
             if (canRedo.value) {
                historyIndex.value++;
-               try {
-                   tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-                   safeStorageSet('fitma_os_pro_silver', JSON.stringify(tasks.value));
-               } catch(e) {}
+               tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
+               localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
                nextTick(initSortable);
             }
         };
@@ -751,7 +728,8 @@ createApp({
         });
  
         const avgCycleTime = computed(() => {
-            if(completedTasks.value.length === 0) return 0;
+            const completed = completedTasks.value;
+           if(completed.length === 0) return 0;
             return 3.4;
         });
  
@@ -799,14 +777,14 @@ createApp({
             } else {
                document.documentElement.classList.remove('dark');
             }
-           safeStorageSet('fitma_dark_mode', isDarkMode.value);
+           localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
  
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
  
         const parseMarkdown = (text) => {
             if (!text) return '';
-            try { return typeof marked !== 'undefined' ? marked.parse(text) : text; } catch(e) { return text; }
+            return marked.parse(text);
         };
  
         const commands = computed(() => [
@@ -815,7 +793,7 @@ createApp({
             { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
             { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
             { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
-            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => { const el = document.querySelector('input[placeholder="Message Vora..."]'); if(el) el.focus(); } }
+            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
         ]);
  
         const filteredCommands = computed(() => {
@@ -833,17 +811,29 @@ createApp({
            fileUploadType.value = type;
            showFileMenu.value = false;
             let el = document.getElementById('file-upload');
-            if (type === 'image') { el.accept = "image/*"; } else { el.accept = ".pdf,.doc,.docx,.txt"; }
+            if (type === 'image') {
+               el.accept = "image/*";
+            } else {
+               el.accept = ".pdf,.doc,.docx,.txt";
+            }
            el.click();
         };
  
         const handleFileChange = (e) => {
             if (e.target.files && e.target.files.length > 0) {
-               attachedFile.value = { name: e.target.files[0].name, file: e.target.files[0], type: fileUploadType.value };
+               attachedFile.value = {
+                   name: e.target.files[0].name,
+                   file: e.target.files[0],
+                   type: fileUploadType.value
+                };
             }
         };
-        const removeFile = () => { attachedFile.value = null; const el = document.getElementById('file-upload'); if(el) el.value = ''; };
+        const removeFile = () => {
+           attachedFile.value = null;
+           document.getElementById('file-upload').value = '';
+        };
  
+        // Text to Speech Function
         const speakText = (text, onEndCallback) => {
             if (!('speechSynthesis' in window)) {
                if(onEndCallback) onEndCallback();
@@ -854,8 +844,13 @@ createApp({
             const voices = window.speechSynthesis.getVoices();
             const preferredVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')) || voices[0];
            if(preferredVoice) utterance.voice = preferredVoice;
-           utterance.rate = 1.0; utterance.pitch = 1.1;
-           utterance.onend = () => { isVoraSpeaking.value = false; if(onEndCallback) onEndCallback(); };
+           utterance.rate = 1.0;
+           utterance.pitch = 1.1;
+            
+           utterance.onend = () => {
+               isVoraSpeaking.value = false;
+               if(onEndCallback) onEndCallback();
+            };
            isVoraSpeaking.value = true;
            window.speechSynthesis.speak(utterance);
         };
@@ -864,37 +859,40 @@ createApp({
             if (!('webkitSpeechRecognition' in window)) return;
             if (siriRecog) siriRecog.stop();
             
-           siriRecog = new webkitSpeechRecognition();
-           siriRecog.continuous = true; 
+            siriRecog = new webkitSpeechRecognition();
+           siriRecog.continuous = true;
            siriRecog.interimResults = true;
             
-           siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening... (Tap microphone to finish)'; };
+           siriRecog.onstart = () => { 
+               siriListening.value = true; 
+               siriTranscript.value = 'I am listening...'; 
+            };
             
            siriRecog.onresult = (e) => {
-                let finalT = ''; let interimT = '';
+                let finalT = '';
+                let interimT = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
                    else interimT += e.results[i][0].transcript;
                 }
                siriTranscript.value = (finalT || interimT).replace(/bora/gi, 'Vora');
             };
-           siriRecog.onerror = (e) => { siriListening.value = false; siriProcessing.value = false; };
-           siriRecog.onend = async () => { 
+           siriRecog.onerror = (e) => { 
+               siriListening.value = false; 
+               siriProcessing.value = false; 
+            };
+           siriRecog.onend = () => { 
                siriListening.value = false;
-               const finalTranscript = siriTranscript.value.trim();
-               if(finalTranscript && !finalTranscript.includes('I am listening...')) {
-                   siriProcessing.value = true;
-                   await processSiriCommand(finalTranscript);
-                   siriProcessing.value = false;
-                }
             };
            siriRecog.start();
         };
  
+        // Siri Intent Parsing
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
+ 
              const prompt = `Analyze this voice command from Stanley: "${cleanedText}". 
-             You are Vora, his helpful AI assistant. You communicate like Siri.
+             You are Vora, his helpful AI assistant.
              If he is making a statement, asking a question, or just chatting, you MUST converse back naturally. 
              Return ONLY valid JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"}
              
@@ -909,8 +907,7 @@ createApp({
                 });
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
-               siriTranscript.value = '';
- 
+                
                 if (data.intent === 'chat') {
                    chatHistory.value.push({ role: 'user', content: cleanedText });
                    chatHistory.value.push({ role: 'ai', content: data.response });
@@ -918,7 +915,7 @@ createApp({
                    speakText(data.response);
                 } else {
                    pendingVoiceTask.value = {
-                       originalText: cleanedText,
+                       rawTranscript: cleanedText,
                        title: data.title || cleanedText,
                        company: data.company || 'Dymek',
                        priority: data.priority || 'Normal',
@@ -928,33 +925,60 @@ createApp({
                    speakText("I've prepared that task for you, Stanley. Please confirm to add it.");
                 }
              } catch(e) {
-                speakText("I'm sorry Stanley, I didn't quite catch that. Could you say it again?", () => { startSiriListening(); });
+                console.error("Failed to parse Voice Command", e);
+                speakText("I'm sorry Stanley, I didn't quite catch that.");
+             } finally {
+                siriTranscript.value = '';
+                siriProcessing.value = false;
              }
         };
  
         const confirmVoiceTask = () => {
             if (!pendingVoiceTask.value) return;
-           tasks.value.push(schemaEnhance({ id: Date.now(), ...pendingVoiceTask.value }));
-           safeStorageSet('fitma_os_pro_silver', JSON.stringify(tasks.value));
+           tasks.value.push(schemaEnhance({
+                id: Date.now(),
+               ...pendingVoiceTask.value
+            }));
+           localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
            commitState();
            pendingVoiceTask.value = null;
         };
  
         const toggleSiriCapture = () => {
-            if (siriListening.value) { if (siriRecog) siriRecog.stop(); return; }
-            if (isVoraSpeaking.value) {
-               if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-               isVoraSpeaking.value = false; siriTranscript.value = ''; return;
+            if (siriListening.value || isVoraSpeaking.value) {
+                const finalTranscript = siriTranscript.value;
+                if (siriRecog) siriRecog.stop();
+               window.speechSynthesis.cancel();
+               siriListening.value = false;
+               isVoraSpeaking.value = false;
+
+               if(finalTranscript && finalTranscript !== 'I am listening...') {
+                   siriProcessing.value = true;
+                   processSiriCommand(finalTranscript);
+                } else {
+                   siriTranscript.value = '';
+                }
+               return;
             }
            startSiriListening();
         };
  
         const toggleSpeechRecognition = () => {
-            if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; }
-            if (!('webkitSpeechRecognition' in window)) { alert("Voice input not supported."); return; }
+            if (isListening.value) {
+                if (speechRecog) speechRecog.stop();
+               isListening.value = false;
+               return;
+            }
+            if (!('webkitSpeechRecognition' in window)) {
+               alert("Voice input not supported.");
+               return;
+            }
            speechRecog = new webkitSpeechRecognition();
-           speechRecog.continuous = false; speechRecog.interimResults = true;
+           speechRecog.continuous = false;
+           speechRecog.interimResults = true;
+            
            speechRecog.onstart = () => { isListening.value = true; };
+            
             let finalTranscript = '';
            speechRecog.onresult = (e) => {
                 let interimTranscript = '';
@@ -966,31 +990,218 @@ createApp({
                 const resultText = (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
                aiInput.value = baseText + resultText.replace(/bora/gi, 'Vora');
             };
-           speechRecog.onerror = () => { isListening.value = false; };
+           speechRecog.onerror = (e) => { isListening.value = false; };
            speechRecog.onend = () => { isListening.value = false; };
            speechRecog.start();
         };
  
         const scrollToBottom = () => {
-           nextTick(() => { if (chatScrollContainer.value) { chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; } });
+           nextTick(() => {
+                if (chatScrollContainer.value) {
+                   chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight;
+                }
+            });
         };
  
         const clearChat = () => {
-           if(confirm("Clear conversation history?")) { chatHistory.value = []; safeStorageRemove('fitma_vora_chat'); }
+           if(confirm("Clear conversation history?")) {
+               chatHistory.value = [];
+               localStorage.removeItem('fitma_vora_chat');
+            }
         };
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
             try {
                 let parsed = JSON.parse(text);
+                if (parsed.error) throw new Error(parsed.error);
                 if (Array.isArray(parsed) && parsed.length > 0) {
-                   text = parsed[0].content || (parsed[0].message && parsed[0].message.content) || JSON.stringify(parsed);
+                   text = parsed[0].content || parsed[0].message?.content || text;
                 } 
-                else if (parsed.choices && parsed.choices.length > 0 && parsed.choices[0].message) text = parsed.choices[0].message.content;
+                else if (parsed.choices && parsed.choices[0].message) text = parsed.choices[0].message.content;
                 else if (parsed.content) text = parsed.content;
                 else if (parsed.response) text = parsed.response;
-                else if (parsed.message && parsed.message.content) text = parsed.message.content;
+                else if (parsed.message?.content) text = parsed.message.content;
             } catch(e) {}
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-            text = text.replace(/
-http://googleusercontent.com/immersive_entry_chip/0
+            text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
+            text = text.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
+            return text;
+        };
+ 
+        const generateBrief = async () => {
+           aiStatus.value = "Analyzing data...";
+            const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
+            const prompt = `You are Vora. Give Stanley a morning brief using colorful raw HTML Tailwind cards. 
+            Backgrounds should be light: bg-emerald-50, bg-blue-50, bg-amber-50, bg-rose-50.
+            Each card should have a 3-5 line description with bullet points (max 2 lines per bullet).
+            Output MUST end with exactly ONE supportive paragraph (4-5 sentences/lines) with no headings or titles.
+            Output ONLY raw HTML. Data: \n${snapshot}`;
+            
+           chatHistory.value.push({ role: 'user', content: "Give me my Morning Brief." });
+           scrollToBottom();
+ 
+            try {
+                const res = await fetch('https://text.pollinations.ai/', {
+                   method: 'POST',
+                   headers: {'Content-Type': 'application/json'},
+                   body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random()*1000), model: 'openai', jsonMode: false })
+                });
+                const finalResponse = await _parseAiResponse(res);
+               chatHistory.value.push({ role: 'ai', content: finalResponse, isRaw: true });
+               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+               scrollToBottom();
+            } catch (e) {
+               chatHistory.value.push({ role: 'ai', content: "Error fetching brief." });
+            } finally {
+               aiStatus.value = '';
+            }
+        };
+ 
+        const askAI = async () => {
+            let query = aiInput.value.trim();
+            if (!query && !attachedFile.value) return;
+            let displayQuery = query;
+            let fullQuery = query;
+            if (attachedFile.value) {
+               displayQuery = `[Attached ${attachedFile.value.type}: ${attachedFile.value.name}] \n${query}`;
+                let fileInstruction = attachedFile.value.type === 'image' ? `[Gemini mode: Understand image]` : `[ChatGPT mode: Analyze document]`;
+               fullQuery = `${query}\n\n${fileInstruction}`;
+            }
+           chatHistory.value.push({ role: 'user', content: displayQuery });
+           scrollToBottom();
+           isThinking.value = true;
+           aiInput.value = '';
+           removeFile();
+           aiStatus.value = "Generating...";
+            const systemPrompt = `You are Vora. Advisor to Stanley. Format: Tables, lists, bold. End with warm sentences (4-5 lines).`;
+            try {
+                const res = await fetch('https://text.pollinations.ai/', {
+                   method: 'POST',
+                   headers: {'Content-Type': 'application/json'},
+                   body: JSON.stringify({ messages: [{role:'system', content:systemPrompt},{role:'user', content:fullQuery}], seed: Math.floor(Math.random()*1000), model: 'openai' })
+                });
+                const finalResponse = await _parseAiResponse(res);
+               chatHistory.value.push({ role: 'ai', content: finalResponse });
+               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+               scrollToBottom();
+            } catch (err) {
+               chatHistory.value.push({ role: 'ai', content: "Error connecting." });
+            } finally {
+               isThinking.value = false;
+               aiStatus.value = '';
+            }
+        };
+ 
+        const schemaEnhance = (t) => {
+            const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t };
+           base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
+            return base;
+        };
+ 
+        const getCompletedSubtasks = (t) => t.subtasks && Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.done).length : 0;
+        const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
+        const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
+        
+        const saveTask = () => {
+            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); }
+            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; }
+           editingTask.value = null;
+           localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+           commitState();
+        };
+
+        const deleteTask = () => { 
+           if(confirm("Move to recycle bin?")) { 
+               const taskToDel = tasks.value.find(t => t.id === editingTask.value.id);
+               if (taskToDel) {
+                   taskToDel.deletedAt = Date.now();
+                   recycleBin.value.push(taskToDel);
+                   localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
+               }
+               tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id);
+               editingTask.value = null; 
+               localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+               commitState();
+            } 
+        };
+
+        const restoreTask = (task) => {
+            recycleBin.value = recycleBin.value.filter(t => t.id !== task.id);
+            localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
+            delete task.deletedAt;
+            tasks.value.push(task);
+            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+            commitState();
+            nextTick(initSortable);
+        };
+
+        const permanentDelete = (task) => {
+            recycleBin.value = recycleBin.value.filter(t => t.id !== task.id);
+            localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
+        };
+ 
+        const initialData = [
+            { id: 1, company: 'Dymek', title: 'Dymek new website on Squarespace', priority: 'Urgent', impact: 'High', effort: 'High', status: 'notstarted', action: 'Complete brand guideline first', assignee: 'Kriti' },
+            { id: 4, company: 'Dymek', title: 'Brand Guideline', priority: 'Urgent', impact: 'High', effort: 'Medium', status: 'progress', assignee: 'Stanley' },
+            { id: 5, company: 'GigaScan', title: 'Japanese website translation', priority: 'High', impact: 'Medium', effort: 'High', status: 'waiting', assignee: 'Kriti' },
+            { id: 62, company: 'Lading Technology', title: 'Dynamic Homepage Overhaul', status: 'completed', assignee: 'Stanley' }
+        ];
+ 
+        const initSortable = () => {
+           columns.forEach(col => {
+                const el = document.getElementById('kanban-' + col.id);
+                if (el) {
+                   new Sortable(el, { group: 'tasks', animation: 150, ghostClass: 'opacity-50',
+                       onEnd: (evt) => {
+                           evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+                           if (evt.from !== evt.to) {
+                                const t = tasks.value.find(x => x.id == evt.item.dataset.id);
+                                if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); }
+                           }
+                       }
+                   });
+                }
+            });
+        };
+ 
+        onMounted(() => {
+           window.speechSynthesis.getVoices();
+            const savedTheme = localStorage.getItem('fitma_dark_mode');
+           if(savedTheme === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
+            const savedChat = localStorage.getItem('fitma_vora_chat');
+           if(savedChat) { try { chatHistory.value = JSON.parse(savedChat); } catch(e) {} }
+           window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); }
+                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
+            });
+            const saved = localStorage.getItem('fitma_os_pro_silver');
+           tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [...initialData].map(schemaEnhance);
+           commitState();
+
+           const savedRecycle = localStorage.getItem('fitma_recycle_bin');
+           if (savedRecycle) {
+               recycleBin.value = JSON.parse(savedRecycle).filter(t => (Date.now() - t.deletedAt) < 30 * 24 * 60 * 60 * 1000);
+               localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value));
+           }
+
+           nextTick(initSortable);
+        });
+ 
+        return {
+            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType,
+           showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting,
+            aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat,
+           attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition,
+           siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture,
+            undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete,
+           filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount,
+           completionPercentage, smartNotifications, getCompletedSubtasks, toggleZenMode, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown,
+           getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
+        };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
