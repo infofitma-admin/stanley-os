@@ -831,7 +831,9 @@ createApp({
                     if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
                    else interimT += e.results[i][0].transcript;
                 }
-               siriTranscript.value = finalT || interimT;
+                // FIX: Normalize "bora" misdetection to "Vora"
+                let transcript = (finalT || interimT).replace(/bora/gi, 'Vora');
+               siriTranscript.value = transcript;
             };
            siriRecog.onerror = (e) => { 
                siriListening.value = false; 
@@ -848,8 +850,10 @@ createApp({
            siriRecog.start();
         };
  
-        // NEW: Siri Intent Parsing (Chat vs Task)
+        // Siri Intent Parsing (Chat vs Task)
         const processSiriCommand = async (text) => {
+             // FIX: Sanitize "bora" to "Vora" before processing intent
+             text = text.replace(/bora/gi, 'Vora');
              const lowerText = text.toLowerCase().trim();
              
              // Quick local response for pure greetings to make it feel fast
@@ -953,7 +957,8 @@ createApp({
                    else interimTranscript += e.results[i][0].transcript;
                 }
                 const baseText = aiInput.value.replace(/ \.$/, '');
-               aiInput.value = baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript;
+                // FIX: Sanitize input to handle "bora" misdetection and ensure "full idea" flow
+               aiInput.value = (baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript).replace(/bora/gi, 'Vora');
             };
            speechRecog.onerror = (e) => { isListening.value = false; };
            speechRecog.onend = () => { isListening.value = false; };
