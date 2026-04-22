@@ -679,7 +679,6 @@ createApp({
             return 'Good evening';
         });
  
-        // Undo/Redo Logic
         const commitState = () => {
             if (historyIndex.value < history.value.length - 1) {
               history.value = history.value.slice(0, historyIndex.value + 1);
@@ -750,10 +749,8 @@ createApp({
             return tasks.value.filter(t => {
                 if (activeTab.value !== 'All' && t.company !== activeTab.value) return false;
                 if (t.status === 'completed') return false;
-                
                 const impactMatch = Array.isArray(quad.impact) ? quad.impact.includes(t.impact) : t.impact === quad.impact;
                 const effortMatch = Array.isArray(quad.effort) ? quad.effort.includes(t.effort) : t.effort === quad.effort;
-                
                 return impactMatch && effortMatch;
             });
         };
@@ -767,11 +764,7 @@ createApp({
  
         const toggleDarkMode = () => {
           isDarkMode.value = !isDarkMode.value;
-            if (isDarkMode.value) {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
+          document.documentElement.classList.toggle('dark', isDarkMode.value);
           localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
  
@@ -785,11 +778,7 @@ createApp({
  
         const commands = computed(() => [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
-            { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
-            { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
-            { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
-            { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
-            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
+            { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode }
         ]);
  
         const filteredCommands = computed(() => {
@@ -797,157 +786,76 @@ createApp({
             return commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()));
         });
  
-        const executeCommand = (cmd) => {
-          cmd.action();
-          showCommandPalette.value = false;
-          cmdSearch.value = '';
-        };
+        const executeCommand = (cmd) => { cmd.action(); showCommandPalette.value = false; cmdSearch.value = ''; };
  
-        const triggerFileUpload = (type) => {
-          fileUploadType.value = type;
-          showFileMenu.value = false;
-            let el = document.getElementById('file-upload');
-            if (type === 'image') {
-              el.accept = "image/*";
-            } else {
-              el.accept = ".pdf,.doc,.docx,.txt";
-            }
-           el.click();
-        };
+        const triggerFileUpload = (type) => { fileUploadType.value = type; showFileMenu.value = false; let el = document.getElementById('file-upload'); el.accept = type === 'image' ? "image/*" : ".pdf,.doc,.docx,.txt"; el.click(); };
  
         const handleFileChange = (e) => {
             if (e.target.files && e.target.files.length > 0) {
-              attachedFile.value = {
-                  name: e.target.files[0].name,
-                  file: e.target.files[0],
-                  type: fileUploadType.value
-                };
+              attachedFile.value = { name: e.target.files[0].name, file: e.target.files[0], type: fileUploadType.value };
             }
         };
-        const removeFile = () => {
-          attachedFile.value = null;
-          document.getElementById('file-upload').value = '';
-        };
+        const removeFile = () => { attachedFile.value = null; document.getElementById('file-upload').value = ''; };
  
         const speakText = (text, onEndCallback) => {
-            if (!('speechSynthesis' in window)) {
-              if(onEndCallback) onEndCallback();
-               return;
-            }
-          window.speechSynthesis.cancel();
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')) || voices[0];
-          if(preferredVoice) utterance.voice = preferredVoice;
-          utterance.rate = 1.0;
-          utterance.pitch = 1.1;
-          utterance.onend = () => { isVoraSpeaking.value = false; if(onEndCallback) onEndCallback(); };
-          isVoraSpeaking.value = true;
-          window.speechSynthesis.speak(utterance);
+            utterance.onend = () => { isVoraSpeaking.value = false; if(onEndCallback) onEndCallback(); };
+            isVoraSpeaking.value = true;
+            window.speechSynthesis.speak(utterance);
         };
  
         const startSiriListening = () => {
             if (!('webkitSpeechRecognition' in window)) return;
-            if (siriRecog) siriRecog.stop();
             siriRecog = new webkitSpeechRecognition();
-          siriRecog.continuous = false;
-          siriRecog.interimResults = true;
-          siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening...'; };
-          siriRecog.onresult = (e) => {
-                let finalT = '';
-                let interimT = '';
-                for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
-                  else interimT += e.results[i][0].transcript;
-                }
-              siriTranscript.value = (finalT || interimT).replace(/bora/gi, 'Vora');
-            };
-          siriRecog.onerror = () => { siriListening.value = false; siriProcessing.value = false; };
-          siriRecog.onend = async () => { 
-              siriListening.value = false;
-              if(siriTranscript.value && siriTranscript.value !== 'I am listening...') {
-                  siriProcessing.value = true;
-                  await processSiriCommand(siriTranscript.value);
-                  siriProcessing.value = false;
-                }
-            };
-          siriRecog.start();
+            siriRecog.onstart = () => { siriListening.value = true; siriTranscript.value = 'I am listening...'; };
+            siriRecog.onresult = (e) => { siriTranscript.value = e.results[0][0].transcript.replace(/bora/gi, 'Vora'); };
+            siriRecog.onend = async () => { siriListening.value = false; if(siriTranscript.value && siriTranscript.value !== 'I am listening...') { siriProcessing.value = true; await processSiriCommand(siriTranscript.value); siriProcessing.value = false; } };
+            siriRecog.start();
         };
  
-        const _callDuckAI = async (messages, seed = 12345) => {
-            // Updated to use a Proxy because standard browsers block DDG headers
-            const proxy = "https://corsproxy.io/?";
-            const api = "https://duckduckgo.com/duckai/v1/chat";
-            
-            // This is a minimal implementation that mimics the previous idea
-            // If the proxy is blocked, it defaults to a safe fallback
-            const payload = {
-                model: "gpt-4o-mini",
-                messages: messages
-            };
-            
-            // Since DDG requires complex headers, we use an alternative simplified endpoint
-            // that I used previously which handles the search engine gateway better
-            const simplifiedUrl = `https://text.pollinations.ai/`; 
-            const res = await fetch(simplifiedUrl, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    messages: messages, 
-                    seed: seed, 
-                    model: 'openai' // Routes to GPT-4o mini via pollinations gateway
-                })
-            });
-            return res;
-        };
-
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
-             const prompt = `Analyze: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "spoken reply"} OR {"intent": "task", "title": "...", "company": "...", "priority": "...", "status": "...", "assignee": "..."}`;
+             const prompt = `Voice Command: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"} OR {"intent": "task", "title": "...", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "...", "status": "notstarted", "assignee": "..."}`;
              try {
-                const res = await _callDuckAI([{role:'user', content:prompt}]);
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
                 const responseText = await _parseAiResponse(res);
                 const data = JSON.parse(responseText);
-              siriTranscript.value = '';
-                if (data.intent === 'chat') {
-                  chatHistory.value.push({ role: 'user', content: cleanedText }, { role: 'ai', content: data.response });
-                  scrollToBottom(); speakText(data.response);
-                } else {
-                  pendingVoiceTask.value = { ...data, id: Date.now() };
-                  speakText("Task ready, Stanley. Confirm to add.");
-                }
+                siriTranscript.value = '';
+                if (data.intent === 'chat') { chatHistory.value.push({ role: 'user', content: cleanedText }, { role: 'ai', content: data.response }); scrollToBottom(); speakText(data.response); }
+                else { pendingVoiceTask.value = { title: data.title || cleanedText, company: data.company || 'Dymek', priority: data.priority || 'Normal', status: 'notstarted', assignee: 'Unassigned' }; speakText("Task prepared, Stanley."); }
              } catch(e) { speakText("Could you repeat that?"); }
         };
  
-        const confirmVoiceTask = () => { if (!pendingVoiceTask.value) return; tasks.value.push(schemaEnhance(pendingVoiceTask.value)); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); pendingVoiceTask.value = null; };
+        const confirmVoiceTask = () => { if (!pendingVoiceTask.value) return; tasks.value.push(schemaEnhance({ id: Date.now(), ...pendingVoiceTask.value })); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); pendingVoiceTask.value = null; };
         const toggleSiriCapture = () => { if (siriListening.value || isVoraSpeaking.value) { if (siriRecog) siriRecog.stop(); window.speechSynthesis.cancel(); siriListening.value = false; isVoraSpeaking.value = false; siriTranscript.value = ''; return; } startSiriListening(); };
-        const toggleSpeechRecognition = () => { if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; } if (!('webkitSpeechRecognition' in window)) return; speechRecog = new webkitSpeechRecognition(); speechRecog.continuous = false; speechRecog.interimResults = true; speechRecog.onstart = () => { isListening.value = true; }; let finalTranscript = ''; speechRecog.onresult = (e) => { let interimTranscript = ''; for (let i = e.resultIndex; i < e.results.length; ++i) { if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript; else interimTranscript += e.results[i][0].transcript; } const baseText = aiInput.value.replace(/ \.$/, ''); aiInput.value = baseText + (baseText && finalTranscript ? ' ' : '') + finalTranscript + interimTranscript; }; speechRecog.onerror = () => { isListening.value = false; }; speechRecog.onend = () => { isListening.value = false; }; speechRecog.start(); };
+        const toggleSpeechRecognition = () => { if (isListening.value) { if (speechRecog) speechRecog.stop(); isListening.value = false; return; } speechRecog = new webkitSpeechRecognition(); speechRecog.onstart = () => { isListening.value = true; }; speechRecog.onresult = (e) => { aiInput.value += e.results[0][0].transcript; }; speechRecog.onend = () => { isListening.value = false; }; speechRecog.start(); };
         const scrollToBottom = () => { nextTick(() => { if (chatScrollContainer.value) chatScrollContainer.value.scrollTop = chatScrollContainer.value.scrollHeight; }); };
-        const clearChat = () => { if(confirm("Clear history?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
+        const clearChat = () => { if(confirm("Clear conversation?")) { chatHistory.value = []; localStorage.removeItem('fitma_vora_chat'); } };
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
-            try {
-                let parsed = JSON.parse(text);
-                if (parsed.html) return parsed.html;
-                if (parsed.choices?.[0]?.message) text = parsed.choices[0].message.content;
-                else if (parsed.content) text = parsed.content;
-            } catch(e) {}
-            return text.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
+            // Original strategy: Remove any think tags and clean up common wrap characters
+            text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+            text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
+            return text;
         };
  
         const generateBrief = async () => {
-          aiStatus.value = "Analyzing...";
+          aiStatus.value = "Scanning tasks...";
           const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-          const prompt = `Morning Brief for Stanley. 3 colorful HTML cards (Rose/Sky/Amber) with 3-5 lines each. End with 1 motivating paragraph. Return ONLY JSON: {"html": "..."}. Data: \n${snapshot}`;
-          chatHistory.value.push({ role: 'user', content: "Generate Brief." }); scrollToBottom();
+          const prompt = `You are Vora. Create a Morning Brief. Show exactly 3 colorful HTML cards (Rose for Critical, Sky for Flow, Amber for Blockers). Each card 3-5 lines. End with 4 lines of motivation. Data: \n${snapshot}`;
+          chatHistory.value.push({ role: 'user', content: "Morning Brief." }); scrollToBottom();
           try {
-              const res = await _callDuckAI([{role:'user', content:prompt}]);
+              // Note: Removed the model header to use original stable route
+              const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
               const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-          } catch (e) { chatHistory.value.push({ role: 'ai', content: "Glitch. Try again." }); }
-          finally { aiStatus.value = ''; scrollToBottom(); }
+              scrollToBottom();
+          } catch (e) { chatHistory.value.push({ role: 'ai', content: "Error preparing brief." }); }
+          finally { aiStatus.value = ''; }
         };
  
         const askAI = async () => {
@@ -955,15 +863,21 @@ createApp({
             chatHistory.value.push({ role: 'user', content: query }); scrollToBottom();
             isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Thinking...";
             try {
-                const res = await _callDuckAI([{role:'system', content:"You are Vora, kind assistant. Use tables/markdown. End with 4 lines of motivation."},{role:'user', content:query}]);
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, kind and helpful. Use tables/markdown. End with 4 lines of motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
                 const finalResponse = await _parseAiResponse(res);
-                chatHistory.value.push({ role: 'ai', content: finalResponse });
-                localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
-            } catch (err) { chatHistory.value.push({ role: 'ai', content: "Connection Error." }); }
-            finally { isThinking.value = false; aiStatus.value = ''; scrollToBottom(); }
+              chatHistory.value.push({ role: 'ai', content: finalResponse });
+              localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
+              scrollToBottom();
+            } catch (err) { chatHistory.value.push({ role: 'ai', content: "Error." }); }
+            finally { isThinking.value = false; aiStatus.value = ''; }
         };
  
-        const schemaEnhance = (t) => { const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t }; base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : []; return base; };
+        const schemaEnhance = (t) => {
+            const base = { effort: 'Medium', impact: 'Medium', lastUpdated: Date.now(), priority: 'Normal', action: '', dueDate: '', assignee: 'Unassigned', ...t };
+          base.subtasks = Array.isArray(base.subtasks) ? base.subtasks : [];
+            return base;
+        };
+ 
         const getCompletedSubtasks = (t) => t.subtasks?.filter(s => s.done).length || 0;
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
@@ -975,11 +889,10 @@ createApp({
         const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]); if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
  
         onMounted(() => {
-          const savedTheme = localStorage.getItem('fitma_dark_mode');
+            const savedTheme = localStorage.getItem('fitma_dark_mode');
           if(savedTheme === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
           const savedChat = localStorage.getItem('fitma_vora_chat');
           if(savedChat) try { chatHistory.value = JSON.parse(savedChat); } catch(e) {}
-          window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); } });
           const saved = localStorage.getItem('fitma_os_pro_silver');
           tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [].map(schemaEnhance);
           commitState();
