@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        [v-cloak] { display: none !important; }
+        [v-cloak] { display: none; }
         body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100vh; width: 100vw; }
         
        ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -105,7 +105,7 @@
                <div>
                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 px-2 flex justify-between">Portfolios <span class="bg-slate-800 px-1.5 rounded">{{ activeTasksCount }}</span></h2>
                    <div class="space-y-1">
-                       <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" :key="tab" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
+                       <button v-for="tab in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = tab; viewMode = 'kanban'" :class="activeTab === tab && viewMode === 'kanban' ? 'bg-slate-800 text-white border-l-2 border-brand' : 'hover:bg-slate-800/50 hover:text-white border-l-2 border-transparent'" class="w-full flex items-center px-3 py-2 text-sm font-bold transition-colors">
                            <div class="w-2 h-2 rounded-full mr-3" :class="tab==='Dymek'?'bg-blue-500':tab==='GigaScan'?'bg-purple-500':'bg-orange-500'"></div>
                            {{ tab }}
                        </button>
@@ -189,7 +189,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                                 <div class="flex space-x-1 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-lg">
-                                    <button v-for="mode in ['Fast', 'Think', 'Research']" :key="mode" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
+                                    <button v-for="(mode, index) in ['Fast', 'Think', 'Research']" :key="index" @click="aiMode = mode" :class="aiMode === mode ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="text-[10px] font-bold px-3 py-1 rounded-md transition-all">{{ mode }}</button>
                                 </div>
                            </div>
                        </div>
@@ -311,7 +311,7 @@
                                 <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                       <span :class="'tag ' + getPriorityClass(task.priority)">{{ task.priority || 'Normal' }}</span>
+                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                    </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
                                     
@@ -348,13 +348,13 @@
                            <div class="p-4 border-b border-slate-200 dark:border-slate-700/50 shrink-0">
                                 <div class="flex justify-between items-center mb-3">
                                     <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm tracking-tight flex items-center">
-                                        <span class="w-6 h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-black mr-2">{{ assignee.id.charAt(0) }}</span>
+                                        <span class="w-6 h-6 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-black mr-2">{{ assignee.id ? assignee.id.charAt(0) : 'U' }}</span>
                                         {{ assignee.title }}
                                     </h3>
                                     <span class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-black shadow-sm">{{ getResourceTasks(assignee.id).length }} active</span>
                                 </div>
                                 <div class="h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="h-full transition-all duration-500" :style="'width: ' + getCapacityWidth(assignee.id) + '%'" :class="getResourceTasks(assignee.id).length > 4 ? 'bg-red-500' : 'bg-brand'"></div>
+                                    <div class="h-full transition-all duration-500" :style="'width: ' + Math.min((getResourceTasks(assignee.id).length / 5) * 100, 100) + '%'" :class="getResourceTasks(assignee.id).length > 4 ? 'bg-red-500' : 'bg-brand'"></div>
                                 </div>
                                 <p class="text-[9px] font-bold mt-2 uppercase" :class="getResourceTasks(assignee.id).length > 4 ? 'text-red-500' : 'text-slate-500'">{{ getResourceTasks(assignee.id).length > 4 ? 'At Capacity' : 'Available for work' }}</p>
                            </div>
@@ -363,7 +363,7 @@
                                 <div v-for="task in getResourceTasks(assignee.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
                                     <div class="flex justify-between items-start mb-3">
                                        <span class="text-[9px] font-black uppercase tracking-wider" :class="task.company === 'Dymek' ? 'text-blue-500' : task.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ task.company }}</span>
-                                       <span :class="'tag ' + getPriorityClass(task.priority)">{{ task.priority || 'Normal' }}</span>
+                                       <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
                                    </div>
                                     <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug mb-3">{{ task.title }}</h4>
                                     <span class="text-[10px] font-black bg-slate-100 dark:bg-slate-900 text-slate-500 px-2 py-1 rounded">{{ getColumnTitle(task.status) }}</span>
@@ -393,13 +393,13 @@
                        </div>
                    </main>
  
-                   <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" :key="t.id" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag ' + getPriorityClass(t.priority)">{{ t.priority || 'Normal' }}</span></td></tr></tbody></table></div></main>
+                   <main v-if="viewMode === 'timeline'" class="pb-10"><div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-4 text-xs font-black uppercase text-slate-500">Due Date</th><th class="p-4 text-xs font-black uppercase text-slate-500">Task</th><th class="p-4 text-xs font-black uppercase text-slate-500">Priority</th></tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-700/50"><tr v-for="t in timelineTasks" :key="t.id" @click="openTask(t)" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition"><td class="p-4 text-sm font-bold dark:text-slate-300">{{ t.dueDate || 'TBD' }}</td><td class="p-4"><div class="text-sm font-black dark:text-slate-100">{{ t.title }}</div><div class="text-[10px] font-bold uppercase" :class="t.company === 'Dymek' ? 'text-blue-500' : t.company === 'GigaScan' ? 'text-purple-500' : 'text-orange-500'">{{ t.company }}</div></td><td class="p-4"><span :class="'tag tag-' + t.priority.toLowerCase()">{{ t.priority }}</span></td></tr></tbody></table></div></main>
  
                    <main v-show="viewMode === 'matrix'" class="pb-10 grid grid-cols-2 gap-6 h-[700px]">
                        <div v-for="quad in matrixQuadrants" :key="quad.id" class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
                            <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-200">{{ quad.name }}</h3>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">Impact: {{ formatImpactEffort(quad.impact) }} | Effort: {{ formatImpactEffort(quad.effort) }}</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">Impact: {{ Array.isArray(quad.impact) ? quad.impact.join('/') : quad.impact }} | Effort: {{ Array.isArray(quad.effort) ? quad.effort.join('/') : quad.effort }}</span>
                            </div>
                            
                            <div :id="'matrix-' + quad.id" class="matrix-zone space-y-3 overflow-y-auto flex-grow custom-scrollbar bg-slate-50/50 dark:bg-slate-900/30 p-2 rounded-lg border border-dashed border-slate-200 dark:border-slate-700" :data-impact="Array.isArray(quad.impact) ? quad.impact[0] : quad.impact" :data-effort="Array.isArray(quad.effort) ? quad.effort[0] : quad.effort">
@@ -449,7 +449,7 @@
                                <div v-for="t in recycleBin" :key="t.id" class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
                                    <div>
                                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ t.title }}</h4>
-                                       <p class="text-[10px] text-slate-400 uppercase mt-1">Deleted on {{ formatDate(t.deletedAt) }}</p>
+                                       <p v-if="t.deletedAt" class="text-[10px] text-slate-400 uppercase mt-1">Deleted on {{ new Date(t.deletedAt).toLocaleDateString() }}</p>
                                    </div>
                                    <div class="flex space-x-3">
                                        <button @click="restoreTask(t)" class="text-xs font-black uppercase text-brand hover:underline">Restore</button>
@@ -585,7 +585,7 @@
  
                <div>
                    <label class="text-[10px] font-black text-slate-400 uppercase">Checklist</label>
-                   <template v-if="editingTask.subtasks">
+                   <template v-if="editingTask && editingTask.subtasks">
                        <div v-for="(s, idx) in editingTask.subtasks" :key="idx" class="flex items-center space-x-3 mt-2">
                            <input type="checkbox" v-model="s.done" @change="commitState" class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
                            <input v-model="s.text" class="flex-grow border-b border-slate-100 dark:border-slate-700 bg-transparent text-sm dark:text-white outline-none focus:border-brand">
@@ -679,22 +679,17 @@ createApp({
             { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
         ];
 
-        // Template Helper Functions to avoid compilation crashes
-        const getColumnTitle = (id) => {
-            const col = columns.find(c => c.id === id);
-            return col ? col.title : id || 'Not Started';
-        };
-        const formatImpactEffort = (val) => Array.isArray(val) ? val.join('/') : val;
-        const getPriorityClass = (p) => p ? 'tag-' + p.toLowerCase() : 'tag-normal';
-        const getCapacityWidth = (id) => Math.min((getResourceTasks(id).length / 5) * 100, 100);
-        const formatDate = (ts) => new Date(ts).toLocaleDateString();
-
         const timeGreeting = computed(() => {
             const hr = new Date().getHours();
             if (hr < 12) return 'Good morning';
             if (hr < 17) return 'Good afternoon';
             return 'Good evening';
         });
+
+        const getColumnTitle = (id) => {
+            const col = columns.find(c => c.id === id);
+            return col ? col.title : 'Not Started';
+        };
  
         // Undo/Redo Logic
         const commitState = () => {
@@ -712,8 +707,10 @@ createApp({
         const undo = () => {
             if (canUndo.value) {
                historyIndex.value--;
-               tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-               localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+               try {
+                   tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
+                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+               } catch(e) { console.error("Undo error", e); }
                nextTick(initSortable);
             }
         };
@@ -721,8 +718,10 @@ createApp({
         const redo = () => {
             if (canRedo.value) {
                historyIndex.value++;
-               tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
-               localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+               try {
+                   tasks.value = JSON.parse(history.value[historyIndex.value]).map(schemaEnhance);
+                   localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
+               } catch(e) { console.error("Redo error", e); }
                nextTick(initSortable);
             }
         };
@@ -845,6 +844,7 @@ createApp({
            document.getElementById('file-upload').value = '';
         };
  
+        // Text to Speech Function
         const speakText = (text, onEndCallback) => {
             if (!('speechSynthesis' in window)) {
                if(onEndCallback) onEndCallback();
@@ -867,13 +867,10 @@ createApp({
         };
  
         const startSiriListening = () => {
-            if (!('webkitSpeechRecognition' in window)) {
-                alert('Voice recognition not supported in your browser.');
-                return;
-            }
+            if (!('webkitSpeechRecognition' in window)) return;
             if (siriRecog) siriRecog.stop();
             
-           siriRecog = new webkitSpeechRecognition();
+            siriRecog = new webkitSpeechRecognition();
            siriRecog.continuous = true; 
            siriRecog.interimResults = true;
             
@@ -907,6 +904,7 @@ createApp({
            siriRecog.start();
         };
  
+        // Siri Intent Parsing
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
  
