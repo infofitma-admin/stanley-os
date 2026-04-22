@@ -91,7 +91,7 @@
                             <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Timeline
                         </button>
                         <button @click="viewMode = 'matrix'; activeTab = 'All'" :class="viewMode==='matrix' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> Impact Matrix
+                            <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> Impact Matrix
                         </button>
                         <button @click="viewMode = 'heatmap'; activeTab = 'All'" :class="viewMode==='heatmap' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800/50 hover:text-white'" class="w-full flex items-center px-3 py-2 text-sm font-bold rounded-lg transition-colors">
                             <svg class="w-4 h-4 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Heatmap
@@ -625,6 +625,7 @@ createApp({
         const siriTranscript = ref('');
         const pendingVoiceTask = ref(null);
         let siriRecog = null;
+        let siriSilenceTimer = null; // Used for continuous auto-stop
         
         // Undo/Redo State
         const history = ref([]);
@@ -811,17 +812,21 @@ createApp({
             window.speechSynthesis.speak(utterance);
         };
 
+        // Deep Listening Logic (Continuous Mode + Auto Stop)
         const startSiriListening = () => {
-            if (!('webkitSpeechRecognition' in window)) return;
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Voice input not supported in your browser. Please use Chrome or Edge.");
+                return;
+            }
             if (siriRecog) siriRecog.stop();
             
             siriRecog = new webkitSpeechRecognition();
-            siriRecog.continuous = false;
+            siriRecog.continuous = true; // CHANGED to handle rambling/pauses
             siriRecog.interimResults = true;
             
             siriRecog.onstart = () => { 
                 siriListening.value = true; 
-                siriTranscript.value = 'I am listening...'; 
+                siriTranscript.value = 'Listening... (Explain fully, tap again when done)'; 
             };
             
             siriRecog.onresult = (e) => {
@@ -831,15 +836,31 @@ createApp({
                     if (e.results[i].isFinal) finalT += e.results[i][0].transcript;
                     else interimT += e.results[i][0].transcript;
                 }
-                siriTranscript.value = finalT || interimT;
+
+                // 1. Phonetic Correction for Vora
+                let rawText = finalT || interimT;
+                let correctedText = rawText.replace(/\b(bora|flora|laura|dora|zora|korra|for a|vo ra)\b/gi, 'Vora');
+                
+                siriTranscript.value = correctedText;
+
+                // Auto-stop after 4 seconds of silence
+                clearTimeout(siriSilenceTimer);
+                siriSilenceTimer = setTimeout(() => {
+                    if(siriListening.value) siriRecog.stop();
+                }, 4000);
             };
+
             siriRecog.onerror = (e) => { 
                 siriListening.value = false; 
                 siriProcessing.value = false; 
+                clearTimeout(siriSilenceTimer);
+                if(e.error === 'not-allowed') alert("Microphone access was denied.");
             };
+
             siriRecog.onend = async () => { 
                 siriListening.value = false;
-                if(siriTranscript.value && siriTranscript.value !== 'I am listening...') {
+                clearTimeout(siriSilenceTimer);
+                if(siriTranscript.value && siriTranscript.value !== 'Listening... (Explain fully, tap again when done)') {
                     siriProcessing.value = true;
                     await processSiriCommand(siriTranscript.value);
                     siriProcessing.value = false;
@@ -848,24 +869,25 @@ createApp({
             siriRecog.start();
         };
 
-        // NEW: Siri Intent Parsing (Chat vs Task)
+        // Siri Intent Parsing (Chat vs Task + Filter Rambling)
         const processSiriCommand = async (text) => {
              const lowerText = text.toLowerCase().trim();
              
-             // Quick local response for pure greetings to make it feel fast
              if(lowerText === 'hi vora' || lowerText === 'hey vora' || lowerText === 'hello vora') {
                  siriTranscript.value = '';
                  speakText("Hi Stanley, how can I help you today?", () => {
-                     startSiriListening(); // Loop back to listening
+                     startSiriListening();
                  });
                  return;
              }
 
-             const prompt = `Analyze this voice command from Stanley: "${text}". 
+             // 3. Smart Extraction Prompting
+             const prompt = `Analyze this detailed voice transcript from Stanley: "${text}". 
+             Stanley often explains a lot of context. Filter out the rambling and extract the core actionable intent.
              Determine if he is trying to add/create a project task OR if he is just chatting/asking a question.
              Return ONLY valid JSON with no markdown formatting.
              If it's a general question/chat, return: {"intent": "chat", "response": "Your helpful, conversational reply as Vora."}
-             If he is adding a task, return: {"intent": "task", "title": "extracted title", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"High"|"Normal"|"Low", "status": "notstarted"|"progress"|"waiting"|"brainstorm", "assignee": "extracted name or Unassigned"}`;
+             If he is adding a task, return: {"intent": "task", "title": "A concise summary of the actual task to be done (ignoring background story)", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "Urgent"|"High"|"Normal"|"Low", "status": "notstarted"|"progress"|"waiting"|"brainstorm", "assignee": "extracted name or Unassigned"}`;
              
              try {
                 const res = await fetch('https://text.pollinations.ai/', {
@@ -879,7 +901,6 @@ createApp({
                 siriTranscript.value = '';
 
                 if (data.intent === 'chat') {
-                    // It's a conversation. Update chat history, speak, and keep listening.
                     chatHistory.value.push({ role: 'user', content: text });
                     chatHistory.value.push({ role: 'ai', content: data.response });
                     scrollToBottom();
@@ -887,7 +908,6 @@ createApp({
                         startSiriListening();
                     });
                 } else {
-                    // It's a task capture. Speak, show modal, do not loop listening to avoid noise.
                     pendingVoiceTask.value = {
                         title: data.title || text,
                         company: data.company || 'Dymek',
@@ -917,10 +937,10 @@ createApp({
         };
 
         const toggleSiriCapture = () => {
-            // If already active in any form, stop everything
             if (siriListening.value || isVoraSpeaking.value) {
                 if (siriRecog) siriRecog.stop();
                 window.speechSynthesis.cancel();
+                clearTimeout(siriSilenceTimer);
                 siriListening.value = false;
                 isVoraSpeaking.value = false;
                 siriTranscript.value = '';
