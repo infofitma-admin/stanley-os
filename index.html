@@ -1014,15 +1014,16 @@ createApp({
             let text = await res.text();
             try {
                 let parsed = JSON.parse(text);
-                if (parsed.error) throw new Error(parsed.error);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                   text = parsed[0].content || parsed[0].message?.content || text;
-                } 
-                else if (parsed.choices && parsed.choices[0].message) text = parsed.choices[0].message.content;
-                else if (parsed.content) text = parsed.content;
-                else if (parsed.response) text = parsed.response;
+                // Priority extraction of 'content' field if it exists (DeepSeek/GPT-style)
+                if (parsed.content) text = parsed.content;
                 else if (parsed.message?.content) text = parsed.message.content;
+                else if (parsed.choices && parsed.choices[0]?.message?.content) text = parsed.choices[0].message.content;
+                else if (Array.isArray(parsed) && parsed.length > 0) {
+                   text = parsed[0].content || parsed[0].message?.content || text;
+                }
             } catch(e) {}
+            
+            // Aggressive cleaning of reasoning tags and technical headers
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
             text = text.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
@@ -1034,8 +1035,8 @@ createApp({
            aiStatus.value = "Analyzing data...";
             const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
             const prompt = `You are Vora. Give Stanley a morning brief using colorful raw HTML Tailwind cards. 
-            Backgrounds should be light: bg-emerald-50, bg-blue-50, bg-amber-50, bg-rose-50.
-            Each card should have a 3-5 line description with bullet points (max 2 lines per bullet).
+            Backgrounds: bg-emerald-50, bg-blue-50, bg-amber-50, bg-rose-50.
+            Each card: 3-5 line description with bullet points (max 2 lines per bullet).
             Output MUST end with exactly ONE supportive paragraph (4-5 sentences/lines) with no headings or titles.
             Output ONLY raw HTML. Data: \n${snapshot}`;
             
