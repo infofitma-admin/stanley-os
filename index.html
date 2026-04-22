@@ -130,10 +130,10 @@
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
             
             <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 flex-shrink-0 z-10 transition-colors duration-300">
-              <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+              <button @click="showCommandPalette = true" class="flex items-center px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition w-64 text-left">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                   Search or jump to...
-                  <span class="ml-4 px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">Ctrl K</span>
+                  <span class="ml-auto px-1.5 py-0.5 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">Ctrl K</span>
               </button>
 
                <div class="flex items-center space-x-6">
@@ -603,7 +603,7 @@
         <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col transform transition-all">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center">
                <svg class="w-5 h-5 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="What do you need? (e.g. 'Dark mode', 'New Task')" class="w-full bg-transparent text-lg font-medium text-slate-900 dark:text-white outline-none placeholder-slate-400">
+              <input id="cmd-input" v-model="cmdSearch" @keydown.esc="showCommandPalette = false" placeholder="What do you need? (e.g. 'Dark mode', 'New Task')" class="w-full bg-transparent text-lg font-medium text-slate-900 dark:text-white outline-none placeholder-slate-400" autofocus>
           </div>
             <div class="max-h-[400px] overflow-y-auto p-2 custom-scrollbar">
                <div v-for="(cmd, idx) in filteredCommands" :key="idx" @click="executeCommand(cmd)" class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg cursor-pointer flex items-center group transition">
@@ -672,18 +672,11 @@ createApp({
             { id: 'q4', name: 'Re-evaluate', impact: ['Low', 'Medium'], effort: ['High'] }
         ];
 
-        // 4. Greeting detects device time accordingly
         const timeGreeting = computed(() => {
             const hr = new Date().getHours();
             if (hr < 12) return 'Good morning';
             if (hr < 17) return 'Good afternoon';
             return 'Good evening';
-        });
-
-        // 1. Dark mode logic fixes
-        watch(isDarkMode, (newVal) => {
-            document.documentElement.classList.toggle('dark', newVal);
-            localStorage.setItem('fitma_dark_mode', newVal);
         });
 
         const commitState = () => {
@@ -771,6 +764,8 @@ createApp({
 
         const toggleDarkMode = () => {
           isDarkMode.value = !isDarkMode.value;
+          document.documentElement.classList.toggle('dark', isDarkMode.value);
+          localStorage.setItem('fitma_dark_mode', isDarkMode.value);
         };
 
         const toggleZenMode = () => { zenMode.value = !zenMode.value; viewMode.value = 'kanban'; };
@@ -781,17 +776,20 @@ createApp({
             return marked.parse(text);
         };
 
-        // 2. Commands/Jump options restored
         const commands = computed(() => [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
             { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
-            { title: 'Dashboard View', desc: 'Switch to Kanban', icon: '📊', action: () => { viewMode.value = 'kanban' } },
-            { title: 'Risk Predictor', desc: 'Check blockers', icon: '⚠️', action: () => { viewMode.value = 'risk' } }
+            { title: 'Dashboard', desc: 'Switch to Kanban View', icon: '📊', action: () => { viewMode.value = 'kanban'; activeTab.value = 'All'; } },
+            { title: 'Dymek Portfolio', desc: 'Filter by Dymek', icon: '🏢', action: () => { viewMode.value = 'kanban'; activeTab.value = 'Dymek'; } },
+            { title: 'GigaScan Portfolio', desc: 'Filter by GigaScan', icon: '🔍', action: () => { viewMode.value = 'kanban'; activeTab.value = 'GigaScan'; } },
+            { title: 'Lading Tech Portfolio', desc: 'Filter by Lading Technology', icon: '🚚', action: () => { viewMode.value = 'kanban'; activeTab.value = 'Lading Technology'; } },
+            { title: 'Risk Predictor', desc: 'View Potential Blockers', icon: '⚠️', action: () => { viewMode.value = 'risk'; } },
+            { title: 'Timeline', desc: 'View Task Schedules', icon: '📅', action: () => { viewMode.value = 'timeline'; } }
         ]);
 
         const filteredCommands = computed(() => {
           if(!cmdSearch.value) return commands.value;
-            return commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()));
+            return commands.value.filter(c => c.title.toLowerCase().includes(cmdSearch.value.toLowerCase()) || c.desc.toLowerCase().includes(cmdSearch.value.toLowerCase()));
         });
 
         const executeCommand = (cmd) => { cmd.action(); showCommandPalette.value = false; cmdSearch.value = ''; };
@@ -825,7 +823,7 @@ createApp({
 
         const processSiriCommand = async (text) => {
              const cleanedText = text.replace(/bora/gi, 'Vora');
-             const prompt = `You are Vora. Voice Command: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"} OR {"intent": "task", "title": "...", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "...", "status": "notstarted", "assignee": "..."}`;
+             const prompt = `Voice Command: "${cleanedText}". Extract JSON: {"intent": "chat", "response": "Your spoken reply as Vora here"} OR {"intent": "task", "title": "...", "company": "Dymek"|"GigaScan"|"Lading Technology", "priority": "...", "status": "notstarted", "assignee": "..."}`;
              try {
                 const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
                 const responseText = await _parseAiResponse(res);
@@ -852,7 +850,7 @@ createApp({
         const generateBrief = async () => {
           aiStatus.value = "Scanning tasks...";
           const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-          const prompt = `You are Vora, Stanley's kind AI assistant. Create a Morning Brief. Show exactly 3 colorful HTML cards (Rose for Critical, Sky for Flow, Amber for Blockers). Each card 3-5 lines. End with 4 lines of warm motivation. Data: \n${snapshot}`;
+          const prompt = `You are Vora, Stanley's kind, caring, and professional assistant. Create a Morning Brief. Show exactly 3 colorful HTML cards (Rose for Critical, Sky for Flow, Amber for Blockers). Each card 3-5 lines. End with 4 lines of motivation. Data: \n${snapshot}`;
           chatHistory.value.push({ role: 'user', content: "Morning Brief." }); scrollToBottom();
           try {
               const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
@@ -860,22 +858,21 @@ createApp({
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-          } catch (e) { chatHistory.value.push({ role: 'ai', content: "I'm so sorry, I had trouble preparing your brief." }); }
+          } catch (e) { chatHistory.value.push({ role: 'ai', content: "Error preparing brief." }); }
           finally { aiStatus.value = ''; }
         };
 
-        // 3. Updated AI personality prompt
         const askAI = async () => {
             let query = aiInput.value.trim(); if (!query && !attachedFile.value) return;
             chatHistory.value.push({ role: 'user', content: query }); scrollToBottom();
             isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Thinking...";
             try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, Stanley's kind, caring, and highly capable human-like assistant. Always be understanding and supportive. Use tables/markdown for structure. End with 4 lines of sincere motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, Stanley's assistant. You must be human-like, kind, understanding, and caring. Use tables and markdown to organize data. Always end responses with 4 lines of genuine motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
               scrollToBottom();
-            } catch (err) { chatHistory.value.push({ role: 'ai', content: "I'm sorry Stanley, I encountered an error. How can I try again for you?" }); }
+            } catch (err) { chatHistory.value.push({ role: 'ai', content: "Error." }); }
             finally { isThinking.value = false; aiStatus.value = ''; }
         };
 
@@ -905,12 +902,10 @@ createApp({
           commitState();
           nextTick(initSortable);
 
-          // Listen for Ctrl+K
           window.addEventListener('keydown', (e) => {
               if (e.ctrlKey && e.key === 'k') {
                   e.preventDefault();
                   showCommandPalette.value = true;
-                  nextTick(() => document.getElementById('cmd-input')?.focus());
               }
           });
         });
