@@ -722,9 +722,15 @@ createApp({
         });
 
         const avgCycleTime = computed(() => {
-            const completed = completedTasks.value;
-          if(completed.length === 0) return 0;
-            return 3.4;
+            const completed = tasks.value.filter(t => t.status === 'completed');
+            if (completed.length === 0) return 0;
+            const now = Date.now();
+            const totalDays = completed.reduce((acc, t) => {
+                const created = t.id; // Using ID as timestamp
+                const diff = (t.lastUpdated || now) - created;
+                return acc + (diff / (1000 * 60 * 60 * 24));
+            }, 0);
+            return (totalDays / completed.length).toFixed(1);
         });
 
         const atRiskTasks = computed(() => {
@@ -779,12 +785,15 @@ createApp({
         const commands = computed(() => [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
             { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
-            { title: 'Dashboard', desc: 'Switch to Kanban View', icon: '📊', action: () => { viewMode.value = 'kanban'; activeTab.value = 'All'; } },
-            { title: 'Dymek Portfolio', desc: 'Filter by Dymek', icon: '🏢', action: () => { viewMode.value = 'kanban'; activeTab.value = 'Dymek'; } },
-            { title: 'GigaScan Portfolio', desc: 'Filter by GigaScan', icon: '🔍', action: () => { viewMode.value = 'kanban'; activeTab.value = 'GigaScan'; } },
-            { title: 'Lading Tech Portfolio', desc: 'Filter by Lading Technology', icon: '🚚', action: () => { viewMode.value = 'kanban'; activeTab.value = 'Lading Technology'; } },
-            { title: 'Risk Predictor', desc: 'View Potential Blockers', icon: '⚠️', action: () => { viewMode.value = 'risk'; } },
-            { title: 'Timeline', desc: 'View Task Schedules', icon: '📅', action: () => { viewMode.value = 'timeline'; } }
+            { title: 'Main Dashboard', desc: 'Overview of all portfolios', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>', action: () => { viewMode.value = 'kanban'; activeTab.value = 'All'; } },
+            { title: 'Risk Predictor', desc: 'AI-driven blocker analysis', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>', action: () => { viewMode.value = 'risk'; } },
+            { title: 'Timeline View', desc: 'Schedule and deadline tracking', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>', action: () => { viewMode.value = 'timeline'; } },
+            { title: 'Impact Matrix', desc: 'Impact vs Effort prioritization', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>', action: () => { viewMode.value = 'matrix'; } },
+            { title: 'Workload Heatmap', desc: 'Bottleneck visualization', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>', action: () => { viewMode.value = 'heatmap'; } },
+            { title: 'Recycle Bin', desc: 'Recover deleted items', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>', action: () => { viewMode.value = 'recycle'; } },
+            { title: 'Dymek Project', desc: 'Switch to Dymek focus', icon: '<div class="w-2 h-2 rounded-full bg-blue-500"></div>', action: () => { viewMode.value = 'kanban'; activeTab.value = 'Dymek'; } },
+            { title: 'GigaScan Project', desc: 'Switch to GigaScan focus', icon: '<div class="w-2 h-2 rounded-full bg-purple-500"></div>', action: () => { viewMode.value = 'kanban'; activeTab.value = 'GigaScan'; } },
+            { title: 'Lading Technology', desc: 'Switch to Lading focus', icon: '<div class="w-2 h-2 rounded-full bg-orange-500"></div>', action: () => { viewMode.value = 'kanban'; activeTab.value = 'Lading Technology'; } }
         ]);
 
         const filteredCommands = computed(() => {
@@ -885,12 +894,24 @@ createApp({
         const getCompletedSubtasks = (t) => t.subtasks?.filter(s => s.done).length || 0;
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        const saveTask = () => { if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); } else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; } editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); };
+        const saveTask = () => { 
+            if (editingTask.value.isNew) { 
+                delete editingTask.value.isNew; 
+                tasks.value.push(editingTask.value); 
+            } else { 
+                const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); 
+                editingTask.value.lastUpdated = Date.now();
+                tasks.value[idx] = editingTask.value; 
+            } 
+            editingTask.value = null; 
+            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
+            commitState(); 
+        };
         const deleteTask = () => { if(confirm("Delete?")) { const taskToDel = tasks.value.find(t => t.id === editingTask.value.id); if (taskToDel) { taskToDel.deletedAt = Date.now(); recycleBin.value.push(taskToDel); localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value)); } tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } };
         const restoreTask = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); delete task.deletedAt; tasks.value.push(task); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); nextTick(initSortable); };
         const permanentDelete = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); localStorage.setItem('fitma_recycle_bin', JSON.stringify(recycleBin.value)); };
 
-        const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]); if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
+        const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]); if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; t.lastUpdated = Date.now(); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
 
         onMounted(() => {
             const savedTheme = localStorage.getItem('fitma_dark_mode');
