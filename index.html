@@ -778,7 +778,11 @@ createApp({
  
         const commands = computed(() => [
             { title: 'Create New Task', desc: 'Add a task to current board', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>', action: () => addTask('notstarted') },
-            { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode }
+            { title: isDarkMode.value ? 'Toggle Light Mode' : 'Toggle Dark Mode', desc: 'Switch system theme', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>', action: toggleDarkMode },
+            { title: 'View Dymek Portfolio', desc: 'Switch to Dymek', icon: '<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Dymek'; viewMode.value = 'kanban'; } },
+            { title: 'View GigaScan Portfolio', desc: 'Switch to GigaScan', icon: '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'GigaScan'; viewMode.value = 'kanban'; } },
+            { title: 'View Lading Tech Portfolio', desc: 'Switch to Lading', icon: '<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', action: () => { activeTab.value = 'Lading Technology'; viewMode.value = 'kanban'; } },
+            { title: 'Talk to Vora', desc: 'Focus the AI Assistant', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>', action: () => document.querySelector('input[placeholder="Message Vora..."]')?.focus() }
         ]);
  
         const filteredCommands = computed(() => {
@@ -836,7 +840,6 @@ createApp({
  
         const _parseAiResponse = async (res) => {
             let text = await res.text();
-            // Original strategy: Remove any think tags and clean up common wrap characters
             text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
             return text;
@@ -845,10 +848,13 @@ createApp({
         const generateBrief = async () => {
           aiStatus.value = "Scanning tasks...";
           const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (${t.priority})`).join('\n');
-          const prompt = `You are Vora. Create a Morning Brief. Show exactly 3 colorful HTML cards (Rose for Critical, Sky for Flow, Amber for Blockers). Each card 3-5 lines. End with 4 lines of motivation. Data: \n${snapshot}`;
+          const prompt = `You are Vora. Create a Morning Brief. Show exactly 3 colorful HTML cards.
+          CARD 1 (Critical): bg-rose-50 dark:bg-rose-900/20 text-rose-800 dark:text-rose-200
+          CARD 2 (Flow): bg-sky-50 dark:bg-sky-900/20 text-sky-800 dark:text-sky-200
+          CARD 3 (Blockers): bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200
+          Each card 3-5 lines. End with 4 lines of motivation. Data: \n${snapshot}`;
           chatHistory.value.push({ role: 'user', content: "Morning Brief." }); scrollToBottom();
           try {
-              // Note: Removed the model header to use original stable route
               const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages:[{role:'user', content:prompt}], seed: Math.floor(Math.random() * 1000000) }) });
               const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
@@ -863,7 +869,7 @@ createApp({
             chatHistory.value.push({ role: 'user', content: query }); scrollToBottom();
             isThinking.value = true; aiInput.value = ''; removeFile(); aiStatus.value = "Thinking...";
             try {
-                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora, kind and helpful. Use tables/markdown. End with 4 lines of motivation."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
+                const res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ messages: [{role:'system', content:"You are Vora. Use tables/markdown. End with motivation. In dark mode, ensure text is readable."},{role:'user', content:query}], seed: Math.floor(Math.random() * 1000000) }) });
                 const finalResponse = await _parseAiResponse(res);
               chatHistory.value.push({ role: 'ai', content: finalResponse });
               localStorage.setItem('fitma_vora_chat', JSON.stringify(chatHistory.value));
@@ -889,10 +895,14 @@ createApp({
         const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]); if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
  
         onMounted(() => {
-            const savedTheme = localStorage.getItem('fitma_dark_mode');
+          const savedTheme = localStorage.getItem('fitma_dark_mode');
           if(savedTheme === 'true') { isDarkMode.value = true; document.documentElement.classList.add('dark'); }
           const savedChat = localStorage.getItem('fitma_vora_chat');
           if(savedChat) try { chatHistory.value = JSON.parse(savedChat); } catch(e) {}
+          window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; setTimeout(() => document.getElementById('cmd-input')?.focus(), 50); }
+                if (e.key === 'Escape') { showCommandPalette.value = false; editingTask.value = null; }
+            });
           const saved = localStorage.getItem('fitma_os_pro_silver');
           tasks.value = saved ? JSON.parse(saved).map(schemaEnhance) : [].map(schemaEnhance);
           commitState();
