@@ -1029,21 +1029,25 @@ createApp({
  
         const generateBrief = async () => {
           aiStatus.value = "Analyzing dashboard...";
-          const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Effort: ${t.effort}) - Status: ${t.status}`).join('\n');
+          const snapshot = tasks.value.filter(t => t.status !== 'completed').map(t => `- [${t.company}] ${t.title} (Priority: ${t.priority}, Effort: ${t.effort}, Status: ${t.status})`).join('\n');
           
-          const prompt = `You are Vora, Stanley's caring AI assistant. Analyze these dashboard tasks:
-          ${snapshot}
+          const prompt = `You are Vora, Stanley's caring and highly motivating AI assistant. 
+          Analyze the following task list and provide a Morning Brief.
           
-          Generate a Morning Brief with exactly 3 colorful cards using Tailwind CSS classes:
-          1. "The Critical List" (Top Priorities): Summarize Urgent and High priority tasks. (Use bg-rose-50 / dark:bg-rose-900/10)
-          2. "Maintenance & Flow" (Normal & Low): Summarize Normal and Low priority tasks. (Use bg-sky-50 / dark:bg-sky-900/10)
-          3. "Blocker Radar": Identify tasks that are stalled (Waiting) or High Effort that might be blocking the Top Priorities. (Use bg-amber-50 / dark:bg-amber-900/10)
+          TASK ANALYSIS REQUIREMENTS:
+          1. Identify the Top Priorities (High/Urgent), then Normal and Low.
+          2. Specifically identify "Blockers"—tasks that are High Effort, in 'Waiting' status, or 'Paused' that might prevent Top Priorities from finishing.
           
-          Rules:
-          - Each card must be a <div class="rounded-xl p-4 mb-4 shadow-sm [COLOR_CLASS] flex flex-col"> description... </div>
-          - Card content must be 3 to 5 lines.
-          - End with exactly one warm, motivating paragraph of 4-5 lines.
-          - Return ONLY the raw HTML divs and the paragraph. No backticks.`;
+          STRUCTURE:
+          1. Use exactly 3 colorful HTML cards. 
+          2. Each card MUST have: <div class="rounded-xl p-4 mb-4 shadow-sm [COLOR_CLASS] flex flex-col">...content...</div>
+          3. Tailwind color classes: Card 1 (Top Priorities) = bg-rose-50/80; Card 2 (Normal/Low Priorities) = bg-emerald-50/80; Card 3 (Blockers/Risks) = bg-amber-50/80.
+          4. Each card content MUST be exactly 3-5 lines of text summarizing the findings.
+          5. After the cards, write exactly one supportive paragraph of 4-5 lines to keep Stanley motivated.
+          
+          IMPORTANT: Return ONLY raw HTML div elements and the paragraph. No markdown backticks or pre-text.
+          
+          Data: \n${snapshot}`;
           
           chatHistory.value.push({ role: 'user', content: "Generate my Morning Brief." });
           scrollToBottom();
