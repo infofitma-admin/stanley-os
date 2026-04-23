@@ -22,9 +22,6 @@
             }
         }
     </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -309,7 +306,7 @@
                   <main v-show="viewMode === 'kanban'" class="flex gap-6 overflow-x-auto pb-6 custom-scrollbar">
                       <div v-for="col in columns" :key="col.id" class="bg-slate-200/30 dark:bg-slate-900/30 rounded-[1.5rem] flex flex-col kanban-col shrink-0 border border-slate-200/50 dark:border-slate-800/50 h-[620px]">
                           <div class="p-5 flex justify-between items-center border-b border-slate-200/50 dark:border-slate-800/50 shrink-0">
-                                <h3 class="font-display font-extrabold text-slate-900 dark:text-white text-xs uppercase tracking-[0.1em]">{{ col.title }}</h3>
+                                <h3 class="font-display font-extrabold text-slate-900 dark:text-slate-200 text-xs uppercase tracking-[0.1em]">{{ col.title }}</h3>
                                 <span class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-300 px-2.5 py-0.5 rounded-full text-[10px] font-black shadow-sm border border-slate-200/50 dark:border-slate-700/50">{{ getTaskCount(col.id) }}</span>
                           </div>
                           
@@ -542,11 +539,6 @@
 </div>
 
 <script>
-// CLOUD SETTINGS INJECTED
-const SUPABASE_URL = 'https://waeqcgpldlvtrglxfxjl.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXFjZ3BsZGx2dHJnbHhmeGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjY4NjYsImV4cCI6MjA5MjQ0Mjg2Nn0.y29VL88QCi_e01LVckzQzBdYzObYPDr49vCzAC2b5gg';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const { createApp, ref, onMounted, computed, nextTick, watch } = Vue;
 
 createApp({
@@ -582,7 +574,6 @@ createApp({
         const history = ref([]);
         const historyIndex = ref(-1);
         const tasks = ref([]);
-        const isSyncing = ref(false); // Background cloud indicator
 
         const columns = [{id:'brainstorm', title:'Brainstorming'}, {id:'notstarted', title:'Not Started'}, {id:'progress', title:'In Progress'}, {id:'waiting', title:'Paused'}, {id:'completed', title:'Completed'}];
 
@@ -777,79 +768,18 @@ createApp({
         };
 
         const getCompletedSubtasks = (t) => t.subtasks?.filter(s => s.done).length || 0;
-        
         const addTask = (id) => { editingTask.value = schemaEnhance({ id:Date.now(), company:activeTab.value==='All'?'Dymek':activeTab.value, status:id, isNew:true, title:'' }); };
         const openTask = (t) => { editingTask.value = JSON.parse(JSON.stringify(t)); };
-        
-        // --- CLOUD SYNC LOGIC OVERRIDES --- //
-        
-        const fetchCloudTasks = async () => {
-            isSyncing.value = true;
-            const { data, error } = await supabaseClient.from('tasks').select('*');
-            if (data && data.length > 0) {
-                tasks.value = data.map(schemaEnhance);
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value));
-                commitState();
-                nextTick(initSortable);
-            }
-            isSyncing.value = false;
-        };
-
-        const subscribeCloud = () => {
-            supabaseClient.channel('os_live_sync').on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
-                fetchCloudTasks();
-            }).subscribe();
-        };
-
         const saveTask = () => { 
-            const taskData = { ...editingTask.value };
-            
-            // 1. Instantly update UI and Local Storage
-            if (taskData.isNew) { 
-                delete taskData.isNew; 
-                if(!taskData.id) taskData.id = Date.now();
-                tasks.value.push(taskData); 
-                // 2. Background sync to Supabase
-                supabaseClient.from('tasks').insert([taskData]).then(()=>{});
-            } else { 
-                const idx = tasks.value.findIndex(t => t.id === taskData.id); 
-                if(idx !== -1) tasks.value[idx] = taskData; 
-                // 2. Background sync to Supabase
-                supabaseClient.from('tasks').update(taskData).eq('id', taskData.id).then(()=>{});
-            } 
-            
-            editingTask.value = null; 
-            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-            commitState(); 
+            if (editingTask.value.isNew) { delete editingTask.value.isNew; tasks.value.push(editingTask.value); } 
+            else { const idx = tasks.value.findIndex(t => t.id === editingTask.value.id); tasks.value[idx] = editingTask.value; } 
+            editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); 
         };
-
-        const deleteTask = () => { 
-            if(confirm("Archive item?")) { 
-                const taskToDel = tasks.value.find(t => t.id === editingTask.value.id); 
-                if (taskToDel) { recycleBin.value.push(taskToDel); } 
-                const idToDelete = editingTask.value.id;
-                
-                // Instantly Update UI
-                tasks.value = tasks.value.filter(t => t.id !== idToDelete); 
-                editingTask.value = null; 
-                localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-                commitState(); 
-                
-                // Background Delete from Cloud
-                supabaseClient.from('tasks').delete().eq('id', idToDelete).then(()=>{});
-            } 
-        };
-
-        const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { 
-            t.status = evt.to.dataset.status; 
-            localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); 
-            commitState(); 
-            // Background Move Cloud
-            supabaseClient.from('tasks').update({ status: evt.to.dataset.status }).eq('id', t.id).then(()=>{}); 
-        } } } }); } }); };
-
-        const restoreTask = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); tasks.value.push(task); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); nextTick(initSortable); supabaseClient.from('tasks').insert([task]).then(()=>{}); };
+        const deleteTask = () => { if(confirm("Archive item?")) { const taskToDel = tasks.value.find(t => t.id === editingTask.value.id); if (taskToDel) { recycleBin.value.push(taskToDel); } tasks.value = tasks.value.filter(t => t.id !== editingTask.value.id); editingTask.value = null; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } };
+        const restoreTask = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); tasks.value.push(task); localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); nextTick(initSortable); };
         const permanentDelete = (task) => { recycleBin.value = recycleBin.value.filter(t => t.id !== task.id); };
+
+        const initSortable = () => { columns.forEach(col => { const el = document.getElementById('kanban-' + col.id); if (el) { new Sortable(el, { group: 'tasks', animation: 150, onEnd: (evt) => { if (evt.from !== evt.to) { const t = tasks.value.find(x => x.id == evt.item.dataset.id); if (t) { t.status = evt.to.dataset.status; localStorage.setItem('fitma_os_pro_silver', JSON.stringify(tasks.value)); commitState(); } } } }); } }); };
 
         onMounted(() => {
             const savedTheme = localStorage.getItem('fitma_dark_mode');
@@ -861,14 +791,10 @@ createApp({
             commitState();
             nextTick(initSortable);
             window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); showCommandPalette.value = true; } });
-
-            // TURN ON SATELLITE
-            fetchCloudTasks();
-            subscribeCloud();
         });
 
         return {
-            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, isSyncing, matrixQuadrants, showNotifications, showFileMenu, fileUploadType, showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting, aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat, attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition, siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture, undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown, getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
+            activeTab, viewMode, zenMode, tasks, editingTask, columns, isDarkMode, matrixQuadrants, showNotifications, showFileMenu, fileUploadType, showCommandPalette, cmdSearch, commands, filteredCommands, executeCommand, recycleBin, timeGreeting, aiInput, aiStatus, aiMode, isThinking, chatHistory, chatScrollContainer, clearChat, attachedFile, isListening, triggerFileUpload, handleFileChange, removeFile, toggleSpeechRecognition, siriListening, siriProcessing, isVoraSpeaking, siriTranscript, pendingVoiceTask, confirmVoiceTask, toggleSiriCapture, undo, redo, canUndo, canRedo, commitState, restoreTask, permanentDelete, filteredTasks, completedTasks, timelineTasks, getMatrixTasks, getTaskCount, wipCount, activeTasksCount, completionPercentage, smartNotifications, getCompletedSubtasks, toggleDarkMode, askAI, addTask, openTask, saveTask, deleteTask, parseMarkdown, getWorkload, generateBrief, avgCycleTime, atRiskTasks, assignees, getResourceTasks
         };
     }
 }).mount('#app');
