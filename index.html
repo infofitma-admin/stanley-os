@@ -1,72 +1,219 @@
-<div v-if="editingTask" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex justify-end">
-    <div @click.self="editingTask = null" class="absolute inset-0"></div>
-    <div class="w-full max-w-xl bg-white dark:bg-slate-900 h-full shadow-2xl relative flex flex-col animate-slide-left">
-        <header class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <select v-model="editingTask.company" class="bg-slate-100 dark:bg-slate-800 border-none text-[10px] font-black uppercase tracking-widest rounded-lg px-3 py-1.5">
-                    <option>Dymek</option><option>GigaScan</option><option>Lading Technology</option>
-                </select>
-            </div>
-            <button @click="editingTask = null" class="text-slate-400 hover:text-slate-900 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitma | Stanley OS 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { brand: '#10b981', surface: '#f8fafc', darkSurface: '#020617' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Plus Jakarta Sans', 'sans-serif'] }
+                } 
+            }
+        }
+    </script>
 
-        <div class="flex-1 overflow-y-auto p-8 space-y-8">
-            <textarea v-model="editingTask.title" class="text-3xl font-display font-extrabold w-full bg-transparent border-none focus:ring-0 resize-none p-0" placeholder="Operation Title..." rows="2"></textarea>
-            
-            <div class="grid grid-cols-2 gap-6">
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Status</label>
-                    <select v-model="editingTask.status" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-xl p-3 text-sm font-bold appearance-none">
-                        <option v-for="c in columns" :key="c.id" :value="c.id" v-text="c.title"></option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Priority</label>
-                    <select v-model="editingTask.priority" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-xl p-3 text-sm font-bold">
-                        <option>Urgent</option><option>High</option><option>Normal</option><option>Low</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Effort (Heatmap)</label>
-                    <select v-model="editingTask.effort" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-xl p-3 text-sm font-bold">
-                        <option>High</option><option>Medium</option><option>Low</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Impact (Matrix)</label>
-                    <select v-model="editingTask.impact" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-xl p-3 text-sm font-bold">
-                        <option>High</option><option>Medium</option><option>Low</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Assignee</label>
-                    <input v-model="editingTask.assignee" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-xl p-3 text-sm font-bold" placeholder="Who's responsible?">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Target Date</label>
-                    <input type="date" v-model="editingTask.due_date" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-xl p-3 text-sm font-bold">
-                </div>
-            </div>
+    <style>
+        [v-cloak] { display: none; }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100vh; width: 100vw; -webkit-font-smoothing: antialiased; }
+        .dynamic-padding { padding: clamp(1.5rem, 5vw, 2.5rem); }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #1e293b; }
+        .kanban-col { min-width: 320px; max-width: 320px; display: flex; flex-direction: column; max-height: 100%; }
+        .task-card { cursor: grab; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
+        .task-card:hover { transform: translateY(-3px); border-color: #10b981; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .tag-urgent { background: #fee2e2; color: #991b1b; }
+        .tag-high { background: #fef3c7; color: #92400e; }
+        .tag-normal { background: #f0f9ff; color: #075985; }
+        .tag-low { background: #f1f5f9; color: #475569; }
+        @keyframes slide-left { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .animate-slide-left { animation: slide-left 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+    </style>
+</head>
+<body class="bg-surface text-slate-900 transition-colors duration-300">
 
-            <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Action roadmap</label>
-                <textarea v-model="editingTask.action" class="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl p-5 text-sm font-medium min-h-[200px]" placeholder="Detailed steps..."></textarea>
+<div id="app" v-cloak :class="{'dark': isDarkMode}" class="h-screen w-full flex overflow-hidden">
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800 z-20">
+        <div class="h-16 flex items-center px-6 border-b border-slate-800 shrink-0">
+            <div class="w-7 h-7 bg-brand rounded-lg flex items-center justify-center mr-3 shadow-lg shadow-brand/20">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
+            <h1 class="text-lg font-extrabold text-white tracking-tight">Fitma <span class="opacity-40 text-sm font-medium">| OS</span></h1>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto py-8 px-4 space-y-8 custom-scrollbar">
+            <nav class="space-y-1">
+                <h2 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4 px-2">Navigation</h2>
+                <button v-for="mode in navItems" @click="viewMode = mode.id; activeTab = 'All'" :class="viewMode === mode.id ? 'bg-white/10 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white'" class="w-full flex items-center px-3 py-2.5 text-sm font-semibold rounded-xl transition-all">
+                    <span class="mr-3 opacity-70" v-html="mode.icon"></span> {{ mode.label }}
+                </button>
+            </nav>
+
+            <nav class="space-y-1">
+                <h2 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4 px-2">Portfolios</h2>
+                <button v-for="brand in ['Dymek', 'GigaScan', 'Lading Technology']" @click="activeTab = brand; viewMode = 'kanban'" :class="activeTab === brand ? 'border-brand text-white bg-white/10' : 'border-transparent hover:bg-white/5 hover:text-white'" class="w-full flex items-center px-3 py-2.5 text-sm font-semibold border-l-4 transition-all">
+                    <div class="w-2.5 h-2.5 rounded-full mr-3" :class="brand==='Dymek'?'bg-blue-400':brand==='GigaScan'?'bg-purple-400':'bg-orange-400'"></div>
+                    {{ brand }}
+                </button>
+            </nav>
         </div>
 
-        <footer class="p-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <button @click="deleteTask" class="text-rose-500 text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity">Delete</button>
-            <button @click="saveTask" class="px-12 py-4 bg-brand text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:scale-[1.02] active:scale-95 transition-all">Save</button>
-        </footer>
+        <div class="p-6 border-t border-slate-800 bg-slate-950/20 shrink-0">
+            <div class="flex items-center space-x-4">
+                <div class="relative w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center shadow-inner">
+                    <div class="absolute inset-0 bg-brand animate-pulse opacity-10 rounded-xl"></div>
+                    <svg class="w-5 h-5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-white tracking-wide">Vora AI</p>
+                    <p class="text-[10px] text-brand/80 font-black uppercase tracking-tighter">Connected</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-surface dark:bg-darkSurface transition-colors overflow-hidden">
+        <header class="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between px-10 shrink-0 z-10">
+            <div class="relative w-96">
+                <input v-model="searchQuery" placeholder="Search operations..." class="w-full bg-slate-100/50 dark:bg-slate-800/50 border border-transparent focus:border-brand/30 rounded-xl py-2 pl-10 pr-4 text-xs font-semibold text-slate-900 dark:text-white outline-none transition-all">
+                <svg class="w-4 h-4 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <button @click="toggleDarkMode" class="text-slate-400 hover:text-amber-400 transition-all">
+                    <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto dynamic-padding custom-scrollbar">
+            <div class="mb-10 bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-800 flex justify-between items-center relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110"></div>
+                <div class="relative z-10">
+                    <h2 class="text-3xl font-display font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight">System Operational.</h2>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-lg leading-relaxed">Vora is monitoring <span class="text-brand font-bold">{{ tasks.length }} active operations</span>. Everything is synchronized with Supabase cloud.</p>
+                </div>
+                <button @click="generateBrief" class="relative z-10 px-8 py-4 bg-brand text-white rounded-2xl text-xs font-black uppercase tracking-[0.15em] shadow-xl shadow-brand/20 hover:scale-105 active:scale-95 transition-all">Daily Brief</button>
+            </div>
+
+            <div v-if="viewMode === 'kanban'" class="flex gap-8 overflow-x-auto pb-10 custom-scrollbar h-full">
+                <div v-for="col in columns" :key="col.id" class="kanban-col shrink-0">
+                    <div class="flex justify-between items-center mb-6 px-2">
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">{{ col.title }}</h3>
+                        <span class="bg-white dark:bg-slate-800 text-[10px] font-black px-3 py-1 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm">{{ getTaskCount(col.id) }}</span>
+                    </div>
+                    <div :id="'kanban-' + col.id" class="space-y-5 flex-1 min-h-[400px] overflow-y-auto custom-scrollbar p-1" :data-status="col.id">
+                        <div v-for="task in filteredTasks(col.id)" :key="task.id" :data-id="task.id" @click="openTask(task)" class="task-card bg-white dark:bg-slate-800/80 p-6 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-900/50" :class="getBrandColor(task.company)">{{ task.company }}</span>
+                                <span :class="'tag tag-' + task.priority.toLowerCase()">{{ task.priority }}</span>
+                            </div>
+                            <h4 class="text-[15px] font-bold leading-relaxed text-slate-900 dark:text-white mb-6">{{ task.title }}</h4>
+                            <div class="flex justify-between items-center pt-4 border-t border-slate-50 dark:border-slate-700/50">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[8px] font-black text-slate-400 uppercase">{{ (task.assignee || 'U').charAt(0) }}</div>
+                                    <span class="text-[10px] font-bold text-slate-500">{{ task.assignee || 'Unassigned' }}</span>
+                                </div>
+                                <span v-if="task.due_date" class="text-[9px] font-black text-rose-500 uppercase tracking-wider">{{ task.due_date }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button @click="addTask(col.id)" class="mt-6 w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-brand hover:border-brand transition-all">+ New Operation</button>
+                </div>
+            </div>
+
+            <div v-else class="flex flex-col items-center justify-center py-20 opacity-50">
+                <div class="text-4xl mb-4">🚧</div>
+                <h3 class="font-display font-extrabold text-xl">Module Under Synchronization</h3>
+                <p class="text-sm">Risk Predictor and Matrix logic is active on data level.</p>
+            </div>
+        </div>
+    </main>
+
+    <div v-if="editingTask" class="fixed inset-0 z-50 flex justify-end">
+        <div @click.self="editingTask = null" class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-all"></div>
+        
+        <div class="w-full max-w-xl bg-white dark:bg-slate-900 h-full shadow-[0_0_100px_rgba(0,0,0,0.3)] relative flex flex-col animate-slide-left border-l border-slate-200 dark:border-slate-800">
+            <header class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+                <select v-model="editingTask.company" class="bg-slate-100 dark:bg-slate-800 border-none text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-brand/20">
+                    <option>Dymek</option><option>GigaScan</option><option>Lading Technology</option>
+                </select>
+                <button @click="editingTask = null" class="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Operation Definition</label>
+                    <textarea v-model="editingTask.title" class="text-3xl font-display font-extrabold w-full bg-transparent border-none focus:ring-0 resize-none p-0 text-slate-900 dark:text-white leading-tight" placeholder="Define the goal..." rows="2"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Status</label>
+                        <select v-model="editingTask.status" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand transition-all">
+                            <option v-for="c in columns" :key="c.id" :value="c.id" v-text="c.title"></option>
+                        </select>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Priority</label>
+                        <select v-model="editingTask.priority" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand transition-all">
+                            <option>Urgent</option><option>High</option><option>Normal</option><option>Low</option>
+                        </select>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Effort Level</label>
+                        <select v-model="editingTask.effort" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand transition-all">
+                            <option>High</option><option>Medium</option><option>Low</option>
+                        </select>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Project Impact</label>
+                        <select v-model="editingTask.impact" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand transition-all">
+                            <option>High</option><option>Medium</option><option>Low</option>
+                        </select>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Responsible Party</label>
+                        <input v-model="editingTask.assignee" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand transition-all" placeholder="Enter name...">
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Deadline</label>
+                        <input type="date" v-model="editingTask.due_date" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Execution Roadmap
+                    </label>
+                    <textarea v-model="editingTask.action" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-[2rem] p-6 text-sm font-medium min-h-[220px] text-slate-700 dark:text-slate-200 outline-none focus:border-brand transition-all" placeholder="Detailed roadmap..."></textarea>
+                </div>
+            </div>
+
+            <footer class="p-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+                <button @click="deleteTask" class="text-rose-500 text-[11px] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">Delete</button>
+                <button @click="saveTask" class="px-12 py-4 bg-slate-900 dark:bg-brand text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-brand/20 hover:scale-[1.03] active:scale-95 transition-all">Save</button>
+            </footer>
+        </div>
     </div>
 </div>
 
 <script>
 const { createApp, ref, onMounted, computed, nextTick } = Vue;
 
-// FIX: Renamed variable to sb to avoid collision with the global supabase object
 const sb = supabase.createClient(
     'https://waeqcgpldlvtrglxfxjl.supabase.co', 
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXFjZ3BsZGx2dHJnbHhmeGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjY4NjYsImV4cCI6MjA5MjQ0Mjg2Nn0.y29VL88QCi_e01LVckzQzBdYzObYPDr49vCzAC2b5gg'
@@ -81,12 +228,19 @@ createApp({
         const isDarkMode = ref(localStorage.getItem('fitma_dark_mode') === 'true');
         const searchQuery = ref('');
 
-        const columns = ref([
+        const columns = [
             {id:'notstarted', title:'Not Started'}, 
             {id:'progress', title:'In Progress'}, 
             {id:'waiting', title:'Paused'}, 
             {id:'completed', title:'Completed'}
-        ]);
+        ];
+
+        const navItems = [
+            {id:'kanban', label:'Dashboard', icon:'📋'},
+            {id:'risk', label:'Risk Predictor', icon:'⚠️'},
+            {id:'matrix', label:'Impact Matrix', icon:'📐'},
+            {id:'timeline', label:'Timeline', icon:'📅'}
+        ];
 
         const fetchTasks = async () => {
             const { data, error } = await sb.from('tasks').select('*').order('created_at', { ascending: false });
@@ -94,7 +248,6 @@ createApp({
             nextTick(initSortable);
         };
 
-        // Real-time listener
         sb.channel('tasks_channel').on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
             fetchTasks();
         }).subscribe();
@@ -106,14 +259,7 @@ createApp({
             return filtered;
         };
 
-        const saveTask = async () => {
-            if (!editingTask.value.title) return;
-            const { error } = await sb.from('tasks').upsert(editingTask.value);
-            if (!error) { 
-                editingTask.value = null; 
-                fetchTasks(); 
-            }
-        };
+        const getTaskCount = (id) => filteredTasks(id).length;
 
         const addTask = (statusId) => {
             editingTask.value = {
@@ -128,20 +274,39 @@ createApp({
             };
         };
 
+        const openTask = (task) => { editingTask.value = { ...task }; };
+
+        const saveTask = async () => {
+            if (!editingTask.value.title) return;
+            const { error } = await sb.from('tasks').upsert(editingTask.value);
+            if (!error) { editingTask.value = null; fetchTasks(); }
+        };
+
         const deleteTask = async () => {
-            if (confirm('Permanently delete this task?')) {
+            if (confirm('Delete operation permanently?')) {
                 await sb.from('tasks').delete().eq('id', editingTask.value.id);
                 editingTask.value = null;
                 fetchTasks();
             }
         };
 
-        // Initialize Sortable with clean-up logic
+        const getBrandColor = (brand) => {
+            if (brand === 'Dymek') return 'text-blue-500';
+            if (brand === 'GigaScan') return 'text-purple-500';
+            return 'text-orange-500';
+        };
+
+        const toggleDarkMode = () => {
+            isDarkMode.value = !isDarkMode.value;
+            localStorage.setItem('fitma_dark_mode', isDarkMode.value);
+            document.documentElement.classList.toggle('dark', isDarkMode.value);
+        };
+
         let sortables = [];
         const initSortable = () => {
             sortables.forEach(s => s.destroy());
             sortables = [];
-            columns.value.forEach(col => {
+            columns.forEach(col => {
                 const el = document.getElementById('kanban-' + col.id);
                 if (el) {
                     const s = new Sortable(el, {
@@ -164,9 +329,11 @@ createApp({
         });
 
         return {
-            tasks, activeTab, viewMode, editingTask, columns, isDarkMode, searchQuery, 
-            filteredTasks, saveTask, addTask, deleteTask, openTask: (t) => editingTask.value = { ...t }
+            tasks, activeTab, viewMode, editingTask, columns, navItems, isDarkMode, searchQuery, 
+            filteredTasks, getTaskCount, addTask, openTask, saveTask, deleteTask, getBrandColor, toggleDarkMode
         };
     }
 }).mount('#app');
 </script>
+</body>
+</html>
